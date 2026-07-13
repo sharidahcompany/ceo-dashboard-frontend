@@ -11,6 +11,7 @@ import { cookies } from "next/headers";
 import ThemeSwitch from "@/components/common/ThemeSwitch";
 import LanguageSwitch from "@/components/common/LanguageSwitch";
 import { Toaster } from "sonner";
+import { StepperWrapper } from "@/components/common/StepperWrapper";
 
 type Props = {
   children: React.ReactNode;
@@ -66,7 +67,7 @@ export default async function Layout({ children, params }: Props) {
                   <ThemeSwitch />
                   <LanguageSwitch />
                 </div>
-                {children}
+                <StepperWrapper>{children} </StepperWrapper>
               </div>
               <div className="w-[50%] h-screen hidden md:flex top-0 inset-e-0">
                 <AuthSidebar />

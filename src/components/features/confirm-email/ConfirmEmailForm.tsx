@@ -10,14 +10,14 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
-import { getConfirmEmailSchema } from "@/schemas/confirmEmail";
+import { getConfirmEmailSchema } from "@/schemas/tenantSchema";
 import { confirmEmailAction } from "@/actions/confirmEmailAction";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { resendConfirmEmailAction } from "@/actions/resendConfirmEmailAction";
+import { resendConfirmEmailAction } from "@/actions/getCountriesAction";
 
 export default function ConfirmEmailForm() {
   const t = useTranslations();
