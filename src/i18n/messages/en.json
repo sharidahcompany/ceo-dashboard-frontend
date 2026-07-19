@@ -1,23 +1,13 @@
 {
   "meta": {
     "title": "CEO App",
-    "description": "A comprehensive cloud platform providing financial accounting solutions, HR management, organizational structure design, and website building for startups and enterprises. Boost your company's efficiency today with Al-Raees software."
-  },
-
-  "auth_sidebar": {
-    "financial_services": "Financial Services",
-    "project_management": "Project Management",
-    "accounting": "Accounting",
-    "hr": "HR Management",
-    "reports": "Detailed reports in one place",
-    "e_invoicing": "E-Invoicing",
-    "websites": "Website Creation",
-    "buffet": "Buffet",
-    "auditing": "Subsidiary Control",
-    "org_structure": "Organizational Structure"
+    "description": "An all-in-one cloud platform providing financial accounting, HR management, organizational structure design, and website building solutions for startups and enterprises. Boost your company's efficiency today with the CEO software."
   },
 
   "attributes": {
+    "name": "Name",
+    "name_ar": "Arabic Name",
+    "name_en": "English Name",
     "email": "Email Address",
     "password": "Password",
     "username": "Username",
@@ -26,81 +16,55 @@
     "phone": "Phone Number",
     "password_confirmation": "Confirm Password",
     "remember_token": "Remember Me",
-    "otp": "Verification Code"
+    "otp": "OTP Verification Code",
+    "country": "Country",
+    "currency": "Currency",
+    "commercial_number": "Commercial Registration Number",
+    "tax_number": "Tax Identification Number",
+    "is_vat_registered": "Is the company registered for VAT?"
   },
 
   "validation": {
     "required": "This field is required",
     "email": "Please enter a valid email address",
-    "password": "Please enter the password",
-    "username": "Please enter the username",
-    "first_name": "Please enter the first name",
-    "last_name": "Please enter the last name",
+    "password": "Please enter your password",
+    "username": "Please enter your username",
+    "first_name": "Please enter your first name",
+    "last_name": "Please enter your last name",
     "phone": "Please enter a valid phone number",
     "password_min_length": "Password must be at least {count} characters long",
-    "username_invalid": "Username must contain only English letters and numbers, with no spaces",
+    "username_invalid": "Username must contain only English letters and numbers with no spaces",
     "phone_invalid": "Phone number must contain numbers only",
-    "password_mismatch": "Passwords do not match"
+    "password_mismatch": "Passwords do not match",
+    "max": "Must be at most {max} characters",
+    "file_size_max": "File size must not exceed {max} MB"
   },
 
   "buttons": {
-    "login": "Login",
-    "register": "Register",
-    "logout": "Logout",
-    "send": "Send",
-    "reset_password": "Reset Password"
+    "previous": "Previous",
+    "next": "Next",
+    "upload_file": "Upload File"
   },
 
   "theme": {
     "dark": "Dark Mode",
     "light": "Light Mode",
-    "system": "System Mode"
+    "system": "System Preference"
   },
 
   "locale": {
-    "ar": "Arabic",
+    "ar": "العربية",
     "en": "English"
   },
 
   "messages": {
-    "login": {
-      "title": "Login",
-      "description": "Enter your email and password to login",
-      "dont_have_account": "Don't have an account?",
-      "register": "Create a new account",
-      "forgot_password": "Forgot password?"
-    },
-    "register": {
-      "title": "Create a New Account",
-      "description": "Enter your details to create a new account",
-      "already_have_account": "Already have an account?",
-      "login": "Login"
-    },
-    "confirm_email": {
-      "title": "Confirm Email Address",
-      "description": "Enter the confirmation code sent to your email",
-      "resend": "Resend",
-      "resend_message": "Didn't receive the email? "
-    },
-    "forgot_password": {
-      "title": "Forgot Password",
-      "description": "Enter your email to recover your password, a confirmation code will be sent to your email",
-      "reset_password": "Recover Password"
-    },
-    "reset_password": {
-      "title": "Reset Password",
-      "description": "Enter your new password",
-      "reset_password": "Reset Password"
+    "file_upload": {
+      "drag_files": "Drag and drop files here to upload"
     }
   },
 
   "errors": {
     "something_went_wrong": "Something went wrong, please try again later",
-    "network_error": "Failed to connect to the server, please check your network connection"
-  },
-
-  "pages": {
-    "login": "Login",
-    "register": "Create a New Account"
+    "network_error": "Unable to connect to the server. Please check your internet connection"
   }
 }

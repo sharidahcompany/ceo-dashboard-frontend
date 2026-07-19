@@ -60,7 +60,7 @@ export const ThreeDMarquee = ({
               {[...column, ...column, ...column].map((item, itemIndex) => (
                 <motion.div
                   key={itemIndex}
-                  className="relative aspect-4/3 w-full shrink-0 overflow-hidden rounded-2xl shadow-xl bg-chart-1"
+                  className="relative aspect-4/3 w-full shrink-0 overflow-hidden rounded-2xl shadow-xl bg-chart-1 dark:bg-yellow-400"
                   style={{
                     minHeight: "20vmax",
                   }}
@@ -83,11 +83,3 @@ export const ThreeDMarquee = ({
     </div>
   );
 };
-
-export function Demo() {
-  return (
-    <div className="fixed inset-0 bg-background">
-      <ThreeDMarquee />
-    </div>
-  );
-}

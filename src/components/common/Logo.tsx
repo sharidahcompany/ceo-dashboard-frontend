@@ -11,7 +11,7 @@ export default function Logo() {
           alt="logo"
           width={100}
           height={100}
-          className={"w-20 h-auto"}
+          className={"w-15 h-auto"}
           priority
         />
       </div>
@@ -22,7 +22,7 @@ export default function Logo() {
           alt="logo"
           width={100}
           height={100}
-          className={"w-20 h-auto"}
+          className={"w-15 h-auto"}
           priority
         />
       </div>

@@ -3,18 +3,24 @@ import { z } from "zod";
 
 export const getTenantSchema = (t: TranslationFunction) => {
   return z.object({
-    name: z
-      .array(z.string())
-      .min(1, { message: t("validation.required") })
-      .max(255, { message: t("validation.max", { max: 255 }) }),
+    name: z.object({
+      ar: z
+        .string()
+        .min(1, { message: t("validation.required") })
+        .max(255, { message: t("validation.max", { max: 255 }) }),
+      en: z
+        .string()
+        .min(1, { message: t("validation.required") })
+        .max(255, { message: t("validation.max", { max: 255 }) }),
+    }),
 
-    commercialNumber: z
+    commercial_number: z
       .string()
       .max(100, { message: t("validation.max", { max: 100 }) })
       .nullable()
       .optional(),
 
-    taxNumber: z
+    tax_number: z
       .string()
       .max(100, { message: t("validation.max", { max: 100 }) })
       .nullable()
@@ -30,6 +36,6 @@ export const getTenantSchema = (t: TranslationFunction) => {
       .min(1, { message: t("validation.required") })
       .max(3, { message: t("validation.max", { max: 3 }) }),
 
-    isVatRegistered: z.boolean().optional().default(false),
+    is_vat_registered: z.boolean(),
   });
 };

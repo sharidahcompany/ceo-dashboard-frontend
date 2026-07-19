@@ -1,9 +1,3 @@
-import React from 'react'
-
-export default function Page() {
-  return (
-    <div>
-      
-    </div>
-  )
+export default async function Page() {
+  return <div>s</div>;
 }

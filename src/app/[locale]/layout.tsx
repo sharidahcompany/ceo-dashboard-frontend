@@ -5,13 +5,15 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
-import AuthSidebar from "@/components/layout/AuthSidebar";
 import { ThemeProvider } from "next-themes";
 import { cookies } from "next/headers";
-import ThemeSwitch from "@/components/common/ThemeSwitch";
-import LanguageSwitch from "@/components/common/LanguageSwitch";
 import { Toaster } from "sonner";
-import { StepperWrapper } from "@/components/common/StepperWrapper";
+import Sidebar from "@/components/layout/Sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Navbar from "@/components/layout/Navbar";
+import Tabbar from "@/components/layout/Tabbar";
+import GlobalBreadcrumb from "@/components/layout/GlobalBreadcrumb";
+import { getMeAction } from "@/actions/userActions";
 
 type Props = {
   children: React.ReactNode;
@@ -45,6 +47,9 @@ export default async function Layout({ children, params }: Props) {
     notFound();
   }
 
+  const me = await getMeAction();
+  console.log(me);
+
   return (
     <html
       suppressHydrationWarning
@@ -61,19 +66,22 @@ export default async function Layout({ children, params }: Props) {
             enableSystem={false}
             scriptProps={themeScriptProps}
           >
-            <div className="flex min-h-screen max-h-screen overflow-auto">
-              <div className="w-full md:w-[50%]">
-                <div className="p-5 flex gap-5">
-                  <ThemeSwitch />
-                  <LanguageSwitch />
+            <TooltipProvider>
+              <div className="flex min-h-screen">
+                <div className="w-16 h-screen shrink-0 fixed top-0 inset-s-0">
+                  <Sidebar />
                 </div>
-                <StepperWrapper>{children} </StepperWrapper>
+
+                <div className="flex-1 ms-16 flex flex-col min-h-screen">
+                  <Navbar />
+                  <Tabbar />
+                  <GlobalBreadcrumb />
+                  <main className="flex-1 p-5">{children}</main>
+                </div>
               </div>
-              <div className="w-[50%] h-screen hidden md:flex top-0 inset-e-0">
-                <AuthSidebar />
-              </div>
-            </div>
-            <Toaster richColors toastOptions={{ className: "font-sans" }} />
+
+              <Toaster richColors toastOptions={{ className: "font-sans" }} />
+            </TooltipProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

@@ -15,3 +15,15 @@ export interface ActionResponse<T> {
   errors: Record<string, string[]> | null;
   firstError?: string | null;
 }
+
+export interface CountryOption {
+  iso3: string;
+  label: string;
+  flag: string;
+}
+
+export interface CurrencyOption {
+  code: string;
+  label: string;
+  symbol: string;
+}

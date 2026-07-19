@@ -20,12 +20,18 @@ api.interceptors.request.use(
 
       const language = cookieStore.get("NEXT_LOCALE")?.value;
 
+      const tenant = cookieStore.get("tenant")?.value;
+
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
       if (language) {
         config.headers["Accept-Language"] = language;
+      }
+
+      if (tenant) {
+        config.headers["X-Tenant"] = tenant;
       }
     } catch (error) {
       console.error("Failed to fetch cookies:", error);
