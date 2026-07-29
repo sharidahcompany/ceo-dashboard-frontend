@@ -36,13 +36,23 @@ export default function GlobalBreadcrumb() {
     if (segmentIndex >= pathSegments.length || !currentRoutes) return [];
 
     const currentSegment = pathSegments[segmentIndex];
-    const match = currentRoutes.find(
-      (r) => r.path.replace(/^\/+|\/+$/g, "") === currentSegment,
-    );
+    const match = currentRoutes.find((r) => {
+      const cleaned = r.path.replace(/^\/+|\/+$/g, "");
+      return (
+        cleaned === currentSegment ||
+        (cleaned.startsWith("[") && cleaned.endsWith("]"))
+      );
+    });
 
     if (!match) return [];
 
-    const nextPath = `${accumulatedPath}/${match.path.replace(/^\/+|\/+$/g, "")}`;
+    const cleanedRoutePath = match.path.replace(/^\/+|\/+$/g, "");
+    const actualSegment =
+      cleanedRoutePath.startsWith("[") && cleanedRoutePath.endsWith("]")
+        ? currentSegment
+        : cleanedRoutePath;
+
+    const nextPath = `${accumulatedPath}/${actualSegment}`.replace(/\/+/g, "/");
     const isLast = segmentIndex === pathSegments.length - 1;
 
     const item: BreadcrumbItemType = {
@@ -72,21 +82,24 @@ export default function GlobalBreadcrumb() {
 
         <BreadcrumbSeparator />
 
-        {breadcrumbItems.map((item) => (
-          <React.Fragment key={item.href}>
-            <BreadcrumbItem>
-              {item.isLast ? (
-                <BreadcrumbPage>{t(item.title)}</BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink render={<Link href={item.href} />}>
-                  {t(item.title)}
-                </BreadcrumbLink>
-              )}
-            </BreadcrumbItem>
+        {breadcrumbItems.map((item, index) => {
+          const isCurrentLast = index === breadcrumbItems.length - 1;
+          return (
+            <React.Fragment key={item.href}>
+              <BreadcrumbItem>
+                {isCurrentLast ? (
+                  <BreadcrumbPage>{t(item.title)}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink render={<Link href={item.href} />}>
+                    {t(item.title)}
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
 
-            {!item.isLast && <BreadcrumbSeparator />}
-          </React.Fragment>
-        ))}
+              {!isCurrentLast && <BreadcrumbSeparator />}
+            </React.Fragment>
+          );
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   );

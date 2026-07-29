@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
-    "Content-Type": "application/json",
     Accept: "application/json",
   },
   withCredentials: true,
@@ -17,9 +16,7 @@ api.interceptors.request.use(
       const cookieStore = await cookies();
 
       const token = cookieStore.get("auth_token")?.value;
-
-      const language = cookieStore.get("NEXT_LOCALE")?.value;
-
+      const language = cookieStore.get("NEXT_LOCALE")?.value || "ar";
       const tenant = cookieStore.get("tenant")?.value;
 
       if (token && config.headers) {
@@ -33,6 +30,11 @@ api.interceptors.request.use(
       if (tenant) {
         config.headers["X-Tenant"] = tenant;
       }
+
+      if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
+      }
+
     } catch (error) {
       console.error("Failed to fetch cookies:", error);
     }

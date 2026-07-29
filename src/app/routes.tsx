@@ -629,25 +629,21 @@ export const routes: Route[] = [
   },
   {
     path: "/buffets",
-    title: "routes.buffet",
+    title: "routes.buffets",
     icon: "Coffee",
     children: [
       {
-        path: "buffet",
-        title: "routes.buffets",
+        path: "[id]",
+        title: "routes.buffet",
         icon: "Coffee",
         children: [
           {
-            path: "categories",
-            title: "routes.categories",
-            icon: "Coffee",
-          },
-          {
-            path: "orders",
-            title: "routes.orders",
+            path: "requests",
+            title: "routes.buffet_requests",
             icon: "Coffee",
           },
         ],
+
       },
     ],
   },
@@ -659,27 +655,37 @@ export const routes: Route[] = [
       {
         path: "settings",
         title: "routes.settings",
-        icon: "Globe",
+        icon: "Settings",
       },
       {
         path: "customization",
         title: "routes.customization",
-        icon: "Globe",
+        icon: "Palette",
       },
       {
         path: "pages",
         title: "routes.pages",
-        icon: "Globe",
+        icon: "FileText",
+        children: [
+          {
+            path: "create",
+            title: "routes.create_page",
+          },
+          {
+            path: "edit",
+            title: "routes.edit_page",
+          },
+        ],
       },
       {
         path: "theme-store",
         title: "routes.theme_store",
-        icon: "Globe",
+        icon: "LayoutTemplate",
       },
       {
         path: "products",
         title: "routes.products",
-        icon: "Globe",
+        icon: "Package",
       },
     ],
   },

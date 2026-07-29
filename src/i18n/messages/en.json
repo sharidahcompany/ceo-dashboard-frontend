@@ -3,7 +3,6 @@
     "title": "CEO App",
     "description": "An all-in-one cloud platform providing financial accounting, HR management, organizational structure design, and website building solutions for startups and enterprises. Boost your company's efficiency today with the CEO software."
   },
-
   "attributes": {
     "name": "Name",
     "name_ar": "Arabic Name",
@@ -21,9 +20,44 @@
     "currency": "Currency",
     "commercial_number": "Commercial Registration Number",
     "tax_number": "Tax Identification Number",
-    "is_vat_registered": "Is the company registered for VAT?"
+    "is_vat_registered": "Is the company registered for VAT?",
+    "title_ar": "Arabic Title",
+    "title_en": "English Title",
+    "description_ar": "Arabic Description",
+    "description_en": "English Description",
+    "image": "Image",
+    "buffet_employees": "Buffet Employees",
+    "notes": "Notes",
+    "status": "Status",
+    "quantity": "Quantity",
+    "buffet_item": "Buffet Item",
+    "domain_type": "Domain Type",
+    "subdomain": "Subdomain",
+    "custom_domain": "Custom Domain",
+    "dns_type": "Type",
+    "dns_host": "Host",
+    "dns_value": "Value",
+    "order": "Order / Position",
+    "section_type": "Section Type",
+    "content": "Section Content (JSON)",
+    "order_value": "Order: {order}",
+    "title": "Title",
+    "description": "Description",
+    "text_alignment": "Text Alignment",
+    "search": "Search",
+    "navigate_to": "Navigate to...",
+    "layout": "Layout / Element Order",
+    "caption": "Caption",
+    "slides_per_view_tablet": "Slides per screen (Tablet)",
+    "slides_per_view_desktop": "Slides per screen (Large Screens)",
+    "slug": "Slug",
+    "title_en": "Title (English)",
+    "description_en": "Description (English)",
+    "keywords_en": "Keywords (English)",
+    "title_ar": "Title (Arabic)",
+    "description_ar": "Description (Arabic)",
+    "keywords_ar": "Keywords (Arabic)"
   },
-
   "validation": {
     "required": "This field is required",
     "email": "Please enter a valid email address",
@@ -37,34 +71,185 @@
     "phone_invalid": "Phone number must contain numbers only",
     "password_mismatch": "Passwords do not match",
     "max": "Must be at most {max} characters",
-    "file_size_max": "File size must not exceed {max} MB"
+    "file_size_max": "File size must not exceed {max} MB",
+    "invalid_subdomain": "Invalid subdomain (only letters, numbers, and dashes '-' are allowed)",
+    "invalid_domain": "Invalid domain format (e.g. example.com)"
   },
-
   "buttons": {
     "previous": "Previous",
     "next": "Next",
-    "upload_file": "Upload File"
+    "upload_file": "Upload File",
+    "add_new_vision": "Add New Vision",
+    "edit_vision": "Edit Vision",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving...",
+    "add": "Add",
+    "update": "Update",
+    "create": "Create",
+    "add_slide": "Add Slide",
+    "add_feature": "Add Feature Card"
   },
-
   "theme": {
     "dark": "Dark Mode",
     "light": "Light Mode",
     "system": "System Preference"
   },
-
   "locale": {
     "ar": "العربية",
     "en": "English"
   },
-
   "messages": {
     "file_upload": {
       "drag_files": "Drag and drop files here to upload"
-    }
+    },
+    "vision": {
+      "title": "Organization Vision",
+      "description": "Add a vision for the organization to be visible to employees inside the application",
+      "create_success": "Vision added successfully",
+      "update_success": "Vision updated successfully"
+    },
+    "buffets": {
+      "no_buffets": "No buffets available",
+      "no_buffets_description": "Add your first buffet to the organization",
+      "add_new_buffet": "Add New Buffet",
+      "edit_buffet": "Edit Buffet",
+      "update_buffet": "Update Buffet",
+      "edit_buffet_description": "Make the required changes to this buffet and save",
+      "add_new_buffet_description": "Add your organization's buffets to later add items and employees",
+      "available_buffets": "Organization Buffets",
+      "available_buffets_description": "A list of available buffets in your organization",
+      "delete_buffet_title": "Confirm Delete",
+      "delete_buffet_confirm": "Are you sure you want to delete this buffet?",
+      "add_new_category": "Add New Category",
+      "add_new_category_description": "Add a new category for buffet items",
+      "edit_category": "Edit Category",
+      "edit_category_description": "Make changes to this category",
+      "update_category": "Update Category",
+      "delete_category_title": "Confirm Delete Category",
+      "delete_category_confirm": "Are you sure you want to delete this category?",
+      "select_buffet": "Select Buffet",
+      "add_new_item": "Add New Item",
+      "add_new_item_description": "Fill in the details of the new item and save",
+      "edit_item": "Edit Item",
+      "edit_item_description": "Make the required changes to this item",
+      "update_item": "Update Item",
+      "delete_item_title": "Confirm Delete Item",
+      "delete_item_confirm": "Are you sure you want to delete this item?",
+      "no_items_in_category": "No items in this category",
+      "no_categories": "No categories",
+      "request_item": "Request Item",
+      "request_item_description": "Request this item from the buffet",
+      "add_order": "Add Order",
+      "items": "Order Items",
+      "status_pending": "Pending",
+      "status_processing": "Processing",
+      "status_completed": "Completed",
+      "status_rejected": "Rejected",
+      "status_cancelled": "Cancelled"
+    },
+    "website_settings": {
+      "title": "Website Settings",
+      "description": "Manage website settings, customize colors, links, and logos.",
+      "save_settings": "Save Settings",
+      "update_success": "Website settings updated successfully",
+      "general_settings": "General Settings",
+      "design_settings": "Design and Color Settings",
+      "links_settings": "App Store Links",
+      "media_settings": "Logos and Media"
+    },
+    "domain_settings": {
+      "title": "Domain Settings",
+      "description": "Manage subdomain or connect your custom domain to your website."
+    },
+    "dns_setup_title": "DNS Setup Configuration",
+    "dns_setup_description": "Please configure the following DNS records at your domain provider (e.g. GoDaddy, Namecheap, Cloudflare) to point your domain to our servers.",
+    "copied": "Copied to clipboard!",
+    "no_sections": "No sections added yet. Add a section to preview.",
+    "success": "Saved successfully!",
+    "fixed_section_no_config": "This is a fixed layout section. No configuration is required.",
+    "notify_success": "We will notify you once the Theme Store is live!"
   },
-
+  "sections": {
+    "navbar": "Navbar",
+    "products": "Products",
+    "vision": "Vision",
+    "footer": "Footer",
+    "header": "Header",
+    "about": "About",
+    "section": "Section",
+    "services": "Services",
+    "features": "Features",
+    "carousel": "Carousel",
+    "team": "Team",
+    "carousel_title": "Carousel Section",
+    "slide": "Slide",
+    "edit": "Edit Section",
+    "new": "Add New Section",
+    "type_section": "{type} Section",
+    "slides": "Slides",
+    "slide_number": "Slide {number}",
+    "feature_items": "Feature Cards",
+    "feature_number": "Feature {number}",
+    "plans": "Plans"
+  },
+  "common": {
+    "preview": "Preview",
+    "confirm_delete_title": "Confirm Delete"
+  },
+  "alignment": {
+    "left": "Left",
+    "center": "Center",
+    "right": "Right"
+  },
+  "layouts": {
+    "text_left_image_right": "Text Left, Image Right",
+    "text_right_image_left": "Text Right, Image Left",
+    "text_top_image_bottom": "Text Center, Image Below",
+    "text_bottom_image_top": "Text Center, Image Above"
+  },
   "errors": {
     "something_went_wrong": "Something went wrong, please try again later",
     "network_error": "Unable to connect to the server. Please check your internet connection"
+  },
+  "themeStore": {
+    "badge": "Next-gen storefront designs",
+    "title_pre": "Customize Your Store With",
+    "title_gradient": "Theme Store",
+    "subtitle": "We are building a marketplace of stunning, responsive e-commerce and portfolio themes optimized for lightning fast loading and maximum conversions.",
+    "email_placeholder": "Enter your email for early access",
+    "notify_btn": "Notify Me",
+    "subscribed": "You are on the launch list!",
+    "preview1_title": "NeoCommerce",
+    "preview1_desc": "Ultra-fast product grid, sleek modern layout, and clean Checkout interface.",
+    "preview2_title": "Alpha Portfolio",
+    "preview2_desc": "High-end glassmorphism portfolio cards for creative agencies and developers.",
+    "preview3_title": "SaaS Launchpad",
+    "preview3_desc": "Bold typography, interactive charts mockup, and conversion-optimized landing section."
+  },
+  "routes": {
+    "pages": "Pages",
+    "create_page": "Create Page",
+    "edit_page": "Edit Page"
+  },
+  "pages": {
+    "description": "Manage website pages, configure custom slugs, and publish changes.",
+    "no_pages": "No pages found",
+    "content_title": "Page Content",
+    "content_description": "Enter page title and description in both Arabic and English.",
+    "keywords_helper": "Separate keywords with commas.",
+    "keywords_helper_ar": "Separate keywords with commas.",
+    "settings_title": "Settings",
+    "slug_helper": "Only lowercase letters, numbers, and dashes are allowed.",
+    "publish_label": "Publish Immediately",
+    "create_description": "Create a new custom page for your website.",
+    "edit_description": "Modify page content, slug, and publishing state.",
+    "not_found": "Page not found",
+    "delete_confirm": "Are you sure you want to delete this page?"
+  },
+  "status": {
+    "active": "Active",
+    "draft": "Draft"
   }
 }
