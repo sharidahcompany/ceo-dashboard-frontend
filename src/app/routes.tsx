@@ -687,6 +687,11 @@ export const routes: Route[] = [
         title: "routes.products",
         icon: "Package",
       },
+      {
+        path: "plans",
+        title: "routes.plans",
+        icon: "Package",
+      }
     ],
   },
   {

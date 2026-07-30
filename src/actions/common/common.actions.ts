@@ -30,7 +30,7 @@ export interface CurrencyApiResponse {
 
 export async function getCountries(): Promise<ActionResponse<CountryOption[]>> {
   try {
-    const response = await api.get<CountryApiResponse>("/countries");
+    const response = await api.get<CountryApiResponse>("/auth/countries");
     return { success: true, data: response.data.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -39,7 +39,7 @@ export async function getCountries(): Promise<ActionResponse<CountryOption[]>> {
 
 export async function getCurrencies(): Promise<ActionResponse<CurrencyOption[]>> {
   try {
-    const response = await api.get<CurrencyApiResponse>("/currencies");
+    const response = await api.get<CurrencyApiResponse>("/auth/currencies");
     return { success: true, data: response.data.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

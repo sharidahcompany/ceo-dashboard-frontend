@@ -101,6 +101,9 @@ export default function SettingForm() {
         },
     });
 
+    const primaryColor = watch("primary_color");
+    const darkModeColor = watch("dark_mode_color");
+
     React.useEffect(() => {
         const loadSettings = async () => {
             const result = await showSettings();
@@ -340,7 +343,8 @@ export default function SettingForm() {
                                     <Input
                                         type="color"
                                         className="w-12 h-10 p-0.5 border cursor-pointer rounded-md bg-transparent"
-                                        {...register("primary_color")}
+                                        value={primaryColor || "#3b82f6"}
+                                        onChange={(e) => setValue("primary_color", e.target.value)}
                                     />
                                     <Input {...register("primary_color")} placeholder="#3b82f6" />
                                 </div>
@@ -353,7 +357,8 @@ export default function SettingForm() {
                                     <Input
                                         type="color"
                                         className="w-12 h-10 p-0.5 border cursor-pointer rounded-md bg-transparent"
-                                        {...register("dark_mode_color")}
+                                        value={darkModeColor || "#1e293b"}
+                                        onChange={(e) => setValue("dark_mode_color", e.target.value)}
                                     />
                                     <Input {...register("dark_mode_color")} placeholder="#1e293b" />
                                 </div>
