@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/combobox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { getUsers, UserResource } from "@/actions/workspace/user.actions"
+import { getTenantUsers, UserResource } from "@/actions/workspace/user.actions"
 import { Spinner } from "./spinner"
 import { useTranslations } from "next-intl"
 
@@ -42,8 +42,8 @@ export function MultiSelectUser<TFieldValues extends FieldValues>({
         isLoading,
         isError
     } = useInfiniteQuery({
-        queryKey: ["users-select"],
-        queryFn: ({ pageParam = 1 }) => getUsers({ page: pageParam }),
+        queryKey: ["tenant-users-select"],
+        queryFn: ({ pageParam = 1 }) => getTenantUsers({ page: pageParam }),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (!lastPage || !lastPage.success) return undefined;

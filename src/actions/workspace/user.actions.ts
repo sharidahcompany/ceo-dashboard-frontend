@@ -5,16 +5,18 @@ import { PaginationMeta } from "@/types/common.types";
 
 export interface UserResource {
   id: string;
-  username: string;
+  username?: string;
   first_name: string;
   last_name: string;
-  phone: string;
+  full_name?: string;
+  phone?: string;
   email: string;
   avatar: string | null;
+  // central-auth only
   password?: string | null;
-  permissions: string[];
-  roles: string[];
-  tenants: Record<string, any>[];
+  permissions?: string[];
+  roles?: string[];
+  tenants?: Record<string, any>[];
 }
 
 export interface UserApiResponse {
@@ -34,6 +36,19 @@ import { ActionResponse } from "@/actions/common/common.actions";
 export async function getUsers(params: Record<string, any> = {}): Promise<ActionResponse<UsersApiResponse>> {
   try {
     const response = await api.get<UsersApiResponse>(`/auth/users`, { params });
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+/**
+ * Fetch users that belong to the current tenant (workspace database).
+ * Calls GET /workspace/users which is served by the workspace-service.
+ */
+export async function getTenantUsers(params: Record<string, any> = {}): Promise<ActionResponse<UsersApiResponse>> {
+  try {
+    const response = await api.get<UsersApiResponse>(`/workspace/users`, { params });
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

@@ -5,7 +5,7 @@ import api from "@/lib/api";
 import { getErrorMessage } from "@/lib/utils";
 
 export type ActionResponse<T = void> =
-  | { success: true; data: T }
+  | { success: true; data: T; message?: string }
   | { success: false; error: string };
 
 export interface CountryOption {

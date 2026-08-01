@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { routes } from "@/app/routes";
 import { usePathname, Link } from "@/i18n/navigation";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
@@ -13,6 +13,30 @@ export default function Tabbar() {
   const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
   const pathSegments = cleanPath.split("/").filter(Boolean);
 
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+  const [hasDragged, setHasDragged] = useState(false);
+
+  useEffect(() => {
+    const el = tabsListRef.current;
+    if (!el) return;
+
+    // Convert vertical mouse wheel scroll to horizontal scroll
+    const handleWheelEvent = (e: WheelEvent) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+
+    el.addEventListener("wheel", handleWheelEvent, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", handleWheelEvent);
+    };
+  }, []);
+
   if (pathSegments.length === 0) return null;
 
   const activeService = routes.find((route) => {
@@ -25,29 +49,57 @@ export default function Tabbar() {
   let activeTabChildren = activeService.children;
   let basePath = activeService.path;
 
-  if (pathSegments.length > 1) {
-    const nextSegment = pathSegments[1];
-    const childMatch = activeService.children.find((r) => {
-      const cleaned = r.path.replace(/^\/+|\/+$/g, "");
-      return (
-        cleaned === nextSegment ||
-        (cleaned.startsWith("[") && cleaned.endsWith("]"))
-      );
-    });
-
-    if (childMatch && childMatch.children && childMatch.children.length > 0) {
-      activeTabChildren = childMatch.children;
-      basePath = `${activeService.path}/${nextSegment}`;
-    }
-  }
-
   const activeTabValue =
-    pathSegments[pathSegments.length - 1] || activeTabChildren[0]?.path || "";
+    pathSegments[1] || activeTabChildren[0]?.path || "";
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = tabsListRef.current;
+    if (!el) return;
+    isDown.current = true;
+    startX.current = e.pageX - el.offsetLeft;
+    scrollLeft.current = el.scrollLeft;
+    setHasDragged(false);
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDown.current) return;
+    const el = tabsListRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - startX.current) * 1.5; // Scroll speed multiplier
+    if (Math.abs(walk) > 5) {
+      setHasDragged(true);
+    }
+    el.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (hasDragged) {
+      e.preventDefault();
+    }
+  };
 
   return (
     <div className="w-full border-b">
-      <Tabs value={activeTabValue}>
-        <TabsList variant={"line"}>
+      <Tabs value={activeTabValue} className="w-full">
+        <TabsList
+          ref={tabsListRef}
+          variant={"line"}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          className="w-full overflow-x-auto overflow-y-hidden flex-nowrap justify-start no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-x"
+        >
           {activeTabChildren.map((child) => {
             const rawChildPath = child.path.replace(/^\/+|\/+$/g, "");
             const actualSegment =
@@ -63,9 +115,13 @@ export default function Tabbar() {
               <TabsTrigger
                 key={child.path}
                 value={child.path}
-                className={"px-3"}
+                className="px-3 shrink-0"
               >
-                <Link href={fullPath} className="w-full">
+                <Link 
+                  href={fullPath} 
+                  className="w-full"
+                  onClick={handleLinkClick}
+                >
                   <div className="w-full flex items-center gap-1">
                     <span>
                       {child.icon && (

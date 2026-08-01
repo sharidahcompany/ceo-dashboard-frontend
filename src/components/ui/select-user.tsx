@@ -15,7 +15,7 @@ import {
     ComboboxList,
 } from "@/components/ui/combobox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getUsers, UserResource } from "@/actions/workspace/user.actions"
+import { getTenantUsers, getUsers, UserResource } from "@/actions/workspace/user.actions"
 import { Spinner } from "./spinner"
 import { useTranslations } from "next-intl"
 
@@ -23,12 +23,14 @@ interface SelectUserProps<TFieldValues extends FieldValues> {
     control: Control<TFieldValues>
     name: Path<TFieldValues>
     initialUser?: UserResource | null
+    isTenantOnly?: boolean
 }
 
 export function SelectUser<TFieldValues extends FieldValues>({
     control,
     name,
-    initialUser
+    initialUser,
+    isTenantOnly = false
 }: SelectUserProps<TFieldValues>) {
     const { ref, inView } = useInView()
     const t = useTranslations()
@@ -41,8 +43,11 @@ export function SelectUser<TFieldValues extends FieldValues>({
         isLoading,
         isError
     } = useInfiniteQuery({
-        queryKey: ["users-select"],
-        queryFn: ({ pageParam = 1 }) => getUsers({ page: pageParam }),
+        queryKey: isTenantOnly ? ["tenant-users-select"] : ["users-select"],
+        queryFn: ({ pageParam = 1 }) => 
+            isTenantOnly 
+                ? getTenantUsers({ page: pageParam })
+                : getUsers({ page: pageParam }),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (!lastPage || !lastPage.success) return undefined;

@@ -272,7 +272,7 @@ export const routes: Route[] = [
     ],
   },
   {
-    path: "/financial-services",
+    path: "/finance",
     title: "routes.financial_services",
     icon: "DollarSign",
     children: [
@@ -697,27 +697,27 @@ export const routes: Route[] = [
   {
     path: "/auditor",
     title: "routes.auditor",
-    icon: "WifiPen",
+    icon: "ShieldCheck",
     children: [
       {
         path: "companies",
         title: "routes.companies",
-        icon: "WifiPen",
+        icon: "Building2",
       },
       {
         path: "incoming-requests",
         title: "routes.incoming_requests",
-        icon: "WifiPen",
+        icon: "Inbox",
       },
       {
         path: "outgoing-requests",
         title: "routes.outgoing_requests",
-        icon: "WifiPen",
+        icon: "Send",
       },
       {
         path: "subsidiaries",
         title: "routes.subsidiaries",
-        icon: "WifiPen",
+        icon: "Handshake",
       },
     ],
   },
