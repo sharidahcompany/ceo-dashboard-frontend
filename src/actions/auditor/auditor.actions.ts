@@ -105,7 +105,7 @@ export async function getSubsidiaries(query: string = ""): Promise<ActionRespons
 export async function requestAccess(data: { to: string }): Promise<ActionResponse<AuditRequestResource>> {
     try {
         const response = await api.post("/auth/auditors/access-requests", data);
-        revalidatePath("/[locale]/auditor/requests", "page");
+        revalidatePath("/[locale]/auditor/outgoing-requests", "page");
         return { success: true, data: response.data.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -118,7 +118,8 @@ export async function requestAccess(data: { to: string }): Promise<ActionRespons
 export async function acceptRequest(requestId: number | string): Promise<ActionResponse<void>> {
     try {
         await api.post(`/auth/auditors/requests/${requestId}/accept`);
-        revalidatePath("/[locale]/auditor/requests", "page");
+        revalidatePath("/[locale]/auditor/incoming-requests", "page");
+        revalidatePath("/[locale]/auditor/subsidiaries", "page");
         return { success: true, data: undefined };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -131,7 +132,7 @@ export async function acceptRequest(requestId: number | string): Promise<ActionR
 export async function rejectRequest(requestId: number | string): Promise<ActionResponse<void>> {
     try {
         await api.post(`/auth/auditors/requests/${requestId}/reject`);
-        revalidatePath("/[locale]/auditor/requests", "page");
+        revalidatePath("/[locale]/auditor/incoming-requests", "page");
         return { success: true, data: undefined };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

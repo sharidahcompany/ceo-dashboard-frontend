@@ -8,7 +8,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "../ui/input-group";
-import { Navigation, Search } from "lucide-react";
+import { Navigation, Search, User, LogOut } from "lucide-react";
 import NotificationsButton from "../common/NotificationsButton";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -19,6 +19,12 @@ import { useAppStore } from "@/providers/StoreProvider";
 import React from "react";
 import { isAxiosError } from "axios";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const t = useTranslations();
@@ -58,6 +64,11 @@ export default function Navbar() {
     (user.last_name?.slice(0, 1).toUpperCase() || "")
     : "US";
 
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = `${process.env.NEXT_PUBLIC_AUTH_URL}/${locale}/login` as string;
+  };
+
   return (
     <div className="flex justify-between items-center p-3 border-b">
       <div className="flex items-center gap-2">
@@ -89,18 +100,32 @@ export default function Navbar() {
         {!user ? (
           <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
         ) : (
-          <Avatar>
-            {user?.avatar && (
-              <AvatarImage
-                src={user.avatar}
-                alt={user.first_name || "User Avatar"}
-                className="aspect-square h-8 w-8"
-              />
-            )}
-            <AvatarFallback className="bg-muted text-xs">
-              {user?.first_name ? userFallback : "US"}
-            </AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="cursor-pointer outline-none">
+              <Avatar>
+                {user?.avatar && (
+                  <AvatarImage
+                    src={user.avatar}
+                    alt={user.first_name || "User Avatar"}
+                    className="aspect-square h-8 w-8"
+                  />
+                )}
+                <AvatarFallback className="bg-muted text-xs">
+                  {user?.first_name ? userFallback : "US"}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="gap-2" onClick={() => router.push("/profile")}>
+                <User className="h-4 w-4" />
+                <span>{t("buttons.profile") || "Profile"}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="gap-2" variant="destructive" onClick={handleLogout}>
+                <LogOut className="h-4 w-4" />
+                <span>{t("buttons.logout") || "Logout"}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
 

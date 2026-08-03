@@ -28,7 +28,7 @@ export async function getGoals(): Promise<ActionResponse<ApiResponse<GoalResourc
 export async function createGoal(formData: FormData): Promise<ActionResponse<ApiResponse<GoalResource>>> {
     try {
         const res = await api.post<ApiResponse<GoalResource>>("/workspace/goals", formData);
-        revalidatePath('/workspace/goals');
+        revalidatePath('/[locale]/company-spirit/goals', 'page');
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -41,7 +41,7 @@ export async function updateGoal(id: string | number, formData: FormData): Promi
             formData.append("_method", "PUT");
         }
         const res = await api.post<ApiResponse<GoalResource>>(`/workspace/goals/${id}`, formData);
-        revalidatePath('/workspace/goals');
+        revalidatePath('/[locale]/company-spirit/goals', 'page');
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -51,7 +51,7 @@ export async function updateGoal(id: string | number, formData: FormData): Promi
 export async function deleteGoal(ids: string[] | number[]): Promise<ActionResponse<ApiResponse>> {
     try {
         const res = await api.delete<ApiResponse>(`/workspace/goals`, { data: { ids } });
-        revalidatePath('/workspace/goals');
+        revalidatePath('/[locale]/company-spirit/goals', 'page');
         return { success: true, data: res.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

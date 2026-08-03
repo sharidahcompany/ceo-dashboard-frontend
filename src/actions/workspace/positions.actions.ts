@@ -1,7 +1,7 @@
 "use server";
 
 import api from "@/lib/api";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, normalizePaginationMeta } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 import { revalidatePath } from "next/cache";
 
@@ -86,7 +86,7 @@ export async function getPositions(query?: string): Promise<ActionResponse<{ dat
             success: true,
             data: {
                 data: Array.isArray(responseData.data) ? responseData.data : [],
-                meta: responseData.meta
+                meta: normalizePaginationMeta(responseData)
             }
         };
     } catch (error) {

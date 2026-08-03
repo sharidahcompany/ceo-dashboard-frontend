@@ -43,7 +43,7 @@ export function MultiSelectUser<TFieldValues extends FieldValues>({
         isError
     } = useInfiniteQuery({
         queryKey: ["tenant-users-select"],
-        queryFn: ({ pageParam = 1 }) => getTenantUsers({ page: pageParam }),
+        queryFn: ({ pageParam = 1 }) => getTenantUsers(`page=${pageParam}`),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (!lastPage || !lastPage.success) return undefined;

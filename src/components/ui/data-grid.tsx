@@ -73,6 +73,7 @@ import {
     ArrowUpDown,
 } from "lucide-react";
 import { ActionResponse } from "@/actions/common/common.actions";
+import { RowError } from "@/lib/utils";
 import { toast } from "sonner";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -115,9 +116,12 @@ export interface DataGridProps<TData, TValue> {
 
     importable?: boolean;
     exportable?: boolean;
-    onExport?: () => void;
+    onExport?: () => void | Promise<void>;
 
+    /** @deprecated pass onDownloadTemplate instead — auth requires the file to be fetched server-side, not linked directly */
     importTemplateUrl?: string;
+    onDownloadTemplate?: () => void | Promise<void>;
+    onImport?: (file: File) => Promise<{ success: boolean; message?: string; errors?: RowError[] }>;
 }
 
 export function DataGrid<TData, TValue>({
@@ -140,6 +144,8 @@ export function DataGrid<TData, TValue>({
     exportable = false,
     onExport,
     importTemplateUrl,
+    onDownloadTemplate,
+    onImport,
 }: DataGridProps<TData, TValue>) {
     const t = useTranslations("datagrid");
     const router = useRouter();
@@ -166,20 +172,26 @@ export function DataGrid<TData, TValue>({
         return [];
     });
     const [activeFilter, setActiveFilter] = useState<{ [key: string]: string }>(() => {
-        const filter = searchParams.get("filter");
-        if (filter) {
-            try {
-                return JSON.parse(filter);
-            } catch (e) {
-                return {};
+        const result: { [key: string]: string } = {};
+        searchParams.forEach((value, key) => {
+            const match = key.match(/^filter\[(.+)\]$/);
+            if (match) {
+                result[match[1]] = value;
             }
-        }
-        return {};
+        });
+        return result;
     });
     const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
     const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
+    const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
+    const [importErrors, setImportErrors] = useState<RowError[] | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // Selection state
     const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
@@ -223,11 +235,13 @@ export function DataGrid<TData, TValue>({
                 currentUrl.delete("sort");
             }
 
-            if (Object.keys(activeFilter).length > 0) {
-                currentUrl.set("filter", JSON.stringify(activeFilter));
-            } else {
-                currentUrl.delete("filter");
-            }
+            Array.from(currentUrl.keys())
+                .filter((key) => /^filter\[.+\]$/.test(key))
+                .forEach((key) => currentUrl.delete(key));
+
+            Object.entries(activeFilter).forEach(([key, value]) => {
+                currentUrl.set(`filter[${key}]`, value);
+            });
 
             if (debouncedSearch.trim() !== "") {
                 currentUrl.set("search", debouncedSearch);
@@ -306,7 +320,10 @@ export function DataGrid<TData, TValue>({
         },
         getRowId: (row: any) => String(row[idKey]),
         onRowSelectionChange: setRowSelection,
-        onSortingChange: setSorting,
+        onSortingChange: (updater) => {
+            setSorting(updater);
+            setPageIndex(0);
+        },
         onPaginationChange: (updater) => {
             if (typeof updater === "function") {
                 const newState = updater({ pageIndex, pageSize });
@@ -361,6 +378,63 @@ export function DataGrid<TData, TValue>({
         } finally {
             setDeleteConfirmOpen(false);
             setIdsToDelete([]);
+        }
+    };
+
+    const resetImportState = () => {
+        setSelectedFile(null);
+        setImportErrors(null);
+        setIsDragging(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
+    const handleImportModalChange = (open: boolean) => {
+        setIsImportModalOpen(open);
+        if (!open) resetImportState();
+    };
+
+    const handleDownloadTemplateClick = async () => {
+        if (!onDownloadTemplate) return;
+        setIsDownloadingTemplate(true);
+        try {
+            await onDownloadTemplate();
+        } catch {
+            toast.error(t("template_download_failed"));
+        } finally {
+            setIsDownloadingTemplate(false);
+        }
+    };
+
+    const handleExportClick = async () => {
+        if (!onExport) return;
+        setIsExporting(true);
+        try {
+            await onExport();
+        } catch {
+            toast.error(t("export_failed"));
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const handleUploadClick = async () => {
+        if (!onImport || !selectedFile) return;
+        setIsUploading(true);
+        setImportErrors(null);
+        try {
+            const result = await onImport(selectedFile);
+            if (result.success) {
+                toast.success(result.message || t("import_success"));
+                handleImportModalChange(false);
+                fetchData();
+            } else {
+                setImportErrors(result.errors && result.errors.length > 0 ? result.errors : null);
+                toast.error(result.message || t("import_failed"));
+            }
+        } catch {
+            toast.error(t("import_failed"));
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -456,9 +530,9 @@ export function DataGrid<TData, TValue>({
                         </Button>
                     )}
                     {exportable && (
-                        <Button variant="outline" onClick={onExport}  >
+                        <Button variant="outline" onClick={handleExportClick} disabled={isExporting} >
                             <Download className="w-4 h-4 " />
-                            {t("export")}
+                            {isExporting ? t("exporting") : t("export")}
                         </Button>
                     )}
                     {createTitle && (
@@ -729,25 +803,92 @@ export function DataGrid<TData, TValue>({
             )}
 
             {/* Import Dialog */}
-            <Dialog open={isImportModalOpen} onOpenChange={setIsImportModalOpen}>
+            <Dialog open={isImportModalOpen} onOpenChange={handleImportModalChange}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{t("import_title")}</DialogTitle>
                         <DialogDescription>{t("import_desc")}</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 pt-4">
-                        {importTemplateUrl && (
+                        {onDownloadTemplate ? (
+                            <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={handleDownloadTemplateClick}
+                                disabled={isDownloadingTemplate}
+                            >
+                                <Download className="w-4 h-4 mr-2" />
+                                {isDownloadingTemplate ? t("downloading") : t("download_template")}
+                            </Button>
+                        ) : importTemplateUrl ? (
                             <Button variant="outline" className="w-full" render={<a href={importTemplateUrl} download />} nativeButton={false}>
                                 <Download className="w-4 h-4 mr-2" />
                                 {t("download_template")}
                             </Button>
-                        )}
-                        <div className="border-2 border-dashed border-muted rounded-xl p-8 flex flex-col items-center justify-center gap-4 text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer">
+                        ) : null}
+
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".xlsx,.xls,.csv"
+                            className="hidden"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    setSelectedFile(file);
+                                    setImportErrors(null);
+                                }
+                            }}
+                        />
+
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                setIsDragging(true);
+                            }}
+                            onDragLeave={() => setIsDragging(false)}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                setIsDragging(false);
+                                const file = e.dataTransfer.files?.[0];
+                                if (file) {
+                                    setSelectedFile(file);
+                                    setImportErrors(null);
+                                }
+                            }}
+                            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-2 text-muted-foreground transition-colors cursor-pointer ${isDragging ? "border-primary bg-primary/5" : "border-muted hover:bg-muted/50"
+                                }`}
+                        >
                             <Upload className="w-8 h-8" />
                             <p className="text-sm text-center">
-                                {t("upload_prompt")}
+                                {selectedFile ? selectedFile.name : t("upload_prompt")}
                             </p>
                         </div>
+
+                        {importErrors && importErrors.length > 0 && (
+                            <div className="max-h-40 overflow-y-auto rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-1">
+                                {importErrors.map((err, idx) => (
+                                    <p key={idx} className="text-xs text-destructive">
+                                        {err.row ? `${t("row")} ${err.row}` : ""}
+                                        {err.document ? ` (${err.document})` : ""}
+                                        {(err.row || err.document) ? ": " : ""}
+                                        {err.message}
+                                    </p>
+                                ))}
+                            </div>
+                        )}
+
+                        {onImport && (
+                            <Button
+                                className="w-full"
+                                onClick={handleUploadClick}
+                                disabled={!selectedFile || isUploading}
+                            >
+                                <Upload className="w-4 h-4 mr-2" />
+                                {isUploading ? t("uploading") : t("upload")}
+                            </Button>
+                        )}
                     </div>
                 </DialogContent>
             </Dialog>

@@ -65,7 +65,7 @@ export async function getPage(id: string | number): Promise<ActionResponse<PageA
 export async function createPage(formData: PageFormData): Promise<ActionResponse<PageApiResponse>> {
     try {
         const response = await api.post<PageApiResponse>("/website/pages", formData);
-        revalidatePath("/website/pages");
+        revalidatePath("/[locale]/website/pages", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -78,7 +78,7 @@ export async function createPage(formData: PageFormData): Promise<ActionResponse
 export async function updatePage(id: string | number, formData: PageFormData): Promise<ActionResponse<PageApiResponse>> {
     try {
         const response = await api.put<PageApiResponse>(`/website/pages/${id}`, formData);
-        revalidatePath("/website/pages");
+        revalidatePath("/[locale]/website/pages", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -91,7 +91,7 @@ export async function updatePage(id: string | number, formData: PageFormData): P
 export async function deletePage(id: string | number): Promise<ActionResponse<{ message?: string }>> {
     try {
         const response = await api.delete<{ message?: string }>(`/website/pages/${id}`);
-        revalidatePath("/website/pages");
+        revalidatePath("/[locale]/website/pages", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

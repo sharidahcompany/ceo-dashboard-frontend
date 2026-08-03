@@ -625,6 +625,21 @@ export const routes: Route[] = [
           },
         ],
       },
+      {
+        path: "cost-centers",
+        title: "routes.cost_centers",
+        icon: "Building2",
+        children: [
+          {
+            path: "create",
+            title: "routes.create_cost_center",
+          },
+          {
+            path: "edit",
+            title: "routes.edit_cost_center",
+          },
+        ],
+      },
     ],
   },
   {
@@ -643,7 +658,6 @@ export const routes: Route[] = [
             icon: "Coffee",
           },
         ],
-
       },
     ],
   },
@@ -683,15 +697,15 @@ export const routes: Route[] = [
         icon: "LayoutTemplate",
       },
       {
-        path: "products",
-        title: "routes.products",
+        path: "orders",
+        title: "routes.orders",
         icon: "Package",
       },
       {
         path: "plans",
         title: "routes.plans",
         icon: "Package",
-      }
+      },
     ],
   },
   {

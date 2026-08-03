@@ -65,7 +65,7 @@ export async function getSection(id: string | number): Promise<ActionResponse<Se
 export async function createSection(formData: SectionFormData): Promise<ActionResponse<SectionApiResponse>> {
     try {
         const response = await api.post<SectionApiResponse>("/website/sections", formData);
-        revalidatePath("/website/customization");
+        revalidatePath("/[locale]/website/customization", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -78,7 +78,7 @@ export async function createSection(formData: SectionFormData): Promise<ActionRe
 export async function updateSection(id: string | number, formData: SectionFormData): Promise<ActionResponse<SectionApiResponse>> {
     try {
         const response = await api.put<SectionApiResponse>(`/website/sections/${id}`, formData);
-        revalidatePath("/website/customization");
+        revalidatePath("/[locale]/website/customization", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -93,7 +93,7 @@ export async function deleteSections(ids: number[]): Promise<ActionResponse<Sect
         const response = await api.delete<SectionDeleteApiResponse>("/website/sections", {
             data: { ids }
         });
-        revalidatePath("/website/customization");
+        revalidatePath("/[locale]/website/customization", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -106,7 +106,7 @@ export async function deleteSections(ids: number[]): Promise<ActionResponse<Sect
 export async function reorderSections(payload: { id: number; order: number }[]): Promise<ActionResponse<{ message?: string }>> {
     try {
         const response = await api.post<{ message?: string }>("/website/sections/reorder", { sections: payload });
-        revalidatePath("/website/customization");
+        revalidatePath("/[locale]/website/customization", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

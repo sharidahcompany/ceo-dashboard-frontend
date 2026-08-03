@@ -81,7 +81,7 @@ export async function createBuffetOrder(
 ): Promise<ActionResponse<BuffetOrderApiResponse>> {
   try {
     const response = await api.post<BuffetOrderApiResponse>("/workspace/buffet-orders", formData);
-    revalidatePath("/workspace/buffet-orders");
+    revalidatePath("/[locale]/buffets", "layout");
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -94,7 +94,7 @@ export async function updateBuffetOrder(
 ): Promise<ActionResponse<BuffetOrderApiResponse>> {
   try {
     const response = await api.put<BuffetOrderApiResponse>(`/workspace/buffet-orders/${id}`, formData);
-    revalidatePath("/workspace/buffet-orders");
+    revalidatePath("/[locale]/buffets", "layout");
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -108,7 +108,7 @@ export async function deleteBuffetOrder(
     const response = await api.delete<BuffetOrderApiResponse>("/workspace/buffet-orders/delete", {
       data: { ids },
     });
-    revalidatePath("/workspace/buffet-orders");
+    revalidatePath("/[locale]/buffets", "layout");
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -122,7 +122,7 @@ export async function updateBuffetOrderStatus(
     const response = await api.put<BuffetOrderApiResponse>(`/workspace/buffet-orders/${id}/status`, {
       status,
     });
-    revalidatePath("/workspace/buffet-orders");
+    revalidatePath("/[locale]/buffets", "layout");
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

@@ -46,11 +46,10 @@ export default function Tabbar() {
 
   if (!activeService || !activeService.children) return null;
 
-  let activeTabChildren = activeService.children;
-  let basePath = activeService.path;
+  const activeTabChildren = activeService.children;
+  const basePath = activeService.path;
 
-  const activeTabValue =
-    pathSegments[1] || activeTabChildren[0]?.path || "";
+  const activeTabValue = pathSegments[1] || activeTabChildren[0]?.path || "";
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = tabsListRef.current;
@@ -98,7 +97,7 @@ export default function Tabbar() {
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className="w-full overflow-x-auto overflow-y-hidden flex-nowrap justify-start no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-x"
+          className="max-w-full overflow-x-auto overflow-y-hidden flex-nowrap justify-start no-scrollbar cursor-grab active:cursor-grabbing select-none touch-pan-x"
         >
           {activeTabChildren.map((child) => {
             const rawChildPath = child.path.replace(/^\/+|\/+$/g, "");
@@ -109,7 +108,10 @@ export default function Tabbar() {
 
             if (!actualSegment || actualSegment.includes("[")) return null;
 
-            const fullPath = `${basePath}/${actualSegment}`.replace(/\/+/g, "/");
+            const fullPath = `${basePath}/${actualSegment}`.replace(
+              /\/+/g,
+              "/",
+            );
 
             return (
               <TabsTrigger
@@ -117,8 +119,8 @@ export default function Tabbar() {
                 value={child.path}
                 className="px-3 shrink-0"
               >
-                <Link 
-                  href={fullPath} 
+                <Link
+                  href={fullPath}
                   className="w-full"
                   onClick={handleLinkClick}
                 >

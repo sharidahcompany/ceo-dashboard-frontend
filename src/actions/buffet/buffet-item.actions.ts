@@ -80,9 +80,7 @@ export async function createBuffetItem(
 ): Promise<ActionResponse<BuffetItemApiResponse>> {
     try {
         const response = await api.post<BuffetItemApiResponse>("/workspace/buffet-items", formData);
-        revalidatePath("/workspace/buffet-items");
-        revalidatePath("/workspace/buffet-categories");
-        revalidatePath("/workspace/buffets");
+        revalidatePath("/[locale]/buffets", "layout");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -104,9 +102,7 @@ export async function updateBuffetItem(
             response = await api.put<BuffetItemApiResponse>(`/workspace/buffet-items/${id}`, formData);
         }
 
-        revalidatePath("/workspace/buffet-items");
-        revalidatePath("/workspace/buffet-categories");
-        revalidatePath("/workspace/buffets");
+        revalidatePath("/[locale]/buffets", "layout");
 
         return { success: true, data: response.data };
     } catch (error) {
@@ -122,9 +118,7 @@ export async function deleteBuffetItem(
             data: { ids },
         });
 
-        revalidatePath("/workspace/buffet-items");
-        revalidatePath("/workspace/buffet-categories");
-        revalidatePath("/workspace/buffets");
+        revalidatePath("/[locale]/buffets", "layout");
 
         return { success: true, data: response.data };
     } catch (error) {

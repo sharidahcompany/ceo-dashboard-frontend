@@ -1,33 +1,100 @@
 "use client";
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "@/i18n/navigation";
-import { Plus } from "lucide-react";
 
-export default function Page() {
+import React, { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataGrid } from "@/components/ui/data-grid";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+    getAvailableScholarships,
+    deleteAvailableScholarships,
+    AvailableScholarshipResource
+} from "@/actions/workspace/scholarships.actions";
+
+export default function AvailableScholarshipsPage() {
+    const t = useTranslations();
+
+    const columns = useMemo<ColumnDef<AvailableScholarshipResource>[]>(
+        () => [
+            {
+                accessorKey: "title",
+                header: t("attributes.title") || "Title",
+                cell: ({ row }) => (
+                    <span className="font-medium text-foreground">{row.original.title}</span>
+                ),
+            },
+            {
+                accessorKey: "description",
+                header: t("attributes.description") || "Description",
+                cell: ({ row }) => (
+                    <span className="text-muted-foreground line-clamp-1 max-w-[250px]">
+                        {row.original.description || "-"}
+                    </span>
+                ),
+            },
+            {
+                accessorKey: "price",
+                header: t("attributes.price") || "Price",
+                cell: ({ row }) => {
+                    const price = row.original.price;
+                    return price !== undefined ? `${price.toFixed(2)}` : "-";
+                },
+            },
+            {
+                accessorKey: "discount_percentage",
+                header: t("attributes.discount_percentage") || "Discount",
+                cell: ({ row }) => {
+                    const pct = row.original.discount_percentage;
+                    return pct !== undefined ? `${pct}%` : "-";
+                },
+            },
+            {
+                accessorKey: "final_price",
+                header: t("attributes.final_price") || "Final Price",
+                cell: ({ row }) => {
+                    const final = row.original.final_price;
+                    return final !== undefined ? `${final.toFixed(2)}` : "-";
+                },
+            },
+            {
+                accessorKey: "duration",
+                header: t("attributes.duration") || "Duration",
+                cell: ({ row }) => row.original.duration || "-",
+            },
+            {
+                accessorKey: "is_active",
+                header: t("attributes.status") || "Status",
+                cell: ({ row }) => (
+                    <Badge variant={row.original.is_active ? "default" : "outline"}>
+                        {row.original.is_active
+                            ? t("attributes.active") || "Active"
+                            : t("attributes.inactive") || "Inactive"}
+                    </Badge>
+                ),
+            },
+        ],
+        [t]
+    );
+
+    const handleDelete = async (ids: string[]) => {
+        const numericIds = ids.map(id => Number(id)).filter(id => !isNaN(id));
+        return deleteAvailableScholarships(numericIds);
+    };
+
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold tracking-tight">Available Scholarships</h1>
-                
-                <Link href="/hr/available-scholarships/create">
-                    <Button className="gap-2">
-                        <Plus className="size-4" />
-                        Create
-                    </Button>
-                </Link>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Available Scholarships Directory</CardTitle>
-                    <CardDescription>Manage and view all records for available scholarships.</CardDescription>
-                </CardHeader>
-                <CardContent className="min-h-[200px] flex items-center justify-center border-dashed border-2 rounded-lg m-6">
-                    <p className="text-muted-foreground">No records found.</p>
-                </CardContent>
-            </Card>
-        </div>
+        <Card>
+            <CardContent>
+                <DataGrid<AvailableScholarshipResource, any>
+                    title={t("routes.available_scholarships") || "Available Scholarships"}
+                    description={t("messages.hr.available_scholarships_description") || "Manage available training and academic scholarship programs"}
+                    fetchAction={getAvailableScholarships}
+                    deleteAction={handleDelete}
+                    columns={columns}
+                    idKey="id"
+                    createTitle={t("messages.hr.create_new_scholarship") || "Create New Scholarship"}
+                />
+            </CardContent>
+        </Card>
     );
 }

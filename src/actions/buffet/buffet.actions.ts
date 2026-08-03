@@ -61,7 +61,7 @@ export async function getBuffet(id: string | number): Promise<ActionResponse<Buf
 export async function createBuffet(formData: BuffetFormData): Promise<ActionResponse<BuffetApiResponse>> {
     try {
         const response = await api.post<BuffetApiResponse>("/workspace/buffets", formData);
-        revalidatePath("/workspace/buffets");
+        revalidatePath("/[locale]/buffets", "layout");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -74,7 +74,7 @@ export async function updateBuffet(
 ): Promise<ActionResponse<BuffetApiResponse>> {
     try {
         const response = await api.put<BuffetApiResponse>(`/workspace/buffets/${id}`, formData);
-        revalidatePath("/workspace/buffets");
+        revalidatePath("/[locale]/buffets", "layout");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -84,7 +84,7 @@ export async function updateBuffet(
 export async function deleteBuffet(ids: number[]): Promise<ActionResponse<BuffetApiResponse>> {
     try {
         const response = await api.delete<BuffetApiResponse>("/workspace/buffets/delete", { data: { ids } });
-        revalidatePath("/workspace/buffets");
+        revalidatePath("/[locale]/buffets", "layout");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

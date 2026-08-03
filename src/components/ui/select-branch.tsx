@@ -41,7 +41,7 @@ export function SelectBranch<TFieldValues extends FieldValues>({
         isError
     } = useInfiniteQuery({
         queryKey: ["branches-select"],
-        queryFn: ({ pageParam = 1 }) => getBranches({ page: pageParam }),
+        queryFn: ({ pageParam = 1 }) => getBranches(`page=${pageParam}`),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (!lastPage || !lastPage.success) return undefined;

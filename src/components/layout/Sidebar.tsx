@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { Building2 } from "lucide-react";
 import Logo from "../common/Logo";
 import { routes } from "@/app/routes";
 import DynamicIcon from "../common/DynamicIcon";
@@ -7,10 +8,25 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { getCurrentOrganization, OrganizationResource } from "@/actions/workspace/organization.actions";
+
+function organizationName(org: OrganizationResource | null): string {
+  if (!org) return "";
+  if (org.name_localized) return org.name_localized;
+  if (typeof org.name === "string") return org.name;
+  return org.name?.ar || org.name?.en || "";
+}
 
 export default function Sidebar() {
   const activePathname = usePathname();
   const t = useTranslations();
+  const [organization, setOrganization] = React.useState<OrganizationResource | null>(null);
+
+  React.useEffect(() => {
+    getCurrentOrganization().then((res) => {
+      if (res.success) setOrganization(res.data);
+    });
+  }, []);
 
   return (
     <div className="hidden md:flex flex-col justify-between items-center gap-5 md:w-16 shrink-0 py-3 px-2 h-screen border-e">
@@ -47,14 +63,20 @@ export default function Sidebar() {
       </div>
 
       <div>
-        <Avatar className="cursor-pointer">
-          <AvatarImage
-            src="https://github.com/shadcn.png"
-            alt="@shadcn"
-            className="w-8 h-8"
-          />
-          <AvatarFallback>SC</AvatarFallback>
-        </Avatar>
+        <Link href="/organization">
+          <Avatar className="cursor-pointer">
+            {organization?.logo_url && (
+              <AvatarImage
+                src={organization.logo_url}
+                alt={organizationName(organization)}
+                className="w-8 h-8"
+              />
+            )}
+            <AvatarFallback>
+              <Building2 className="size-4 text-muted-foreground" />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
       </div>
     </div>
   );

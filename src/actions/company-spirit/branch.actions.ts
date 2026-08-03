@@ -44,9 +44,9 @@ export interface BranchesApiResponse {
 import { getErrorMessage } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 
-export async function getBranches(params: Record<string, any> = {}): Promise<ActionResponse<BranchesApiResponse>> {
+export async function getBranches(query?: string): Promise<ActionResponse<BranchesApiResponse>> {
     try {
-        const response = await api.get<BranchesApiResponse>("/workspace/branches", { params });
+        const response = await api.get<BranchesApiResponse>(`/workspace/branches${query ? `?${query}` : ""}`);
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -65,7 +65,7 @@ export async function getBranch(id: string | number): Promise<ActionResponse<Bra
 export async function createBranch(formData: BranchFormData): Promise<ActionResponse<BranchApiResponse>> {
     try {
         const response = await api.post<BranchApiResponse>("/workspace/branches", formData);
-        revalidatePath("/workspace/branches");
+        revalidatePath("/[locale]/company-spirit/organization-structure", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -75,7 +75,7 @@ export async function createBranch(formData: BranchFormData): Promise<ActionResp
 export async function updateBranch(id: string | number, formData: BranchFormData): Promise<ActionResponse<BranchApiResponse>> {
     try {
         const response = await api.put<BranchApiResponse>(`/workspace/branches/${id}`, formData);
-        revalidatePath("/workspace/branches");
+        revalidatePath("/[locale]/company-spirit/organization-structure", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -85,7 +85,7 @@ export async function updateBranch(id: string | number, formData: BranchFormData
 export async function deleteBranch(ids: number[]): Promise<ActionResponse<BranchApiResponse>> {
     try {
         const response = await api.delete<BranchApiResponse>("/workspace/branches/delete", { data: { ids } });
-        revalidatePath("/workspace/branches");
+        revalidatePath("/[locale]/company-spirit/organization-structure", "page");
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

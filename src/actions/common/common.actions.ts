@@ -2,11 +2,11 @@
 
 import api from "@/lib/api";
 
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, RowError } from "@/lib/utils";
 
 export type ActionResponse<T = void> =
   | { success: true; data: T; message?: string }
-  | { success: false; error: string };
+  | { success: false; error: string; errors?: RowError[] };
 
 export interface CountryOption {
   iso3: string;
@@ -37,7 +37,9 @@ export async function getCountries(): Promise<ActionResponse<CountryOption[]>> {
   }
 }
 
-export async function getCurrencies(): Promise<ActionResponse<CurrencyOption[]>> {
+export async function getCurrencies(): Promise<
+  ActionResponse<CurrencyOption[]>
+> {
   try {
     const response = await api.get<CurrencyApiResponse>("/auth/currencies");
     return { success: true, data: response.data.data };

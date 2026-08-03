@@ -6,11 +6,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const t = useTranslations("hr");
+    const t = useTranslations();
 
     const tabs = [
-        { path: "available-scholarships", title: "Available Scholarships" },
-        { path: "scholarship-requests", title: "Scholarship Requests" }
+        { path: "available-scholarships", title: t("routes.available_scholarships") || "Available Scholarships" },
+        { path: "scholarship-requests", title: t("routes.scholarship_requests") || "Scholarship Requests" }
     ];
 
     const activeTab = tabs.find(tab => pathname.includes(tab.path))?.path || tabs[0].path;

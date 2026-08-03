@@ -28,7 +28,7 @@ export async function getVision(): Promise<ActionResponse<ApiResponse<VisionReso
 export async function createVision(formData: FormData): Promise<ActionResponse<ApiResponse<VisionResource>>> {
   try {
     const res = await api.post<ApiResponse<VisionResource>>("/workspace/visions", formData);
-    revalidatePath('/workspace/visions');
+    revalidatePath('/[locale]/company-spirit/vision', 'page');
     return { success: true, data: res.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -41,7 +41,7 @@ export async function updateVision(id: string | number, formData: FormData): Pro
       formData.append("_method", "PUT");
     }
     const res = await api.post<ApiResponse<VisionResource>>(`/workspace/visions/${id}`, formData);
-    revalidatePath('/workspace/visions');
+    revalidatePath('/[locale]/company-spirit/vision', 'page');
     return { success: true, data: res.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

@@ -44,10 +44,10 @@ export function SelectUser<TFieldValues extends FieldValues>({
         isError
     } = useInfiniteQuery({
         queryKey: isTenantOnly ? ["tenant-users-select"] : ["users-select"],
-        queryFn: ({ pageParam = 1 }) => 
-            isTenantOnly 
-                ? getTenantUsers({ page: pageParam })
-                : getUsers({ page: pageParam }),
+        queryFn: ({ pageParam = 1 }) =>
+            isTenantOnly
+                ? getTenantUsers(`page=${pageParam}`)
+                : getUsers(`page=${pageParam}`),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (!lastPage || !lastPage.success) return undefined;

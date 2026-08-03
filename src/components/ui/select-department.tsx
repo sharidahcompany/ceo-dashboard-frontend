@@ -41,7 +41,7 @@ export function SelectDepartment<TFieldValues extends FieldValues>({
         isError
     } = useInfiniteQuery({
         queryKey: ["departments-select"],
-        queryFn: ({ pageParam = 1 }) => getDepartments({ page: pageParam }),
+        queryFn: ({ pageParam = 1 }) => getDepartments(`page=${pageParam}`),
         initialPageParam: 1,
         getNextPageParam: (lastPage) => {
             if (!lastPage || !lastPage.success) return undefined;

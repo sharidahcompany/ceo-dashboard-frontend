@@ -1,7 +1,7 @@
 "use server";
 
 import api from "@/lib/api";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, normalizePaginationMeta } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 import { revalidatePath } from "next/cache";
 import { UserResource } from "./user.actions";
@@ -27,7 +27,7 @@ export interface AttendancePermissionResource {
 }
 
 export interface AttendancePermissionData {
-    user_id: string;
+    user_id?: string;
     reason?: string | null;
     start_datetime?: string | null;
     end_datetime?: string | null;
@@ -47,7 +47,7 @@ export async function getAttendancePermissions(
             success: true,
             data: {
                 data: Array.isArray(responseData.data) ? responseData.data : [],
-                meta: responseData.meta,
+                meta: normalizePaginationMeta(responseData),
             },
         };
     } catch (error) {

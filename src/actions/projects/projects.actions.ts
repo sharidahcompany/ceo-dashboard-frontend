@@ -423,6 +423,31 @@ export async function postRating(taskId: number | string, score: number, feedbac
     }
 }
 
+export interface UserTaskResource {
+    id: number;
+    name: string;
+    priority: "low" | "medium" | "high";
+    due_date?: string | null;
+    project?: { id: number; name: string } | null;
+    sprint_stage?: { id: number; name: string | null; order: number } | null;
+    // computed server-side: true when the task's stage is the last (highest
+    // order) stage of its sprint
+    is_completed: boolean;
+}
+
+/**
+ * Fetch every task assigned to a given user across all projects, used for
+ * the per-employee task-completion report.
+ */
+export async function getUserTasks(userId: number | string): Promise<ActionResponse<UserTaskResource[]>> {
+    try {
+        const response = await api.get(`/workspace/users/${userId}/tasks`);
+        return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
 export async function syncTaskUsers(taskId: number | string, userIds: string[]): Promise<ActionResponse<TaskResource>> {
     try {
         const response = await api.post(`/workspace/tasks/${taskId}/users`, { user_ids: userIds });

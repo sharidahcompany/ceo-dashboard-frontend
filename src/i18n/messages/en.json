@@ -66,6 +66,11 @@
     "rescheduled": "Rescheduled",
     "accepted": "Accepted",
     "rejected": "Rejected",
+    "pending": "Pending",
+    "full_name": "Full Name",
+    "cv": "CV / Resume Link",
+    "cover_letter": "Cover Letter",
+    "vacancy": "Vacancy",
     "work_days": "Work Days",
     "grace_period": "Grace Period",
     "minutes": "mins",
@@ -73,7 +78,36 @@
     "overtime_rate": "Overtime Rate (Multiplier)",
     "deduction_rate": "Deduction Rate (Multiplier)",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "subtotal": "Subtotal",
+    "discount_total": "Discount",
+    "tax_total": "Tax",
+    "total": "Total",
+    "current_password": "Current Password",
+    "assignments": "Branch, Department & Position Assignments",
+    "branches": "Branches",
+    "departments": "Departments",
+    "positions": "Positions",
+    "attendance_report": "Attendance Report",
+    "missions_report": "Missions Report",
+    "tasks_report": "Tasks Report",
+    "total_records": "Total Records",
+    "late_days": "Late Days",
+    "attendance_date": "Date",
+    "check_in": "Check In",
+    "check_out": "Check Out",
+    "total_missions": "Total Missions",
+    "completed_missions": "Completed Missions",
+    "total_tasks": "Total Tasks",
+    "completed_tasks": "Completed Tasks",
+    "stage": "Stage",
+    "performance_overview": "Performance Overview",
+    "on_time_rate": "On-Time Rate",
+    "missions_completion_rate": "Missions Completion Rate",
+    "tasks_completion_rate": "Tasks Completion Rate",
+    "order_number": "Order Number",
+    "customer": "Customer",
+    "created_at": "Created At"
   },
   "validation": {
     "required": "This field is required",
@@ -96,6 +130,9 @@
   "buttons": {
     "previous": "Previous",
     "next": "Next",
+    "profile": "Profile",
+    "logout": "Logout",
+    "edit": "Edit",
     "upload_file": "Upload File",
     "add_new_vision": "Add New Vision",
     "edit_vision": "Edit Vision",
@@ -193,7 +230,21 @@
       "create_new_position": "Add New Position",
       "create_new_interview": "Schedule Interview",
       "shifts_description": "Manage organization work shifts and assignments",
-      "create_new_shift": "Create New Shift"
+      "create_new_shift": "Create New Shift",
+      "candidates_description": "Manage job applications received for open vacancies.",
+      "create_new_candidate": "Add Candidate",
+      "invite_employee": "Invite Employee",
+      "invite_employee_description": "Send an invitation email so this person can set up their account and join your workspace."
+    },
+    "employees": {
+      "assignments_description": "Assign this employee to one or more branches, departments, and positions.",
+      "attendance_report_description": "Recent attendance records for this employee.",
+      "missions_report_description": "Missions assigned to this employee and their completion status.",
+      "tasks_report_description": "Tasks assigned to this employee across all projects and their completion status.",
+      "performance_overview_description": "A quick statistical summary of this employee's attendance, missions, and task performance."
+    },
+    "website": {
+      "orders_description": "View and manage orders placed through the website store."
     }
   },
   "sections": {
@@ -300,7 +351,45 @@
     "companies": "Companies",
     "incoming_requests": "Incoming Requests",
     "outgoing_requests": "Outgoing Requests",
-    "subsidiaries": "Subsidiaries"
+    "subsidiaries": "Subsidiaries",
+    "cost_centers": "Cost Centers",
+    "create_cost_center": "Add Cost Center",
+    "edit_cost_center": "Edit Cost Center",
+    "profile": "Profile",
+    "reports": "Reports",
+    "orders": "Orders"
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "View your account information.",
+    "change_password_title": "Change Password",
+    "change_password_description": "Update your account password.",
+    "password_updated": "Password updated successfully."
+  },
+  "organization": {
+    "title": "Organization",
+    "description": "View and manage your company information.",
+    "updated": "Organization updated successfully.",
+    "current_plan_title": "Current Plan",
+    "current_plan_description": "Your subscription plan and billing details.",
+    "no_subscription": "No active subscription found.",
+    "building_number": "Building Number",
+    "street": "Street",
+    "district": "District",
+    "city": "City",
+    "postal_code": "Postal Code",
+    "status": "Status",
+    "started_at": "Started At",
+    "renews_at": "Renews At",
+    "trial_ends_at": "Trial Ends At",
+    "upgrade_plan": "Upgrade Plan",
+    "subscription_status": {
+      "active": "Active",
+      "trialing": "Trialing",
+      "past_due": "Past Due",
+      "canceled": "Canceled",
+      "expired": "Expired"
+    }
   },
   "pages": {
     "description": "Manage website pages, configure custom slugs, and publish changes.",
@@ -319,7 +408,9 @@
   },
   "status": {
     "active": "Active",
-    "draft": "Draft"
+    "draft": "Draft",
+    "completed": "Completed",
+    "in_progress": "In Progress"
   },
   "plans": {
     "title": "Plans & Features",
@@ -423,7 +514,16 @@
     "delete_confirm_desc": "This action cannot be undone. This will permanently delete the selected item(s).",
     "cancel": "Cancel",
     "confirm_delete": "Confirm Delete",
-    "per_page": "per page"
+    "per_page": "per page",
+    "exporting": "Exporting...",
+    "downloading": "Downloading...",
+    "uploading": "Uploading...",
+    "upload": "Upload",
+    "import_success": "Imported successfully!",
+    "import_failed": "Import failed. Please check the errors below.",
+    "export_failed": "Export failed. Please try again.",
+    "template_download_failed": "Could not download the template. Please try again.",
+    "row": "Row"
   },
   "auditor": {
     "companies": "Companies",
@@ -458,10 +558,12 @@
   "actions": {
     "loading": "Loading...",
     "no_results": "No results found",
+    "select": "Select",
     "select_user": "Select User",
     "select_department": "Select Department",
     "select_branch": "Select Branch",
-    "actions": "Actions"
+    "actions": "Actions",
+    "select_position": "Select Position"
   },
   "projects": {
     "title": "Project Management",
@@ -561,5 +663,161 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday"
+  },
+  "enums": {
+    "accountClassification": {
+      "REVENUE": "Revenue",
+      "EXPENSE": "Expense",
+      "ASSET": "Asset",
+      "LIABILITY": "Liability",
+      "EQUITY": "Equity"
+    },
+    "activityType": {
+      "CASH": "Cash",
+      "OPERATING": "Operating",
+      "INVESTING": "Investing",
+      "FINANCING": "Financing"
+    },
+    "bankAccountType": {
+      "BANK_ACCOUNT": "Bank Account",
+      "CREDIT_CARD": "Credit Card",
+      "PETTY_CASH": "Petty Cash"
+    },
+    "taxType": {
+      "OUT_OF_SCOPE": "Out of Scope",
+      "REVERSE_CHARGE": "Reverse Charge",
+      "PURCHASES": "Purchases",
+      "SALES": "Sales"
+    },
+    "taxAmountType": {
+      "EXCLUSIVE": "Exclusive",
+      "INCLUSIVE": "Inclusive"
+    },
+    "documentStatus": {
+      "DRAFT": "Draft",
+      "APPROVED": "Approved",
+      "SENT": "Sent",
+      "PAID": "Paid",
+      "PARTIALLY_PAID": "Partially Paid",
+      "SHIPPED": "Shipped",
+      "DELIVERED": "Delivered",
+      "POSTED": "Posted",
+      "draft": "Draft",
+      "approved": "Approved",
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "partial": "Partial",
+      "processed": "Processed"
+    }
+  },
+  "reports": {
+    "title": "Financial Reports",
+    "description": "View profit & loss, balance sheet, trial balance, and general ledger reports for a selected date range.",
+    "tabs": {
+      "profit_loss": "Profit & Loss",
+      "balance_sheet": "Balance Sheet",
+      "trial_balance": "Trial Balance",
+      "general_ledger": "General Ledger"
+    },
+    "presets": {
+      "this_month": "This month",
+      "last_3_months": "Last 3 months",
+      "last_6_months": "Last 6 months",
+      "this_year": "This year"
+    },
+    "custom_range": "Custom range",
+    "apply": "Apply",
+    "total_revenue": "Total Revenue",
+    "total_expenses": "Total Expenses",
+    "net_profit_loss": "Net Profit / Loss",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "period": "Period",
+    "total": "Total",
+    "as_of": "As of {date}",
+    "range": "{from} to {to}",
+    "total_assets": "Total Assets",
+    "total_liabilities": "Total Liabilities",
+    "total_equity": "Total Equity",
+    "line_item": "Line Item",
+    "amount": "Amount",
+    "equity_capital": "Capital",
+    "equity_current_earnings": "Current Period Earnings",
+    "account_code": "Code",
+    "account_name": "Account",
+    "classification": "Classification",
+    "debit": "Debit",
+    "credit": "Credit",
+    "all_accounts": "All accounts",
+    "no_data": "No Data Found",
+    "no_data_desc": "No ledger activity in this date range.",
+    "date": "Date",
+    "reference": "Reference"
+  },
+  "workspace_reports": {
+    "title": "Workspace Reports",
+    "description": "Overview of projects, tasks, attendance, and buffet activity for a selected date range.",
+    "gauges": {
+      "title": "Overview",
+      "attendance_percentage": "Attendance %",
+      "completed_projects_percentage": "Completed Projects %",
+      "completed_tasks_percentage": "Completed Tasks %"
+    },
+    "projects": {
+      "title": "Projects",
+      "total": "Total Projects",
+      "status": {
+        "pending": "Pending",
+        "in_progress": "In Progress",
+        "complete": "Complete",
+        "late": "Late"
+      }
+    },
+    "tasks": {
+      "title": "Tasks",
+      "total": "Total Tasks",
+      "completed": "Completed",
+      "overdue": "Overdue"
+    },
+    "attendance": {
+      "title": "Attendance",
+      "total": "Total Records",
+      "late_minutes": "Late Minutes",
+      "overtime_minutes": "Overtime Minutes",
+      "status": {
+        "pending": "Pending",
+        "present": "Present",
+        "late": "Late",
+        "absent": "Absent",
+        "missed_checkout": "Missed Checkout",
+        "weekend": "Weekend",
+        "holiday": "Holiday",
+        "leave_permission": "Leave Permission",
+        "mission": "Mission"
+      }
+    },
+    "buffet": {
+      "title": "Buffet",
+      "total_orders": "Total Orders",
+      "total_revenue": "Total Revenue",
+      "status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "rejected": "Rejected",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "period": "Period",
+    "no_data": "No Data Found",
+    "no_data_desc": "No activity in this date range."
+  },
+  "orders": {
+    "status": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled"
+    }
   }
 }
