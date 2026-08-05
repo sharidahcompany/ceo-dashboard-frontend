@@ -923,6 +923,8 @@
     "add_column": "إضافة مرحلة",
     "create_stage_desc": "تحديد مرحلة/عمود جديد للوحة المهام (Kanban).",
     "column_name": "اسم المرحلة",
+    "delete": "حذف",
+    "action_cannot_be_undone": "لا يمكن التراجع عن هذا الإجراء.",
     "confirm_delete_stage": "هل أنت متأكد من حذف هذه المرحلة؟ سيتم فقدان جميع المهام داخلها.",
     "stage_created": "تم إنشاء المرحلة بنجاح.",
     "stage_deleted": "تم حذف المرحلة بنجاح.",

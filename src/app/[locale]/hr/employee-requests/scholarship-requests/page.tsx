@@ -93,7 +93,7 @@ export default function ScholarshipRequestsPage() {
                             options={options}
                             onChange={(newValue) =>
                                 updateScholarshipRequestStatus(
-                                    row.original.id,
+                                    row.original,
                                     newValue as "pending" | "approved" | "rejected"
                                 )
                             }

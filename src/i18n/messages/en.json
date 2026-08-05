@@ -613,6 +613,8 @@
     "add_column": "Add Stage",
     "create_stage_desc": "Define a new stage/column for your Kanban board.",
     "column_name": "Stage Name",
+    "delete": "Delete",
+    "action_cannot_be_undone": "This action cannot be undone.",
     "confirm_delete_stage": "Are you sure you want to delete this stage? All tasks in this stage will be lost.",
     "stage_created": "Stage created successfully.",
     "stage_deleted": "Stage deleted successfully.",

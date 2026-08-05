@@ -184,11 +184,20 @@ export async function deleteScholarshipRequests(ids: number[]): Promise<ActionRe
 }
 
 export async function updateScholarshipRequestStatus(
-    id: number | string,
+    request: ScholarshipRequestResource,
     status: "pending" | "approved" | "rejected"
 ): Promise<ActionResponse<ScholarshipRequestResource>> {
     try {
-        const response = await api.put(`/workspace/scholarship-requests/${id}`, { status });
+        const response = await api.put(`/workspace/scholarship-requests/${request.id}`, {
+            user_id: request.user_id,
+            scholarship_id: request.scholarship_id ?? null,
+            title: request.title,
+            description: request.description,
+            price: request.price,
+            discount_percentage: request.discount_percentage,
+            duration: request.duration,
+            status,
+        });
         revalidatePath("/[locale]/hr/scholarships/scholarship-requests", "page");
         revalidatePath("/[locale]/hr/employee-requests/scholarship-requests", "page");
         return { success: true, data: response.data.data, message: response.data.message };

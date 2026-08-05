@@ -284,7 +284,7 @@ export async function updateStage(id: number | string, data: {
 
 export async function deleteStage(id: number | string): Promise<ActionResponse<void>> {
     try {
-        await api.delete(`/workspace/stages/${id}`);
+        await api.delete(`/workspace/stages/${id}`, { data: { ids: [id] } });
         return { success: true, data: undefined };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
