@@ -6,9 +6,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { DocumentStatusBadge } from "@/components/ui/document-status-badge";
+import { saveFileDownload } from "@/lib/download";
 import {
     getCashInvoices,
     deleteCashInvoices,
+    importCashInvoices,
+    exportCashInvoices,
+    downloadCashInvoiceImportTemplate,
     CashInvoiceResource,
 } from "@/actions/finance/cash-invoice.actions";
 
@@ -58,6 +62,25 @@ export default function CashInvoicesPage() {
         return deleteCashInvoices(numericIds);
     };
 
+    const handleExport = async () => {
+        const res = await exportCashInvoices();
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
+    const handleDownloadTemplate = async () => {
+        const res = await downloadCashInvoiceImportTemplate();
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
+    const handleImport = async (file: File) => {
+        const res = await importCashInvoices(file);
+        return res.success
+            ? { success: true, message: res.message }
+            : { success: false, message: res.error, errors: res.errors };
+    };
+
     return (
         <Card>
             <CardContent>
@@ -68,6 +91,11 @@ export default function CashInvoicesPage() {
                     columns={columns}
                     idKey="id"
                     createTitle={t("routes.create_cash_invoice") || "Add Cash Invoice"}
+                    importable
+                    exportable
+                    onExport={handleExport}
+                    onDownloadTemplate={handleDownloadTemplate}
+                    onImport={handleImport}
                 />
             </CardContent>
         </Card>

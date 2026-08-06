@@ -12,7 +12,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, X, Save } from "lucide-react";
@@ -271,10 +271,7 @@ export default function MissionForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.expense_amount") || "Expense Amount"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
+                                        <NumericInput
                                             {...register("expense_amount")}
                                             placeholder="0.00"
                                         />

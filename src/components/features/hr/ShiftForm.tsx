@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, X, Save } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -258,9 +258,9 @@ export default function ShiftForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.grace_period") || "Grace Period (Minutes)"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            {...register("grace_period", { valueAsNumber: true })}
+                                        <NumericInput
+                                            allowDecimal={false}
+                                            {...register("grace_period")}
                                             placeholder="0"
                                         />
                                     </FieldContent>
@@ -297,10 +297,8 @@ export default function ShiftForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.overtime_rate") || "Overtime Rate (Multiplier)"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            {...register("overtime_rate", { valueAsNumber: true })}
+                                        <NumericInput
+                                            {...register("overtime_rate")}
                                             placeholder="1.0"
                                         />
                                     </FieldContent>
@@ -310,10 +308,8 @@ export default function ShiftForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.deduction_rate") || "Deduction Rate (Multiplier)"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            {...register("deduction_rate", { valueAsNumber: true })}
+                                        <NumericInput
+                                            {...register("deduction_rate")}
                                             placeholder="1.0"
                                         />
                                     </FieldContent>

@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Field,
@@ -191,7 +191,7 @@ export default function TaxRateForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.tax_rate") || "Tax Rate"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("tax_rate", { valueAsNumber: true })} placeholder={t("attributes.tax_rate") || "Tax Rate"} />
+                                        <NumericInput {...register("tax_rate")} placeholder={t("attributes.tax_rate") || "Tax Rate"} />
                                         {errors.tax_rate && <FieldError>{t(errors.tax_rate.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>

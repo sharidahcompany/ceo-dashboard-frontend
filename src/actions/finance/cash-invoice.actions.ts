@@ -1,7 +1,7 @@
 "use server";
 
 import api from "@/lib/api";
-import { getErrorMessage, normalizePaginationMeta } from "@/lib/utils";
+import { getErrorMessage, getRowErrors, normalizePaginationMeta, extractFileDownload, FileDownload } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 import { revalidatePath } from "next/cache";
 
@@ -152,6 +152,39 @@ export async function deleteCashInvoices(
         const response = await api.delete("/finance/cash-invoices", { data: { ids } });
         revalidatePath("/[locale]/finance", "layout");
         return { success: true, data: undefined as any, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function importCashInvoices(
+    file: File
+): Promise<ActionResponse<void>> {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await api.post("/finance/cash-invoices/import", formData);
+        revalidatePath("/[locale]/finance", "layout");
+        return { success: true, data: undefined as any, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error), errors: getRowErrors(error) };
+    }
+}
+
+export async function exportCashInvoices(): Promise<ActionResponse<FileDownload>> {
+    try {
+        const response = await api.get("/finance/cash-invoices/export", { responseType: "arraybuffer" });
+        return { success: true, data: extractFileDownload(response, "cash-invoices.xlsx") };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function downloadCashInvoiceImportTemplate(): Promise<ActionResponse<FileDownload>> {
+    try {
+        const response = await api.get("/finance/cash-invoices/import-template", { responseType: "arraybuffer" });
+        return { success: true, data: extractFileDownload(response, "cash-invoice-import-template.xlsx") };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
     }

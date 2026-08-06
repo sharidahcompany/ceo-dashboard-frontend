@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
@@ -708,9 +708,7 @@ export default function KanbanBoard({
                   <label className="text-sm font-medium">
                     {t("story_points")}
                   </label>
-                  <Input
-                    type="number"
-                    step="0.5"
+                  <NumericInput
                     value={taskStory}
                     onChange={(e) => setTaskStory(e.target.value)}
                   />

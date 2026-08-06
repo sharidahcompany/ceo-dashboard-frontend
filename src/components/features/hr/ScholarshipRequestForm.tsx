@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, X, Save } from "lucide-react";
@@ -251,10 +251,7 @@ export default function ScholarshipRequestForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.price") || "Price"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
+                                        <NumericInput
                                             {...register("price", { required: "validation.required" })}
                                             placeholder="0.00"
                                         />
@@ -268,11 +265,7 @@ export default function ScholarshipRequestForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.discount_percentage") || "Discount Percentage"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            max="100"
+                                        <NumericInput
                                             {...register("discount_percentage", { required: "validation.required" })}
                                             placeholder="0.00"
                                         />

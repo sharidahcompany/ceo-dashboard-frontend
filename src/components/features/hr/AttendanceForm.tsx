@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Loader2, X, Save } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -261,9 +261,9 @@ export default function AttendanceForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.late_minutes") || "Late Minutes"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            {...register("late_minutes", { valueAsNumber: true })}
+                                        <NumericInput
+                                            allowDecimal={false}
+                                            {...register("late_minutes")}
                                             placeholder="0"
                                         />
                                     </FieldContent>
@@ -273,9 +273,9 @@ export default function AttendanceForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.overtime_minutes") || "Overtime Minutes"}</FieldLabel>
                                     <FieldContent>
-                                        <Input
-                                            type="number"
-                                            {...register("overtime_minutes", { valueAsNumber: true })}
+                                        <NumericInput
+                                            allowDecimal={false}
+                                            {...register("overtime_minutes")}
                                             placeholder="0"
                                         />
                                     </FieldContent>

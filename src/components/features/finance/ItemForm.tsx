@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -249,35 +249,35 @@ export default function ItemForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.unit_cost") || "Unit Cost"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("unit_cost")} />
+                                        <NumericInput {...register("unit_cost")} />
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.unit_price") || "Unit Price"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("unit_price")} />
+                                        <NumericInput {...register("unit_price")} />
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.quantity") || "Quantity"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("quantity")} />
+                                        <NumericInput {...register("quantity")} />
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.avg_unit_cost") || "Average Unit Cost"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("avg_unit_cost")} />
+                                        <NumericInput {...register("avg_unit_cost")} />
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.inventory_value") || "Inventory Value"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("inventory_value")} />
+                                        <NumericInput {...register("inventory_value")} />
                                     </FieldContent>
                                 </Field>
 

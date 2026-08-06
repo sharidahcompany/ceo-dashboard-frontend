@@ -28,9 +28,13 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Loader2, User, UserPlus } from "lucide-react";
+import { saveFileDownload } from "@/lib/download";
 import {
   getEmployees,
   inviteUser,
+  importEmployees,
+  exportEmployees,
+  downloadEmployeeImportTemplate,
   InviteUserData,
   UserResource,
 } from "@/actions/workspace/user.actions";
@@ -69,6 +73,25 @@ export default function EmployeesPage() {
         toast.error(res.error);
       }
     });
+  };
+
+  const handleExport = async () => {
+    const res = await exportEmployees();
+    if (!res.success) throw new Error(res.error);
+    saveFileDownload(res.data);
+  };
+
+  const handleDownloadTemplate = async () => {
+    const res = await downloadEmployeeImportTemplate();
+    if (!res.success) throw new Error(res.error);
+    saveFileDownload(res.data);
+  };
+
+  const handleImport = async (file: File) => {
+    const res = await importEmployees(file);
+    return res.success
+      ? { success: true, message: res.message }
+      : { success: false, message: res.error, errors: res.errors };
   };
 
   const columns = useMemo<ColumnDef<UserResource>[]>(
@@ -231,6 +254,11 @@ export default function EmployeesPage() {
           idKey="id"
           editable={true}
           deletable={false}
+          importable
+          exportable
+          onExport={handleExport}
+          onDownloadTemplate={handleDownloadTemplate}
+          onImport={handleImport}
         />
       </CardContent>
     </Card>

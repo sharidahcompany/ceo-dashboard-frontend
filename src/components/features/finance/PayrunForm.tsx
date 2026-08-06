@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import {
     Field,
     FieldGroup,
@@ -48,14 +48,20 @@ const payrunSchema = z.object({
     name: z.string().min(1, { message: "validation.required" }),
     period_start: z.string().min(1, { message: "validation.required" }),
     period_end: z.string().min(1, { message: "validation.required" }),
-    pay_date: z.string().optional(),
+    pay_date: z.string().min(1, { message: "validation.required" }),
     currency: z.string().min(1, { message: "validation.required" }),
     exchange_rate: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== null, {
         message: "validation.required",
     }),
-    total_gross: z.union([z.string(), z.number()]).optional(),
-    total_deductions: z.union([z.string(), z.number()]).optional(),
-    total_net: z.union([z.string(), z.number()]).optional(),
+    total_gross: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== null && v !== undefined, {
+        message: "validation.required",
+    }),
+    total_deductions: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== null && v !== undefined, {
+        message: "validation.required",
+    }),
+    total_net: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== null && v !== undefined, {
+        message: "validation.required",
+    }),
     status: z.enum(["draft", "processed", "approved", "paid"]).optional(),
 });
 
@@ -89,9 +95,9 @@ export default function PayrunForm() {
             pay_date: "",
             currency: "",
             exchange_rate: 1,
-            total_gross: "",
-            total_deductions: "",
-            total_net: "",
+            total_gross: 0,
+            total_deductions: 0,
+            total_net: 0,
             status: "draft",
         },
     });
@@ -120,9 +126,9 @@ export default function PayrunForm() {
                 setValue("pay_date", pr.pay_date?.slice(0, 10) || "");
                 setValue("currency", pr.currency?.code || "");
                 setValue("exchange_rate", pr.exchange_rate);
-                setValue("total_gross", pr.total_gross ?? "");
-                setValue("total_deductions", pr.total_deductions ?? "");
-                setValue("total_net", pr.total_net ?? "");
+                setValue("total_gross", pr.total_gross ?? 0);
+                setValue("total_deductions", pr.total_deductions ?? 0);
+                setValue("total_net", pr.total_net ?? 0);
                 setValue("status", pr.status || "draft");
             } else {
                 toast.error(res.error);
@@ -212,13 +218,14 @@ export default function PayrunForm() {
                                     <FieldLabel>{t("attributes.pay_date") || "Pay Date"}</FieldLabel>
                                     <FieldContent>
                                         <Input type="date" {...register("pay_date")} />
+                                        {errors.pay_date && <FieldError>{t(errors.pay_date.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.exchange_rate") || "Exchange Rate"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("exchange_rate", { valueAsNumber: true })} placeholder="1" />
+                                        <NumericInput {...register("exchange_rate")} placeholder="1" />
                                         {errors.exchange_rate && <FieldError>{t(errors.exchange_rate.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -248,21 +255,24 @@ export default function PayrunForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.total_gross") || "Total Gross"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("total_gross")} />
+                                        <NumericInput {...register("total_gross")} />
+                                        {errors.total_gross && <FieldError>{t(errors.total_gross.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.total_deductions") || "Total Deductions"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("total_deductions")} />
+                                        <NumericInput {...register("total_deductions")} />
+                                        {errors.total_deductions && <FieldError>{t(errors.total_deductions.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.total_net") || "Total Net"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("total_net")} />
+                                        <NumericInput {...register("total_net")} />
+                                        {errors.total_net && <FieldError>{t(errors.total_net.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
                             </FieldGroup>

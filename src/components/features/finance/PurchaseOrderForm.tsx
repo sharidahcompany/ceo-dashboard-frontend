@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Field,
@@ -342,7 +342,7 @@ export default function PurchaseOrderForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.exchange_rate") || "Exchange Rate"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("exchange_rate", { valueAsNumber: true })} placeholder="1" />
+                                        <NumericInput {...register("exchange_rate")} placeholder="1" />
                                     </FieldContent>
                                 </Field>
 
@@ -423,7 +423,7 @@ export default function PurchaseOrderForm() {
                                         <Field>
                                             <FieldLabel>{t("attributes.quantity") || "Quantity"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.quantity`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.quantity`)} />
                                                 {errors.items?.[index]?.quantity && (
                                                     <FieldError>{t(errors.items[index]?.quantity?.message!)}</FieldError>
                                                 )}
@@ -433,7 +433,7 @@ export default function PurchaseOrderForm() {
                                         <Field>
                                             <FieldLabel>{t("attributes.price") || "Price"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.price`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.price`)} />
                                                 {errors.items?.[index]?.price && (
                                                     <FieldError>{t(errors.items[index]?.price?.message!)}</FieldError>
                                                 )}
@@ -443,7 +443,7 @@ export default function PurchaseOrderForm() {
                                         <Field>
                                             <FieldLabel>{t("attributes.discount_percent") || "Discount %"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.discount_percent`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.discount_percent`)} />
                                             </FieldContent>
                                         </Field>
 

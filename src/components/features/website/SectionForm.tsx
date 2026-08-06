@@ -10,7 +10,7 @@ import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldSet } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -268,8 +268,8 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
                     {/* Order Field */}
                     <Field>
                         <Label>{t("attributes.order", { defaultValue: "Order / Position" })}</Label>
-                        <Input
-                            type="number"
+                        <NumericInput
+                            allowDecimal={false}
                             {...register("order")}
                             placeholder="0"
                             className="mt-2"

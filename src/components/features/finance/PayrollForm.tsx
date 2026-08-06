@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import {
     Field,
     FieldGroup,
@@ -207,7 +207,7 @@ export default function PayrollForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.gross_salary") || "Gross Salary"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("gross_salary")} />
+                                        <NumericInput {...register("gross_salary")} />
                                         {errors.gross_salary && <FieldError>{t(errors.gross_salary.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -215,14 +215,14 @@ export default function PayrollForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.total_deductions") || "Total Deductions"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("total_deductions")} />
+                                        <NumericInput {...register("total_deductions")} />
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.net_salary") || "Net Salary"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("net_salary")} />
+                                        <NumericInput {...register("net_salary")} />
                                         {errors.net_salary && <FieldError>{t(errors.net_salary.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -230,14 +230,14 @@ export default function PayrollForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.paid_amount") || "Paid Amount"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("paid_amount")} />
+                                        <NumericInput {...register("paid_amount")} />
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>{t("attributes.remaining_amount") || "Remaining Amount"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("remaining_amount")} />
+                                        <NumericInput {...register("remaining_amount")} />
                                     </FieldContent>
                                 </Field>
 

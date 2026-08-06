@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Field,
@@ -232,7 +232,7 @@ export default function InventoryAdjustmentForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.quantity") || "Quantity"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("qty", { valueAsNumber: true })} />
+                                        <NumericInput {...register("qty")} />
                                         {errors.qty && <FieldError>{t(errors.qty.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -240,7 +240,7 @@ export default function InventoryAdjustmentForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.inventory_value") || "Inventory Value"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("inventory_value", { valueAsNumber: true })} />
+                                        <NumericInput {...register("inventory_value")} />
                                         {errors.inventory_value && <FieldError>{t(errors.inventory_value.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -255,7 +255,7 @@ export default function InventoryAdjustmentForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.total_adjustment_amount") || "Total Adjustment Amount"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("total_adjustment_amount", { valueAsNumber: true })} />
+                                        <NumericInput allowNegative {...register("total_adjustment_amount")} />
                                     </FieldContent>
                                 </Field>
 

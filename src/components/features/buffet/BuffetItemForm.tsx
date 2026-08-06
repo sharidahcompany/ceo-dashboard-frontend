@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldGroup, FieldSeparator, FieldSet } from "@/components/ui/field";
 import { FileUpload } from "@/components/ui/file-upload";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,7 +34,7 @@ export const buffetItemSchema = z.object({
         ar: z.string().min(1, { message: "validation.required" }),
         en: z.string().min(1, { message: "validation.required" }),
     }),
-    price: z.number().min(0, { message: "validation.min_value" }),
+    price: z.union([z.string(), z.number()]).refine((v) => Number(v) >= 0, { message: "validation.min_value" }),
     is_available: z.boolean().optional(),
     is_vip: z.boolean().optional(),
     is_active: z.boolean().optional(),
@@ -168,10 +168,8 @@ export default function BuffetItemForm({
 
                     <Field>
                         <Label>{t("attributes.price")}</Label>
-                        <Input
-                            type="number"
-                            step="0.01"
-                            {...register("price", { valueAsNumber: true })}
+                        <NumericInput
+                            {...register("price")}
                             placeholder={t("attributes.price")}
                         />
                         {errors?.price && (

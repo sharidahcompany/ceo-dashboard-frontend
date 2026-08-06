@@ -1,7 +1,7 @@
 "use server";
 
 import api from "@/lib/api";
-import { getErrorMessage, normalizePaginationMeta } from "@/lib/utils";
+import { getErrorMessage, getRowErrors, normalizePaginationMeta, extractFileDownload, FileDownload } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 import { revalidatePath } from "next/cache";
 
@@ -149,6 +149,39 @@ export async function deleteCreditNotes(
         const response = await api.delete("/finance/credit-notes", { data: { ids } });
         revalidatePath("/[locale]/finance", "layout");
         return { success: true, data: undefined as any, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function importCreditNotes(
+    file: File
+): Promise<ActionResponse<void>> {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await api.post("/finance/credit-notes/import", formData);
+        revalidatePath("/[locale]/finance", "layout");
+        return { success: true, data: undefined as any, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error), errors: getRowErrors(error) };
+    }
+}
+
+export async function exportCreditNotes(): Promise<ActionResponse<FileDownload>> {
+    try {
+        const response = await api.get("/finance/credit-notes/export", { responseType: "arraybuffer" });
+        return { success: true, data: extractFileDownload(response, "credit-notes.xlsx") };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function downloadCreditNoteImportTemplate(): Promise<ActionResponse<FileDownload>> {
+    try {
+        const response = await api.get("/finance/credit-notes/import-template", { responseType: "arraybuffer" });
+        return { success: true, data: extractFileDownload(response, "credit-note-import-template.xlsx") };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
     }

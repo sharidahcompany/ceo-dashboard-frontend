@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Field,
@@ -336,21 +336,21 @@ export default function JournalForm() {
                                         <Field>
                                             <FieldLabel>{t("attributes.exchange_rate") || "Exchange Rate"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.exchange_rate`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.exchange_rate`)} />
                                             </FieldContent>
                                         </Field>
 
                                         <Field>
                                             <FieldLabel>{t("attributes.debit") || "Debit"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.debit`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.debit`)} />
                                             </FieldContent>
                                         </Field>
 
                                         <Field>
                                             <FieldLabel>{t("attributes.credit") || "Credit"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.credit`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.credit`)} />
                                             </FieldContent>
                                         </Field>
 

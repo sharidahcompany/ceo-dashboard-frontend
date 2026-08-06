@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
     Field,
@@ -233,7 +233,7 @@ export default function FixedAssetForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.purchase_cost") || "Purchase Cost"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("purchase_cost")} />
+                                        <NumericInput {...register("purchase_cost")} />
                                         {errors.purchase_cost && <FieldError>{t(errors.purchase_cost.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -241,7 +241,7 @@ export default function FixedAssetForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.salvage_value") || "Salvage Value"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("salvage_value")} />
+                                        <NumericInput {...register("salvage_value")} />
                                         {errors.salvage_value && <FieldError>{t(errors.salvage_value.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
@@ -249,7 +249,7 @@ export default function FixedAssetForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.life_in_months") || "Life (Months)"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" {...register("life_in_months")} />
+                                        <NumericInput {...register("life_in_months")} />
                                         {errors.life_in_months && <FieldError>{t(errors.life_in_months.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>

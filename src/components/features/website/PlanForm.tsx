@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Field, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field";
@@ -246,11 +246,9 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                             <FieldLabel>
                                                 {t("plans.fields.price", { defaultValue: "Price" })}
                                             </FieldLabel>
-                                            <Input
-                                                type="number"
-                                                step="0.01"
+                                            <NumericInput
                                                 {...register("price")}
-                                               
+
                                             />
                                             {errors.price && <FieldError>{t(errors.price.message as any)}</FieldError>}
                                         </Field>
@@ -350,10 +348,8 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                                                 <FieldLabel>
                                                                     {t("features.fields.value", { defaultValue: "Limit" })}
                                                                 </FieldLabel>
-                                                                <Input
-                                                                    type="number"
+                                                                <NumericInput
                                                                     {...register(`featuresMap.${key}.value`)}
-                                                                   
                                                                 />
                                                             </Field>
                                                         )}
@@ -374,10 +370,9 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                                             <FieldLabel>
                                                                 {t("features.fields.reset_period", { defaultValue: "Reset Cycle" })}
                                                             </FieldLabel>
-                                                            <Input
-                                                                type="number"
+                                                            <NumericInput
+                                                                allowDecimal={false}
                                                                 {...register(`featuresMap.${key}.reset_period`)}
-                                                               
                                                             />
                                                         </Field>
 
@@ -427,10 +422,10 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                 <FieldLabel>
                                     {t("plans.fields.billing_period", { defaultValue: "Period Duration" })}
                                 </FieldLabel>
-                                <Input
-                                    type="number"
+                                <NumericInput
+                                    allowDecimal={false}
                                     {...register("billing_period")}
-                                   
+
                                 />
                                 {errors.billing_period && <FieldError>{t(errors.billing_period.message as any)}</FieldError>}
                             </Field>
@@ -464,10 +459,10 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                 <FieldLabel>
                                     {t("plans.fields.trial_days", { defaultValue: "Trial Days" })}
                                 </FieldLabel>
-                                <Input
-                                    type="number"
+                                <NumericInput
+                                    allowDecimal={false}
                                     {...register("trial_days")}
-                                   
+
                                 />
                                 {errors.trial_days && <FieldError>{t(errors.trial_days.message as any)}</FieldError>}
                             </Field>
@@ -476,10 +471,10 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                 <FieldLabel>
                                     {t("plans.fields.grace_days", { defaultValue: "Grace Days" })}
                                 </FieldLabel>
-                                <Input
-                                    type="number"
+                                <NumericInput
+                                    allowDecimal={false}
                                     {...register("grace_days")}
-                                   
+
                                 />
                                 {errors.grace_days && <FieldError>{t(errors.grace_days.message as any)}</FieldError>}
                             </Field>
@@ -488,10 +483,10 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                                 <FieldLabel>
                                     {t("plans.fields.sort_order", { defaultValue: "Display Order" })}
                                 </FieldLabel>
-                                <Input
-                                    type="number"
+                                <NumericInput
+                                    allowDecimal={false}
                                     {...register("sort_order")}
-                                   
+
                                 />
                                 {errors.sort_order && <FieldError>{t(errors.sort_order.message as any)}</FieldError>}
                             </Field>

@@ -6,9 +6,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { DocumentStatusBadge } from "@/components/ui/document-status-badge";
+import { saveFileDownload } from "@/lib/download";
 import {
     getCreditNotes,
     deleteCreditNotes,
+    importCreditNotes,
+    exportCreditNotes,
+    downloadCreditNoteImportTemplate,
     CreditNoteResource,
 } from "@/actions/finance/credit-note.actions";
 
@@ -58,6 +62,25 @@ export default function CreditNotesPage() {
         return deleteCreditNotes(numericIds);
     };
 
+    const handleExport = async () => {
+        const res = await exportCreditNotes();
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
+    const handleDownloadTemplate = async () => {
+        const res = await downloadCreditNoteImportTemplate();
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
+    const handleImport = async (file: File) => {
+        const res = await importCreditNotes(file);
+        return res.success
+            ? { success: true, message: res.message }
+            : { success: false, message: res.error, errors: res.errors };
+    };
+
     return (
         <Card>
             <CardContent>
@@ -68,6 +91,11 @@ export default function CreditNotesPage() {
                     columns={columns}
                     idKey="id"
                     createTitle={t("routes.create_credit_note") || "Add Credit Note"}
+                    importable
+                    exportable
+                    onExport={handleExport}
+                    onDownloadTemplate={handleDownloadTemplate}
+                    onImport={handleImport}
                 />
             </CardContent>
         </Card>

@@ -41,7 +41,7 @@ export interface UsersApiResponse {
   message: string;
 }
 
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, getRowErrors, extractFileDownload, FileDownload } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 
 export async function getUsers(query?: string): Promise<ActionResponse<UsersApiResponse>> {
@@ -62,6 +62,43 @@ export async function getUsers(query?: string): Promise<ActionResponse<UsersApiR
 export async function getEmployees(query?: string): Promise<ActionResponse<UsersApiResponse>> {
   const roleFilter = "roles=employee,owner,super-admin";
   return getUsers(query ? `${query}&${roleFilter}` : roleFilter);
+}
+
+/**
+ * Bulk-invite employees from an uploaded spreadsheet. The backend validates
+ * every row before creating/inviting anyone — on failure nothing is saved
+ * and the first row error is returned; on success each new row goes through
+ * the same create-or-invite path as inviteUser(), so imported employees get
+ * their invitation email too.
+ */
+export async function importEmployees(file: File): Promise<ActionResponse<void>> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post("/auth/users/import", formData);
+    return { success: true, data: undefined as any, message: response.data.message };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error), errors: getRowErrors(error) };
+  }
+}
+
+export async function exportEmployees(): Promise<ActionResponse<FileDownload>> {
+  try {
+    const response = await api.get("/auth/users/export", { responseType: "arraybuffer" });
+    return { success: true, data: extractFileDownload(response, "employees.xlsx") };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function downloadEmployeeImportTemplate(): Promise<ActionResponse<FileDownload>> {
+  try {
+    const response = await api.get("/auth/users/import-template", { responseType: "arraybuffer" });
+    return { success: true, data: extractFileDownload(response, "employee-import-template.xlsx") };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
 }
 
 export interface InviteUserData {

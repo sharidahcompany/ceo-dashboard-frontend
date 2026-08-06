@@ -17,7 +17,7 @@ import {
     CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import {
     Field,
     FieldGroup,
@@ -192,7 +192,7 @@ export default function PayrollPaymentForm() {
                                 <Field>
                                     <FieldLabel>{t("attributes.exchange_rate") || "Exchange Rate"}</FieldLabel>
                                     <FieldContent>
-                                        <Input type="number" step="any" {...register("exchange_rate", { valueAsNumber: true })} />
+                                        <NumericInput {...register("exchange_rate")} />
                                     </FieldContent>
                                 </Field>
 
@@ -236,7 +236,7 @@ export default function PayrollPaymentForm() {
                                         <Field>
                                             <FieldLabel>{t("attributes.amount") || "Amount"}</FieldLabel>
                                             <FieldContent>
-                                                <Input type="number" step="any" {...register(`items.${index}.amount`, { valueAsNumber: true })} />
+                                                <NumericInput {...register(`items.${index}.amount`)} />
                                                 {errors.items?.[index]?.amount && (
                                                     <FieldError>{t(errors.items[index]?.amount?.message!)}</FieldError>
                                                 )}

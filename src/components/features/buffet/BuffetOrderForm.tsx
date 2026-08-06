@@ -14,7 +14,7 @@ import {
   FieldSeparator,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,7 +38,7 @@ const buffetOrderItemSchema = z.object({
   buffet_item_id: z.union([z.string(), z.number()]).refine((val) => !!val, {
     message: "validation.required",
   }),
-  quantity: z.number().min(1, { message: "validation.required" }),
+  quantity: z.union([z.string(), z.number()]).refine((v) => Number(v) >= 1, { message: "validation.required" }),
   notes: z.string().optional().nullable(),
 });
 
@@ -276,12 +276,9 @@ export default function BuffetOrderForm({
                   <div className="grid grid-cols-2 gap-3">
                     <Field>
                       <Label>{t("attributes.quantity") || "Quantity"} *</Label>
-                      <Input
-                        type="number"
-                        {...register(`items.${index}.quantity`, {
-                          valueAsNumber: true,
-                        })}
-                        min="1"
+                      <NumericInput
+                        allowDecimal={false}
+                        {...register(`items.${index}.quantity`)}
                         placeholder="1"
                       />
                       {errors?.items?.[index]?.quantity?.message && (

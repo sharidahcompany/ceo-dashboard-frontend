@@ -22,7 +22,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { Input, NumericInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -451,8 +451,7 @@ export default function PlansList({ initialPlans, initialFeatures }: PlansListPr
                                     <FieldLabel>
                                         {t("features.fields.sort_order", { defaultValue: "Sort Order" })}
                                     </FieldLabel>
-                                    <Input
-                                        type="number"
+                                    <NumericInput
                                         {...register("sort_order")}
                                         placeholder={t("plans.placeholders.sort_order", { defaultValue: "0" })}
                                     />

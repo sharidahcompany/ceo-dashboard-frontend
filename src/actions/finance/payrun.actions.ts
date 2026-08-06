@@ -34,12 +34,12 @@ export interface PayrunFormData {
     name: string;
     period_start: string;
     period_end: string;
-    pay_date?: string;
+    pay_date: string;
     currency: string;
     exchange_rate: number | string;
-    total_gross?: number | string;
-    total_deductions?: number | string;
-    total_net?: number | string;
+    total_gross: number | string;
+    total_deductions: number | string;
+    total_net: number | string;
     status?: PayrunStatus;
 }
 

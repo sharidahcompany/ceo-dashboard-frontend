@@ -17,4 +17,63 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   )
 }
 
-export { Input }
+type NumericInputProps = Omit<React.ComponentProps<"input">, "type"> & {
+  allowDecimal?: boolean
+  allowNegative?: boolean
+}
+
+const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps>(
+  ({ allowDecimal = true, allowNegative = false, onChange, onKeyDown, onPaste, ...props }, ref) => {
+    const sanitize = (value: string) => {
+      let v = value.replace(allowNegative ? /[^0-9.-]/g : /[^0-9.]/g, "")
+      if (allowNegative) {
+        const negative = v.startsWith("-")
+        v = (negative ? "-" : "") + v.slice(negative ? 1 : 0).replace(/-/g, "")
+      }
+      if (allowDecimal) {
+        const firstDot = v.indexOf(".")
+        if (firstDot !== -1) {
+          v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, "")
+        }
+      } else {
+        v = v.replace(/\./g, "")
+      }
+      return v
+    }
+
+    return (
+      <Input
+        type="text"
+        inputMode={allowDecimal ? "decimal" : "numeric"}
+        ref={ref}
+        onKeyDown={(e) => {
+          if (
+            e.key.length === 1 &&
+            !/[0-9]/.test(e.key) &&
+            !(allowDecimal && e.key === "." && !e.currentTarget.value.includes(".")) &&
+            !(allowNegative && e.key === "-" && e.currentTarget.selectionStart === 0 && !e.currentTarget.value.includes("-")) &&
+            !e.ctrlKey &&
+            !e.metaKey
+          ) {
+            e.preventDefault()
+          }
+          onKeyDown?.(e)
+        }}
+        onPaste={(e) => {
+          onPaste?.(e)
+        }}
+        onChange={(e) => {
+          const sanitized = sanitize(e.target.value)
+          if (sanitized !== e.target.value) {
+            e.target.value = sanitized
+          }
+          onChange?.(e)
+        }}
+        {...props}
+      />
+    )
+  }
+)
+NumericInput.displayName = "NumericInput"
+
+export { Input, NumericInput }
