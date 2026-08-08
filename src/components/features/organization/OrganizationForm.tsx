@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/field";
 import { CountryField } from "@/components/ui/country";
 import { CurrencyField } from "@/components/ui/currency";
+import { useIsOwnerOrSuperAdmin } from "@/providers/AbilityProvider";
 
 import {
   getCurrentOrganization,
@@ -70,9 +71,14 @@ function organizationDisplayName(org: OrganizationResource | null): string {
 
 export default function OrganizationForm() {
   const t = useTranslations();
+  const canEditOrganization = useIsOwnerOrSuperAdmin();
 
-  const [organization, setOrganization] = useState<OrganizationResource | null>(null);
-  const [subscription, setSubscription] = useState<SubscriptionResource | null>(null);
+  const [organization, setOrganization] = useState<OrganizationResource | null>(
+    null,
+  );
+  const [subscription, setSubscription] = useState<SubscriptionResource | null>(
+    null,
+  );
   const [countries, setCountries] = useState<CountryOption[]>([]);
   const [currencies, setCurrencies] = useState<CurrencyOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +113,8 @@ export default function OrganizationForm() {
   });
 
   const resetFromOrganization = (org: OrganizationResource) => {
-    const name = typeof org.name === "object" && org.name ? org.name : { ar: "", en: "" };
+    const name =
+      typeof org.name === "object" && org.name ? org.name : { ar: "", en: "" };
     reset({
       name_ar: name.ar || (typeof org.name === "string" ? org.name : ""),
       name_en: name.en || "",
@@ -190,7 +197,10 @@ export default function OrganizationForm() {
       formData.append("postal_code", values.postal_code || "");
       formData.append("country", values.country || "");
       formData.append("currency", values.currency || "");
-      formData.append("is_vat_registered", values.is_vat_registered ? "1" : "0");
+      formData.append(
+        "is_vat_registered",
+        values.is_vat_registered ? "1" : "0",
+      );
       if (logoFile) formData.append("logo", logoFile);
 
       const res = await updateOrganization(formData);
@@ -226,7 +236,7 @@ export default function OrganizationForm() {
           <CardHeader className="border-b">
             <CardTitle>{t("organization.title")}</CardTitle>
             <CardDescription>{t("organization.description")}</CardDescription>
-            {!loading && organization && !isEditing && (
+            {!loading && organization && !isEditing && canEditOrganization && (
               <CardAction>
                 <Button
                   type="button"
@@ -486,7 +496,9 @@ export default function OrganizationForm() {
                       <FieldContent>
                         <Input
                           value={
-                            countries.find((c) => c.iso3 === organization.country)?.label ||
+                            countries.find(
+                              (c) => c.iso3 === organization.country,
+                            )?.label ||
                             organization.country ||
                             ""
                           }
@@ -510,7 +522,9 @@ export default function OrganizationForm() {
                       <FieldContent>
                         <Input
                           value={
-                            currencies.find((c) => c.code === organization.currency)?.label ||
+                            currencies.find(
+                              (c) => c.code === organization.currency,
+                            )?.label ||
                             organization.currency ||
                             ""
                           }
@@ -597,9 +611,12 @@ export default function OrganizationForm() {
                 <FieldLabel>{t("organization.status")}</FieldLabel>
                 <FieldContent>
                   <Badge variant={statusVariant(subscription.status)}>
-                    {t(`organization.subscription_status.${subscription.status}`, {
-                      defaultValue: subscription.status,
-                    })}
+                    {t(
+                      `organization.subscription_status.${subscription.status}`,
+                      {
+                        defaultValue: subscription.status,
+                      },
+                    )}
                   </Badge>
                 </FieldContent>
               </Field>

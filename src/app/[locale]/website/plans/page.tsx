@@ -1,6 +1,7 @@
 import React from "react";
 import PlansList from "@/components/features/website/PlansList";
 import { getPlans, getFeatures } from "@/actions/website/plans.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default async function PlansPage() {
     const [plansRes, featuresRes] = await Promise.all([
@@ -12,8 +13,10 @@ export default async function PlansPage() {
     const features = featuresRes.success && featuresRes.data?.data ? featuresRes.data.data : [];
 
     return (
-        <div className="max-w-6xl mx-auto">
-            <PlansList initialPlans={plans} initialFeatures={features} />
-        </div>
+        <PermissionGate permission="website.setting.view">
+            <div className="max-w-6xl mx-auto">
+                <PlansList initialPlans={plans} initialFeatures={features} />
+            </div>
+        </PermissionGate>
     );
 }

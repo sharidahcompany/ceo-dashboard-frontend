@@ -23,7 +23,15 @@ export function getErrorMessage(
   defaultMessage = "حدث خطأ غير متوقع",
 ): string {
   if (isAxiosError(error)) {
-    const data = error.response?.data;
+    let data = error.response?.data;
+
+    if (data instanceof ArrayBuffer) {
+      try {
+        data = JSON.parse(Buffer.from(data).toString("utf-8"));
+      } catch {
+        data = undefined;
+      }
+    }
 
     if (data) {
       if (data.errors) {

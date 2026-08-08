@@ -12,9 +12,14 @@ import {
     JobApplicationResource,
 } from "@/actions/workspace/candidates.actions";
 import { EditableStatusSelect } from "@/components/features/hr/EditableStatusSelect";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function CandidatesPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.job_application.create");
+    const canEdit = useCan("workspace.job_application.update");
+    const canDelete = useCan("workspace.job_application.delete");
 
     const columns = useMemo<ColumnDef<JobApplicationResource>[]>(
         () => [
@@ -80,18 +85,22 @@ export default function CandidatesPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<JobApplicationResource, any>
-                    title={t("routes.candidates")}
-                    description={t("messages.hr.candidates_description")}
-                    fetchAction={getCandidates}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_candidate")}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.job_application.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<JobApplicationResource, any>
+                        title={t("routes.candidates")}
+                        description={t("messages.hr.candidates_description")}
+                        fetchAction={getCandidates}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? t("messages.hr.create_new_candidate") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

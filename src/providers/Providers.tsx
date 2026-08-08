@@ -4,6 +4,7 @@ import React from "react";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StoreProvider } from "./StoreProvider";
+import { AbilityProvider } from "./AbilityProvider";
 import { DirectionProvider, TextDirection } from "@base-ui/react";
 import { ThemeProvider } from "next-themes";
 import { NextIntlClientProvider } from "next-intl";
@@ -40,17 +41,19 @@ export default function Providers({
           scriptProps={themeScriptProps}
         >
           <StoreProvider>
-            <DirectionProvider direction={direction}>
-              <TooltipProvider>
-                <QueryClientProvider client={queryClient}>
-                  {children}
-                  <Toaster
-                    richColors
-                    toastOptions={{ className: "font-sans" }}
-                  />
-                </QueryClientProvider>
-              </TooltipProvider>
-            </DirectionProvider>
+            <AbilityProvider>
+              <DirectionProvider direction={direction}>
+                <TooltipProvider>
+                  <QueryClientProvider client={queryClient}>
+                    {children}
+                    <Toaster
+                      richColors
+                      toastOptions={{ className: "font-sans" }}
+                    />
+                  </QueryClientProvider>
+                </TooltipProvider>
+              </DirectionProvider>
+            </AbilityProvider>
           </StoreProvider>
         </ThemeProvider>
       </NextIntlClientProvider>

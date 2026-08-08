@@ -16,6 +16,7 @@ export const initializeStore = () => {
           user: state.user,
           tenant_id: state.tenant_id,
           permissions: state.permissions,
+          roles: state.roles,
         }),
       },
     ),

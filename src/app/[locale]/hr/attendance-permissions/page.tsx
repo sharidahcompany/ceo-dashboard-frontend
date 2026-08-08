@@ -13,9 +13,14 @@ import {
     deleteAttendancePermissions,
     AttendancePermissionResource,
 } from "@/actions/workspace/attendance-permissions.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function AttendancePermissionsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.attendance_permission.create");
+    const canEdit = useCan("workspace.attendance_permission.update");
+    const canDelete = useCan("workspace.attendance_permission.delete");
 
     const columns = useMemo<ColumnDef<AttendancePermissionResource>[]>(
         () => [
@@ -102,23 +107,27 @@ export default function AttendancePermissionsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<AttendancePermissionResource, any>
-                    title={t("routes.attendance_permissions") || "Attendance Permissions"}
-                    description={
-                        t("messages.hr.attendance_permissions_description") ||
-                        "Manage employee attendance leave and late permission requests"
-                    }
-                    fetchAction={getAttendancePermissions}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={
-                        t("routes.create_attendance_permission") || "Create Permission"
-                    }
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.attendance_permission.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<AttendancePermissionResource, any>
+                        title={t("routes.attendance_permissions") || "Attendance Permissions"}
+                        description={
+                            t("messages.hr.attendance_permissions_description") ||
+                            "Manage employee attendance leave and late permission requests"
+                        }
+                        fetchAction={getAttendancePermissions}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={
+                            canCreate ? (t("routes.create_attendance_permission") || "Create Permission") : undefined
+                        }
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

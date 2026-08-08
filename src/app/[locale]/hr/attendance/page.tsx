@@ -9,9 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "lucide-react";
 import { getAttendances, deleteAttendances, AttendanceResource } from "@/actions/workspace/attendance.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function AttendancePage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.attendance.create");
+    const canEdit = useCan("workspace.attendance.update");
+    const canDelete = useCan("workspace.attendance.delete");
 
     const columns = useMemo<ColumnDef<AttendanceResource>[]>(
         () => [
@@ -106,18 +111,22 @@ export default function AttendancePage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<AttendanceResource, any>
-                    title={t("routes.attendance") || "Attendance"}
-                    description={t("messages.hr.attendance_description") || "Manage and review organization employee attendance logs"}
-                    fetchAction={getAttendances}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.record_attendance") || "Record Attendance"}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.attendance.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<AttendanceResource, any>
+                        title={t("routes.attendance") || "Attendance"}
+                        description={t("messages.hr.attendance_description") || "Manage and review organization employee attendance logs"}
+                        fetchAction={getAttendances}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? (t("messages.hr.record_attendance") || "Record Attendance") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

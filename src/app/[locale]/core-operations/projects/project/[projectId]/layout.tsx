@@ -10,6 +10,8 @@ import { getProjectDetails, ProjectResource, uploadProjectFile, deleteProjectFil
 import { FolderKanban, Calendar, Users, Paperclip, ChevronLeft, LayoutDashboard, Trash2, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { Can } from "@/providers/AbilityProvider";
 
 interface ProjectContextType {
     project: ProjectResource | null;
@@ -118,6 +120,7 @@ export default function ProjectLayout({
     };
 
     return (
+        <PermissionGate permission="workspace.project.view">
         <ProjectContext.Provider value={{ project, fetchProject }}>
             <Card className="w-full">
                 <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b">
@@ -157,15 +160,17 @@ export default function ProjectLayout({
                                     <DialogDescription>{t("project_files_desc")}</DialogDescription>
                                 </DialogHeader>
                                 <div className="py-4 space-y-4">
-                                    <div className="grid w-full items-center gap-1.5">
-                                        <label className="text-sm font-medium">{t("upload_file")}</label>
-                                        <input
-                                            type="file"
-                                            onChange={handleFileUpload}
-                                            disabled={isPending}
-                                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                        />
-                                    </div>
+                                    <Can I="update" a="workspace.project">
+                                        <div className="grid w-full items-center gap-1.5">
+                                            <label className="text-sm font-medium">{t("upload_file")}</label>
+                                            <input
+                                                type="file"
+                                                onChange={handleFileUpload}
+                                                disabled={isPending}
+                                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                            />
+                                        </div>
+                                    </Can>
 
                                     <div className="space-y-2 mt-4 max-h-[40vh] overflow-y-auto pr-1">
                                         {project.files && project.files.length > 0 ? (
@@ -183,15 +188,17 @@ export default function ProjectLayout({
                                                                 <ArrowUpRight className="size-4" />
                                                             </Button>
                                                         </a>
-                                                        <Button
-                                                            size="icon"
-                                                            variant="ghost"
-                                                            onClick={() => handleFileDelete(file.id)}
-                                                            disabled={isPending}
-                                                            className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                        >
-                                                            <Trash2 className="size-4" />
-                                                        </Button>
+                                                        <Can I="update" a="workspace.project">
+                                                            <Button
+                                                                size="icon"
+                                                                variant="ghost"
+                                                                onClick={() => handleFileDelete(file.id)}
+                                                                disabled={isPending}
+                                                                className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                            >
+                                                                <Trash2 className="size-4" />
+                                                            </Button>
+                                                        </Can>
                                                     </div>
                                                 </div>
                                             ))
@@ -239,5 +246,6 @@ export default function ProjectLayout({
                 </CardContent>
             </Card>
         </ProjectContext.Provider>
+        </PermissionGate>
     );
 }

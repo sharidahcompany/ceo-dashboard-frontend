@@ -27,11 +27,14 @@ import {
     FieldSet,
 } from "@/components/ui/field";
 import EmployeeAssignmentsForm from "@/components/features/hr/EmployeeAssignmentsForm";
+import EmployeePermissionsForm from "@/components/features/hr/EmployeePermissionsForm";
 import EmployeeReports from "@/components/features/hr/EmployeeReports";
+import { useIsOwnerOrSuperAdmin } from "@/providers/AbilityProvider";
 
 export default function EmployeeForm() {
     const t = useTranslations();
     const router = useRouter();
+    const canManagePermissions = useIsOwnerOrSuperAdmin();
     const params = useParams();
     const searchParams = useSearchParams();
     const employeeId = (params?.id as string) || (searchParams?.get("id") as string) || undefined;
@@ -229,6 +232,12 @@ export default function EmployeeForm() {
             {employeeId && (
                 <>
                     <EmployeeAssignmentsForm employeeId={employeeId} initialData={tenantUser} />
+                    {canManagePermissions && (
+                        <EmployeePermissionsForm
+                            employeeId={employeeId}
+                            initialPermissions={employee?.permissions}
+                        />
+                    )}
                     <EmployeeReports employeeId={employeeId} />
                 </>
             )}

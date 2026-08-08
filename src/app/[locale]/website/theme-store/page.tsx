@@ -7,6 +7,7 @@ import { Sparkles, Palette, Layout, Rocket, Bell, CheckCircle2 } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function ThemeStorePage() {
     const t = useTranslations();
@@ -48,6 +49,7 @@ export default function ThemeStorePage() {
     ];
 
     return (
+        <PermissionGate permission="website.setting.view">
         <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-background" dir={isRtl ? "rtl" : "ltr"}>
             {/* Ambient Background Glows */}
             <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-primary/10 blur-[80px] pointer-events-none animate-pulse duration-4000" />
@@ -117,5 +119,6 @@ export default function ThemeStorePage() {
                 </div>
             </div>
         </div>
+        </PermissionGate>
     );
 }

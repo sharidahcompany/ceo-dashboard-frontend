@@ -1,14 +1,16 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { routes } from "@/app/routes";
+import { routes, isRouteVisible } from "@/app/routes";
 import { usePathname, Link } from "@/i18n/navigation";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { useTranslations } from "next-intl";
 import DynamicIcon from "../common/DynamicIcon";
+import { useAbility } from "@/providers/AbilityProvider";
 
 export default function Tabbar() {
   const pathname = usePathname();
   const t = useTranslations();
+  const ability = useAbility();
 
   const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
   const pathSegments = cleanPath.split("/").filter(Boolean);
@@ -46,7 +48,9 @@ export default function Tabbar() {
 
   if (!activeService || !activeService.children) return null;
 
-  const activeTabChildren = activeService.children;
+  const activeTabChildren = activeService.children.filter((child) =>
+    isRouteVisible(child, ability),
+  );
   const basePath = activeService.path;
 
   const activeTabValue = pathSegments[1] || activeTabChildren[0]?.path || "";

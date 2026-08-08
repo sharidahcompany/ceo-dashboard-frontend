@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import { Popover, PopoverClose, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
+import { Can } from "@/providers/AbilityProvider";
 
 export default function Buffets({ buffets }: { buffets: BuffetResource[] }) {
     const t = useTranslations();
@@ -63,11 +64,13 @@ export default function Buffets({ buffets }: { buffets: BuffetResource[] }) {
                         {t("messages.buffets.available_buffets_description")}
                     </CardDescription>
                     {buffets.length > 0 && (
-                        <CardAction>
-                            <Button variant={'outline'} onClick={() => setOpenCreateForm(true)}>
-                                <Coffee /> {t("messages.buffets.add_new_buffet")}
-                            </Button>
-                        </CardAction>
+                        <Can I="create" a="workspace.buffet">
+                            <CardAction>
+                                <Button variant={'outline'} onClick={() => setOpenCreateForm(true)}>
+                                    <Coffee /> {t("messages.buffets.add_new_buffet")}
+                                </Button>
+                            </CardAction>
+                        </Can>
                     )}
                 </CardHeader>
                 <CardContent>
@@ -85,9 +88,11 @@ export default function Buffets({ buffets }: { buffets: BuffetResource[] }) {
                                 </EmptyDescription>
                             </EmptyHeader>
                             <EmptyContent>
-                                <Button variant={'outline'} onClick={() => setOpenCreateForm(true)}>
-                                    <Coffee /> {t("messages.buffets.add_new_buffet")}
-                                </Button>
+                                <Can I="create" a="workspace.buffet">
+                                    <Button variant={'outline'} onClick={() => setOpenCreateForm(true)}>
+                                        <Coffee /> {t("messages.buffets.add_new_buffet")}
+                                    </Button>
+                                </Can>
                             </EmptyContent>
                         </Empty>
                     ) : (
@@ -116,18 +121,21 @@ export default function Buffets({ buffets }: { buffets: BuffetResource[] }) {
                                                     </CardDescription>
                                                 )}
                                                 <CardAction onClick={(e) => e.stopPropagation()}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size={'icon-xs'}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleEdit(buffet);
-                                                        }}
-                                                    >
-                                                        <Edit />
-                                                    </Button>
+                                                    <Can I="update" a="workspace.buffet">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size={'icon-xs'}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleEdit(buffet);
+                                                            }}
+                                                        >
+                                                            <Edit />
+                                                        </Button>
+                                                    </Can>
 
                                                     {/* Popover Confirm Delete */}
+                                                    <Can I="delete" a="workspace.buffet">
                                                     <Popover
                                                         open={popoverOpenId === buffet.id}
                                                         onOpenChange={(open) => setPopoverOpenId(open ? buffet.id : null)}
@@ -188,6 +196,7 @@ export default function Buffets({ buffets }: { buffets: BuffetResource[] }) {
                                                             </div>
                                                         </PopoverContent>
                                                     </Popover>
+                                                    </Can>
                                                 </CardAction>
                                             </CardHeader>
                                         </div>

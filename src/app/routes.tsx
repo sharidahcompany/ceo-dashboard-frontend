@@ -1,10 +1,15 @@
 import * as Icons from "lucide-react";
+import { AppAbility, hasPermission } from "@/lib/ability";
 
 export interface Route {
   path: string;
   title: string;
   icon?: keyof typeof Icons;
   children?: Route[];
+  // Backend permission string ("service.resource.view") required to see this
+  // tab. Omit for routes with no matching backend resource yet, or that
+  // should always be visible (e.g. home). super-admin/owner bypass this.
+  permission?: string;
 }
 export const routes: Route[] = [
   {
@@ -21,16 +26,19 @@ export const routes: Route[] = [
         path: "vision",
         title: "routes.vision",
         icon: "Eye",
+        permission: "workspace.vision.view",
       },
       {
         path: "goals",
         title: "routes.goals",
         icon: "Target",
+        permission: "workspace.goal.view",
       },
       {
         path: "organization-structure",
         title: "routes.organization_structure",
         icon: "Network",
+        permission: "workspace.department.view",
       },
     ],
   },
@@ -43,6 +51,7 @@ export const routes: Route[] = [
         path: "projects",
         title: "routes.projects",
         icon: "Activity",
+        permission: "workspace.project.view",
         children: [
           {
             path: "project",
@@ -73,6 +82,7 @@ export const routes: Route[] = [
         path: "employees",
         title: "routes.employees",
         icon: "Users",
+        permission: "workspace.user.view",
         children: [
           {
             path: "create",
@@ -88,6 +98,7 @@ export const routes: Route[] = [
         path: "positions",
         title: "routes.positions",
         icon: "BriefcaseBusiness",
+        permission: "workspace.position.view",
         children: [
           {
             path: "create",
@@ -103,6 +114,7 @@ export const routes: Route[] = [
         path: "vacancies",
         title: "routes.vacancies",
         icon: "Zap",
+        permission: "workspace.vacancy.view",
         children: [
           {
             path: "create",
@@ -118,6 +130,7 @@ export const routes: Route[] = [
         path: "candidates",
         title: "routes.candidates",
         icon: "UserPen",
+        permission: "workspace.job_application.view",
         children: [
           {
             path: "create",
@@ -133,6 +146,7 @@ export const routes: Route[] = [
         path: "interviews",
         title: "routes.interviews",
         icon: "Handshake",
+        permission: "workspace.job_interview.view",
         children: [
           {
             path: "create",
@@ -148,6 +162,7 @@ export const routes: Route[] = [
         path: "shifts",
         title: "routes.shifts",
         icon: "CalendarDays",
+        permission: "workspace.shift.view",
         children: [
           {
             path: "create",
@@ -163,6 +178,7 @@ export const routes: Route[] = [
         path: "holidays",
         title: "routes.holidays",
         icon: "CalendarHeart",
+        permission: "workspace.holiday.view",
         children: [
           {
             path: "create",
@@ -178,6 +194,7 @@ export const routes: Route[] = [
         path: "attendance",
         title: "routes.attendance",
         icon: "FingerprintPattern",
+        permission: "workspace.attendance.view",
         children: [
           {
             path: "create",
@@ -193,6 +210,7 @@ export const routes: Route[] = [
         path: "missions",
         title: "routes.missions",
         icon: "Flag",
+        permission: "workspace.mission.view",
         children: [
           {
             path: "create",
@@ -208,6 +226,7 @@ export const routes: Route[] = [
         path: "attendance-permissions",
         title: "routes.attendance_permissions",
         icon: "UserX",
+        permission: "workspace.attendance_permission.view",
         children: [
           {
             path: "create",
@@ -223,10 +242,12 @@ export const routes: Route[] = [
         path: "scholarships",
         title: "routes.scholarships",
         icon: "GraduationCap",
+        permission: "workspace.scholarship.view",
         children: [
           {
             path: "available-scholarships",
             title: "routes.available_scholarships",
+            permission: "workspace.scholarship.view",
             children: [
               {
                 path: "create",
@@ -241,6 +262,7 @@ export const routes: Route[] = [
           {
             path: "scholarship-requests",
             title: "routes.scholarship_requests",
+            permission: "workspace.scholarship_request.view",
             children: [
               {
                 path: "create",
@@ -258,14 +280,17 @@ export const routes: Route[] = [
           {
             path: "leave-requests",
             title: "routes.leave_requests",
+            permission: "workspace.attendance_permission.view",
           },
           {
             path: "mission-requests",
             title: "routes.mission_requests",
+            permission: "workspace.mission.view",
           },
           {
             path: "scholarship-requests",
             title: "routes.scholarship_requests",
+            permission: "workspace.scholarship_request.view",
           },
         ],
       },
@@ -284,6 +309,7 @@ export const routes: Route[] = [
           {
             path: "quotes-and-proformas",
             title: "routes.quotes_and_proformas",
+            permission: "finance.quote.view",
             children: [
               {
                 path: "create",
@@ -299,6 +325,7 @@ export const routes: Route[] = [
             path: "invoices",
             title: "routes.invoices",
             icon: "Receipt",
+            permission: "finance.invoice.view",
             children: [
               {
                 path: "create",
@@ -314,6 +341,7 @@ export const routes: Route[] = [
             path: "cash-invoices",
             title: "routes.cash_invoices",
             icon: "Banknote",
+            permission: "finance.cash_invoice.view",
             children: [
               {
                 path: "create",
@@ -329,6 +357,7 @@ export const routes: Route[] = [
             path: "credit-notes",
             title: "routes.credit_notes",
             icon: "CreditCard",
+            permission: "finance.credit_note.view",
             children: [
               {
                 path: "create",
@@ -344,6 +373,7 @@ export const routes: Route[] = [
             path: "delivery-notes",
             title: "routes.delivery_notes",
             icon: "Truck",
+            permission: "finance.delivery_note.view",
             children: [
               {
                 path: "create",
@@ -366,6 +396,7 @@ export const routes: Route[] = [
             path: "bills",
             title: "routes.bills",
             icon: "Receipt",
+            permission: "finance.bill.view",
             children: [
               {
                 path: "create",
@@ -381,6 +412,7 @@ export const routes: Route[] = [
             path: "cash-expenses",
             title: "routes.cash_expenses",
             icon: "Banknote",
+            permission: "finance.cash_expense.view",
             children: [
               {
                 path: "create",
@@ -396,6 +428,7 @@ export const routes: Route[] = [
             path: "debit-notes",
             title: "routes.debit_notes",
             icon: "CreditCard",
+            permission: "finance.debit_note.view",
             children: [
               {
                 path: "create",
@@ -411,6 +444,7 @@ export const routes: Route[] = [
             path: "purchase-orders",
             title: "routes.purchase_orders",
             icon: "Truck",
+            permission: "finance.purchase_order.view",
             children: [
               {
                 path: "create",
@@ -428,6 +462,7 @@ export const routes: Route[] = [
         path: "customers",
         title: "routes.customers",
         icon: "Users",
+        permission: "finance.customer.view",
         children: [
           {
             path: "create",
@@ -448,6 +483,7 @@ export const routes: Route[] = [
             path: "payroll",
             title: "routes.payroll",
             icon: "CreditCard",
+            permission: "finance.payroll.view",
             children: [
               {
                 path: "create",
@@ -463,6 +499,7 @@ export const routes: Route[] = [
             path: "payruns",
             title: "routes.payruns",
             icon: "CreditCard",
+            permission: "finance.payrun.view",
             children: [
               {
                 path: "create",
@@ -478,6 +515,7 @@ export const routes: Route[] = [
             path: "payroll-payments",
             title: "routes.payroll_payments",
             icon: "CreditCard",
+            permission: "finance.payroll_payment.view",
             children: [
               {
                 path: "create",
@@ -500,6 +538,7 @@ export const routes: Route[] = [
             path: "items",
             title: "routes.items",
             icon: "Box",
+            permission: "finance.item.view",
             children: [
               {
                 path: "create",
@@ -515,6 +554,7 @@ export const routes: Route[] = [
             path: "warehouses",
             title: "routes.warehouses",
             icon: "Building",
+            permission: "finance.warehouse.view",
             children: [
               {
                 path: "create",
@@ -530,6 +570,7 @@ export const routes: Route[] = [
             path: "adjustments",
             title: "routes.adjustments",
             icon: "Box",
+            permission: "finance.inventory_adjustment.view",
             children: [
               {
                 path: "create",
@@ -552,6 +593,7 @@ export const routes: Route[] = [
             path: "accounts",
             title: "routes.accounts",
             icon: "CreditCard",
+            permission: "finance.account.view",
             children: [
               {
                 path: "create",
@@ -567,6 +609,7 @@ export const routes: Route[] = [
             path: "tax-rates",
             title: "routes.tax_rates",
             icon: "CreditCard",
+            permission: "finance.tax_rate.view",
             children: [
               {
                 path: "create",
@@ -582,6 +625,7 @@ export const routes: Route[] = [
             path: "manual-journals",
             title: "routes.manual_journals",
             icon: "CreditCard",
+            permission: "finance.journal.view",
             children: [
               {
                 path: "create",
@@ -599,6 +643,7 @@ export const routes: Route[] = [
         path: "bank-accounts",
         title: "routes.bank_accounts",
         icon: "Landmark",
+        permission: "finance.bank_account.view",
         children: [
           {
             path: "create",
@@ -614,6 +659,7 @@ export const routes: Route[] = [
         path: "fixed-assets",
         title: "routes.fixed_assets",
         icon: "PackageOpen",
+        permission: "finance.fixed_asset.view",
         children: [
           {
             path: "create",
@@ -629,6 +675,7 @@ export const routes: Route[] = [
         path: "cost-centers",
         title: "routes.cost_centers",
         icon: "Building2",
+        permission: "finance.cost_center.view",
         children: [
           {
             path: "create",
@@ -646,6 +693,7 @@ export const routes: Route[] = [
     path: "/buffets",
     title: "routes.buffets",
     icon: "Coffee",
+    permission: "workspace.buffet.view",
     children: [
       {
         path: "[id]",
@@ -670,16 +718,19 @@ export const routes: Route[] = [
         path: "settings",
         title: "routes.settings",
         icon: "Settings",
+        permission: "website.setting.view",
       },
       {
         path: "customization",
         title: "routes.customization",
         icon: "Palette",
+        permission: "website.setting.view",
       },
       {
         path: "pages",
         title: "routes.pages",
         icon: "FileText",
+        permission: "website.page.view",
         children: [
           {
             path: "create",
@@ -695,16 +746,19 @@ export const routes: Route[] = [
         path: "theme-store",
         title: "routes.theme_store",
         icon: "LayoutTemplate",
+        permission: "website.setting.view",
       },
       {
         path: "orders",
         title: "routes.orders",
         icon: "Package",
+        permission: "website.setting.view",
       },
       {
         path: "plans",
         title: "routes.plans",
         icon: "Package",
+        permission: "website.setting.view",
       },
     ],
   },
@@ -717,22 +771,40 @@ export const routes: Route[] = [
         path: "companies",
         title: "routes.companies",
         icon: "Building2",
+        permission: "auth.tenant.view",
       },
       {
         path: "incoming-requests",
         title: "routes.incoming_requests",
         icon: "Inbox",
+        permission: "auth.audit_request.view",
       },
       {
         path: "outgoing-requests",
         title: "routes.outgoing_requests",
         icon: "Send",
+        permission: "auth.audit_request.view",
       },
       {
         path: "subsidiaries",
         title: "routes.subsidiaries",
         icon: "Handshake",
+        permission: "auth.audit_request.view",
       },
     ],
   },
 ];
+
+/**
+ * A route is visible if it carries its own permission the user holds, or
+ * (when it has no permission of its own) if at least one descendant is
+ * visible. Routes with neither a permission nor children (e.g. home) stay
+ * visible by default.
+ */
+export function isRouteVisible(route: Route, ability: AppAbility): boolean {
+  if (route.permission) return hasPermission(ability, route.permission);
+  if (route.children && route.children.length > 0) {
+    return route.children.some((child) => isRouteVisible(child, ability));
+  }
+  return true;
+}

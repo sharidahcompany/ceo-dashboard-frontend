@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import Image from "next/image";
 import { toast } from "sonner";
 import { FieldSeparator } from "@/components/ui/field";
+import { Can } from "@/providers/AbilityProvider";
 
 export default function Goals({ goals }: { goals: GoalResource[] }) {
     const t = useTranslations();
@@ -49,10 +50,12 @@ export default function Goals({ goals }: { goals: GoalResource[] }) {
                         {t('messages.goals.description')}
                     </CardDescription>
                     <CardAction>
-                        <Button onClick={() => { setOpenCreateForm(true) }} className="gap-2">
-                            <Plus className="h-4 w-4" />
-                            {t('messages.goals.add_new_goal')}
-                        </Button>
+                        <Can I="create" a="workspace.goal">
+                            <Button onClick={() => { setOpenCreateForm(true) }} className="gap-2">
+                                <Plus className="h-4 w-4" />
+                                {t('messages.goals.add_new_goal')}
+                            </Button>
+                        </Can>
                     </CardAction>
                 </CardHeader>
 
@@ -82,12 +85,16 @@ export default function Goals({ goals }: { goals: GoalResource[] }) {
 
                                         {/* Edit and Delete Buttons */}
                                         <div className="flex justify-end space-x-2 mt-3">
-                                            <Button variant="outline" size="sm" onClick={() => handleEdit(goal)}>
-                                                <Edit />
-                                            </Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(goal.id as number)}>
-                                                <Trash />
-                                            </Button>
+                                            <Can I="update" a="workspace.goal">
+                                                <Button variant="outline" size="sm" onClick={() => handleEdit(goal)}>
+                                                    <Edit />
+                                                </Button>
+                                            </Can>
+                                            <Can I="delete" a="workspace.goal">
+                                                <Button variant="destructive" size="sm" onClick={() => handleDelete(goal.id as number)}>
+                                                    <Trash />
+                                                </Button>
+                                            </Can>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -107,10 +114,12 @@ export default function Goals({ goals }: { goals: GoalResource[] }) {
                                 </EmptyDescription>
                             </EmptyHeader>
 
-                            <Button onClick={() => { setOpenCreateForm(true) }} className="mt-4 gap-2">
-                                <Plus className="h-4 w-4" />
-                                {t('messages.goals.add_new_goal')}
-                            </Button>
+                            <Can I="create" a="workspace.goal">
+                                <Button onClick={() => { setOpenCreateForm(true) }} className="mt-4 gap-2">
+                                    <Plus className="h-4 w-4" />
+                                    {t('messages.goals.add_new_goal')}
+                                </Button>
+                            </Can>
                         </Empty>
                     )}
                 </CardContent>

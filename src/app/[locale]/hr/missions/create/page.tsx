@@ -1,8 +1,11 @@
 
 import MissionForm from "@/components/features/hr/MissionForm";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function Page() {
     return (
-        <MissionForm />
+        <PermissionGate permission="workspace.mission.create">
+            <MissionForm />
+        </PermissionGate>
     );
 }

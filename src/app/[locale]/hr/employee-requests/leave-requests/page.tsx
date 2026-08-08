@@ -14,6 +14,7 @@ import {
     AttendancePermissionResource,
 } from "@/actions/workspace/attendance-permissions.actions";
 import { EditableStatusSelect } from "@/components/features/hr/EditableStatusSelect";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function LeaveRequestsPage() {
     const t = useTranslations();
@@ -111,21 +112,23 @@ export default function LeaveRequestsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<AttendancePermissionResource, any>
-                    title={t("routes.leave_requests") || "Leave Requests"}
-                    description={
-                        t("messages.hr.attendance_permissions_description") ||
-                        "Manage employee attendance leave and late permission requests"
-                    }
-                    fetchAction={getLeaveRequests}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    editable={false}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.attendance_permission.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<AttendancePermissionResource, any>
+                        title={t("routes.leave_requests") || "Leave Requests"}
+                        description={
+                            t("messages.hr.attendance_permissions_description") ||
+                            "Manage employee attendance leave and late permission requests"
+                        }
+                        fetchAction={getLeaveRequests}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        editable={false}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { getProjects, createProject, ProjectResource } from "@/actions/projects/projects.actions";
 import { Calendar, Plus, FolderKanban, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { Can } from "@/providers/AbilityProvider";
 
 export default function ProjectsList() {
     const t = useTranslations("projects");
@@ -84,6 +85,7 @@ export default function ProjectsList() {
 
     return (
         <div className="space-y-6">
+            <Can I="create" a="workspace.project">
             <div className="flex justify-end">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                     <DialogTrigger
@@ -157,6 +159,7 @@ export default function ProjectsList() {
                     </DialogContent>
                 </Dialog>
             </div>
+            </Can>
 
             {loading ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -172,10 +175,12 @@ export default function ProjectsList() {
                     <FolderKanban className="size-12 text-muted-foreground mb-4" />
                     <CardTitle className="mb-2">{t("no_projects")}</CardTitle>
                     <CardDescription className="mb-6">{t("no_projects_desc")}</CardDescription>
-                    <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
-                        <Plus className="size-4" />
-                        {t("create_project")}
-                    </Button>
+                    <Can I="create" a="workspace.project">
+                        <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
+                            <Plus className="size-4" />
+                            {t("create_project")}
+                        </Button>
+                    </Can>
                 </Card>
             ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

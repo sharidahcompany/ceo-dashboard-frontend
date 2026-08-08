@@ -398,8 +398,8 @@ export function DataGrid<TData, TValue>({
         setIsDownloadingTemplate(true);
         try {
             await onDownloadTemplate();
-        } catch {
-            toast.error(t("template_download_failed"));
+        } catch (error) {
+            toast.error(error instanceof Error && error.message ? error.message : t("template_download_failed"));
         } finally {
             setIsDownloadingTemplate(false);
         }
@@ -410,8 +410,8 @@ export function DataGrid<TData, TValue>({
         setIsExporting(true);
         try {
             await onExport();
-        } catch {
-            toast.error(t("export_failed"));
+        } catch (error) {
+            toast.error(error instanceof Error && error.message ? error.message : t("export_failed"));
         } finally {
             setIsExporting(false);
         }

@@ -21,6 +21,7 @@ import {
 } from "@/actions/workspace/missions.actions";
 import { EditableStatusSelect } from "@/components/features/hr/EditableStatusSelect";
 import { Badge } from "@/components/ui/badge";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function MissionRequestsPage() {
   const t = useTranslations();
@@ -189,21 +190,23 @@ export default function MissionRequestsPage() {
   };
 
   return (
-    <Card>
-      <CardContent>
-        <DataGrid<MissionResource, any>
-          title={t("routes.mission_requests") || "Mission Requests"}
-          description={
-            t("messages.hr.missions_description") ||
-            "Manage and track employee missions"
-          }
-          fetchAction={getMissionRequests}
-          deleteAction={handleDelete}
-          columns={columns}
-          idKey="id"
-          editable={false}
-        />
-      </CardContent>
-    </Card>
+    <PermissionGate permission="workspace.mission.view">
+      <Card>
+        <CardContent>
+          <DataGrid<MissionResource, any>
+            title={t("routes.mission_requests") || "Mission Requests"}
+            description={
+              t("messages.hr.missions_description") ||
+              "Manage and track employee missions"
+            }
+            fetchAction={getMissionRequests}
+            deleteAction={handleDelete}
+            columns={columns}
+            idKey="id"
+            editable={false}
+          />
+        </CardContent>
+      </Card>
+    </PermissionGate>
   );
 }

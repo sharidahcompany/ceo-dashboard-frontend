@@ -8,6 +8,7 @@ import { ProfitAndLossReport } from "./_components/profit-and-loss-report";
 import { BalanceSheetReport } from "./_components/balance-sheet-report";
 import { TrialBalanceReport } from "./_components/trial-balance-report";
 import { GeneralLedgerReport } from "./_components/general-ledger-report";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function ReportsPage() {
     const t = useTranslations("reports");
@@ -15,6 +16,7 @@ export default function ReportsPage() {
     const [activeTab, setActiveTab] = useState("profit-loss");
 
     return (
+        <PermissionGate permission="finance.account.view">
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -45,5 +47,6 @@ export default function ReportsPage() {
                 </TabsContent>
             </Tabs>
         </div>
+        </PermissionGate>
     );
 }

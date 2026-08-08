@@ -19,9 +19,14 @@ import {
     deleteMissions,
     MissionResource,
 } from "@/actions/workspace/missions.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function MissionsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.mission.create");
+    const canEdit = useCan("workspace.mission.update");
+    const canDelete = useCan("workspace.mission.delete");
 
     const columns = useMemo<ColumnDef<MissionResource>[]>(
         () => [
@@ -130,18 +135,22 @@ export default function MissionsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<MissionResource, any>
-                    title={t("routes.missions") || "Missions"}
-                    description={t("messages.hr.missions_description") || "Manage and track employee missions"}
-                    fetchAction={getMissions}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_mission") || "Create Mission"}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.mission.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<MissionResource, any>
+                        title={t("routes.missions") || "Missions"}
+                        description={t("messages.hr.missions_description") || "Manage and track employee missions"}
+                        fetchAction={getMissions}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? (t("messages.hr.create_new_mission") || "Create Mission") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

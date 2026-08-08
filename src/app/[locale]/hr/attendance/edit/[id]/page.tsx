@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 import AttendanceForm from "@/components/features/hr/AttendanceForm";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function Page() {
     return (
-        <AttendanceForm />
+        <PermissionGate permission="workspace.attendance.update">
+            <AttendanceForm />
+        </PermissionGate>
     );
 }

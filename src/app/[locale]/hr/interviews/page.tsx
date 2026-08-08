@@ -7,9 +7,14 @@ import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getInterviews, deleteInterviews, JobInterviewResource } from "@/actions/workspace/interviews.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function InterviewsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.job_interview.create");
+    const canEdit = useCan("workspace.job_interview.update");
+    const canDelete = useCan("workspace.job_interview.delete");
 
     const columns = useMemo<ColumnDef<JobInterviewResource>[]>(
         () => [
@@ -69,18 +74,22 @@ export default function InterviewsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<JobInterviewResource, any>
-                    title={t("routes.interviews")}
-                    description={t("messages.hr.positions_description") || "Manage organization job interviews"}
-                    fetchAction={getInterviews}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_interview")}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.job_interview.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<JobInterviewResource, any>
+                        title={t("routes.interviews")}
+                        description={t("messages.hr.positions_description") || "Manage organization job interviews"}
+                        fetchAction={getInterviews}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? t("messages.hr.create_new_interview") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

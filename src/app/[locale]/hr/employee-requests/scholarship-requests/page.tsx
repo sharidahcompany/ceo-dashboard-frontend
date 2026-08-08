@@ -14,6 +14,7 @@ import {
     ScholarshipRequestResource,
 } from "@/actions/workspace/scholarships.actions";
 import { EditableStatusSelect } from "@/components/features/hr/EditableStatusSelect";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function ScholarshipRequestsPage() {
     const t = useTranslations();
@@ -111,18 +112,20 @@ export default function ScholarshipRequestsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<ScholarshipRequestResource, any>
-                    title={t("routes.scholarship_requests") || "Scholarship Requests"}
-                    description={t("messages.hr.scholarship_requests_description") || "Manage employee scholarship applications, approvals, and records"}
-                    fetchAction={getScholarshipRequests}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    editable={false}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.scholarship_request.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<ScholarshipRequestResource, any>
+                        title={t("routes.scholarship_requests") || "Scholarship Requests"}
+                        description={t("messages.hr.scholarship_requests_description") || "Manage employee scholarship applications, approvals, and records"}
+                        fetchAction={getScholarshipRequests}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        editable={false}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

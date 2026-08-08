@@ -13,9 +13,13 @@ import {
     deleteScholarshipRequests,
     ScholarshipRequestResource
 } from "@/actions/workspace/scholarships.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function ScholarshipRequestsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.scholarship_request.create");
+    const canDelete = useCan("workspace.scholarship_request.delete");
 
     const columns = useMemo<ColumnDef<ScholarshipRequestResource>[]>(
         () => [
@@ -101,18 +105,22 @@ export default function ScholarshipRequestsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<ScholarshipRequestResource, any>
-                    title={t("routes.scholarship_requests") || "Scholarship Requests"}
-                    description={t("messages.hr.scholarship_requests_description") || "Manage employee scholarship applications, approvals, and records"}
-                    fetchAction={getScholarshipRequests}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("routes.create_scholarship_request") || "Create Request"}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.scholarship_request.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<ScholarshipRequestResource, any>
+                        title={t("routes.scholarship_requests") || "Scholarship Requests"}
+                        description={t("messages.hr.scholarship_requests_description") || "Manage employee scholarship applications, approvals, and records"}
+                        fetchAction={getScholarshipRequests}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? (t("routes.create_scholarship_request") || "Create Request") : undefined}
+                        editable={false}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

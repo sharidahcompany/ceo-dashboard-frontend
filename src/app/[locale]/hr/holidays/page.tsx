@@ -6,9 +6,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { getHolidays, deleteHolidays, HolidayResource } from "@/actions/workspace/holiday.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function HolidaysPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.holiday.create");
+    const canEdit = useCan("workspace.holiday.update");
+    const canDelete = useCan("workspace.holiday.delete");
 
     const columns = useMemo<ColumnDef<HolidayResource>[]>(
         () => [
@@ -34,18 +39,22 @@ export default function HolidaysPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<HolidayResource, any>
-                    title={t("routes.holidays") || "Holidays"}
-                    description={t("messages.hr.holidays_description") || "Manage organization holidays and official vacations"}
-                    fetchAction={getHolidays}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_holiday") || "Create New Holiday"}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.holiday.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<HolidayResource, any>
+                        title={t("routes.holidays") || "Holidays"}
+                        description={t("messages.hr.holidays_description") || "Manage organization holidays and official vacations"}
+                        fetchAction={getHolidays}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? (t("messages.hr.create_new_holiday") || "Create New Holiday") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

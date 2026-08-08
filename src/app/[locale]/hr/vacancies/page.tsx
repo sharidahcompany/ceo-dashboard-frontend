@@ -6,9 +6,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { getVacancies, deleteVacancies, VacancyResource } from "@/actions/workspace/vacancies.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function VacanciesPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.vacancy.create");
+    const canEdit = useCan("workspace.vacancy.update");
+    const canDelete = useCan("workspace.vacancy.delete");
 
     const columns = useMemo<ColumnDef<VacancyResource>[]>(
         () => [
@@ -47,18 +52,22 @@ export default function VacanciesPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<VacancyResource, any>
-                    title={t("routes.vacancies")}
-                    description={t("messages.hr.positions_description") || "Manage organization vacancies"}
-                    fetchAction={getVacancies}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("buttons.create")}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.vacancy.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<VacancyResource, any>
+                        title={t("routes.vacancies")}
+                        description={t("messages.hr.positions_description") || "Manage organization vacancies"}
+                        fetchAction={getVacancies}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? t("buttons.create") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

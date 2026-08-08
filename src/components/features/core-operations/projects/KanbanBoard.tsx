@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Can } from "@/providers/AbilityProvider";
 import {
   ProjectResource,
   SprintResource,
@@ -510,6 +511,7 @@ export default function KanbanBoard({
         </div>
 
         <div className="flex items-center gap-2">
+          <Can I="update" a="workspace.project">
           <Dialog
             open={isCreateSprintOpen}
             onOpenChange={setIsCreateSprintOpen}
@@ -580,8 +582,10 @@ export default function KanbanBoard({
               </form>
             </DialogContent>
           </Dialog>
+          </Can>
 
           {activeSprint && (
+            <Can I="update" a="workspace.project">
             <Dialog
               open={isCreateStageOpen}
               onOpenChange={setIsCreateStageOpen}
@@ -630,6 +634,7 @@ export default function KanbanBoard({
                 </form>
               </DialogContent>
             </Dialog>
+            </Can>
           )}
         </div>
       </div>
@@ -671,10 +676,12 @@ export default function KanbanBoard({
           <CardDescription className="mb-6">
             {t("create_sprint_to_start")}
           </CardDescription>
-          <Button onClick={() => setIsCreateSprintOpen(true)} className="gap-2">
-            <Plus className="size-4" />
-            {t("new_sprint")}
-          </Button>
+          <Can I="update" a="workspace.project">
+            <Button onClick={() => setIsCreateSprintOpen(true)} className="gap-2">
+              <Plus className="size-4" />
+              {t("new_sprint")}
+            </Button>
+          </Can>
         </Card>
       )}
 
@@ -860,14 +867,16 @@ export default function KanbanBoard({
                   )}
                 </DialogDescription>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDeleteTask}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              >
-                <Trash2 className="size-4" />
-              </Button>
+              <Can I="delete" a="workspace.project">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDeleteTask}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </Can>
             </DialogHeader>
 
             <div className="space-y-5">
@@ -1187,14 +1196,16 @@ function StageColumn({
             {stage.tasks?.length || 0}
           </Badge>
         </div>
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={() => onDeleteStage(stage.id)}
-          className="size-7 text-destructive hover:bg-destructive/10"
-        >
-          <Trash2 className="size-3.5" />
-        </Button>
+        <Can I="delete" a="workspace.project">
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => onDeleteStage(stage.id)}
+            className="size-7 text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="size-3.5" />
+          </Button>
+        </Can>
       </div>
 
       <SortableContext
@@ -1213,15 +1224,17 @@ function StageColumn({
         </div>
       </SortableContext>
 
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={() => onAddTaskClick(stage.id)}
-        className="w-full justify-start text-xs border border-dashed border-border/60 hover:border-border mt-1"
-      >
-        <Plus className="size-3.5 mr-1" />
-        {t("add_task")}
-      </Button>
+      <Can I="create" a="workspace.project">
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => onAddTaskClick(stage.id)}
+          className="w-full justify-start text-xs border border-dashed border-border/60 hover:border-border mt-1"
+        >
+          <Plus className="size-3.5 mr-1" />
+          {t("add_task")}
+        </Button>
+      </Can>
     </div>
   );
 }

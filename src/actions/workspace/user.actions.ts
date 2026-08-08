@@ -284,6 +284,62 @@ export async function updateProfile(
   }
 }
 
+/**
+ * Normalizes whatever shape the permissions catalog comes back in (a flat
+ * array of strings, an array of `{ name }`/`{ permission }` objects, or a
+ * nested `{ data: [...] }` envelope) into a flat string[].
+ */
+function normalizePermissionsCatalog(payload: unknown): string[] {
+  const list = Array.isArray(payload)
+    ? payload
+    : Array.isArray((payload as any)?.data)
+      ? (payload as any).data
+      : [];
+
+  return list
+    .map((item: unknown) => {
+      if (typeof item === "string") return item;
+      if (item && typeof item === "object") {
+        const obj = item as Record<string, unknown>;
+        if (typeof obj.name === "string") return obj.name;
+        if (typeof obj.permission === "string") return obj.permission;
+        if (typeof obj.slug === "string") return obj.slug;
+      }
+      return null;
+    })
+    .filter((item: string | null): item is string => !!item);
+}
+
+/**
+ * Full catalog of assignable backend permission strings (e.g.
+ * "workspace.project.view"), served by the auth-service. Used to render the
+ * permission-assignment checklist on the employee edit form.
+ */
+export async function getPermissions(): Promise<ActionResponse<string[]>> {
+  try {
+    const response = await api.get("/auth/permissions");
+    return { success: true, data: normalizePermissionsCatalog(response.data) };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export interface AssignUserPermissionsData {
+  permissions: string[];
+}
+
+export async function assignUserPermissions(
+  id: string | number,
+  data: AssignUserPermissionsData,
+): Promise<ActionResponse<UserResource>> {
+  try {
+    const response = await api.put(`/auth/users/${id}/permissions`, data);
+    return { success: true, data: response.data.data ?? response.data, message: response.data.message };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
 export interface ChangePasswordFormData {
   current_password: string;
   password: string;

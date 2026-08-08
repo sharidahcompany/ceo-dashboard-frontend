@@ -7,9 +7,14 @@ import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getShifts, deleteShifts, ShiftResource } from "@/actions/workspace/shifts.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function ShiftsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.shift.create");
+    const canEdit = useCan("workspace.shift.update");
+    const canDelete = useCan("workspace.shift.delete");
 
     const columns = useMemo<ColumnDef<ShiftResource>[]>(
         () => [
@@ -74,18 +79,22 @@ export default function ShiftsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<ShiftResource, any>
-                    title={t("routes.shifts") || "Shifts"}
-                    description={t("messages.hr.shifts_description") || "Manage organization work shifts and assignments"}
-                    fetchAction={getShifts}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_shift") || "Create New Shift"}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.shift.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<ShiftResource, any>
+                        title={t("routes.shifts") || "Shifts"}
+                        description={t("messages.hr.shifts_description") || "Manage organization work shifts and assignments"}
+                        fetchAction={getShifts}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? (t("messages.hr.create_new_shift") || "Create New Shift") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

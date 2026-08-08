@@ -1,5 +1,10 @@
 import AttendancePermissionsForm from "@/components/features/hr/AttendancePermissionsForm";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 export default function Page() {
-    return <AttendancePermissionsForm />
+    return (
+        <PermissionGate permission="workspace.attendance_permission.create">
+            <AttendancePermissionsForm />
+        </PermissionGate>
+    );
 }

@@ -11,9 +11,14 @@ import {
     deleteAvailableScholarships,
     AvailableScholarshipResource
 } from "@/actions/workspace/scholarships.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function AvailableScholarshipsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.scholarship.create");
+    const canEdit = useCan("workspace.scholarship.update");
+    const canDelete = useCan("workspace.scholarship.delete");
 
     const columns = useMemo<ColumnDef<AvailableScholarshipResource>[]>(
         () => [
@@ -83,18 +88,22 @@ export default function AvailableScholarshipsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<AvailableScholarshipResource, any>
-                    title={t("routes.available_scholarships") || "Available Scholarships"}
-                    description={t("messages.hr.available_scholarships_description") || "Manage available training and academic scholarship programs"}
-                    fetchAction={getAvailableScholarships}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_scholarship") || "Create New Scholarship"}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="workspace.scholarship.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<AvailableScholarshipResource, any>
+                        title={t("routes.available_scholarships") || "Available Scholarships"}
+                        description={t("messages.hr.available_scholarships_description") || "Manage available training and academic scholarship programs"}
+                        fetchAction={getAvailableScholarships}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? (t("messages.hr.create_new_scholarship") || "Create New Scholarship") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

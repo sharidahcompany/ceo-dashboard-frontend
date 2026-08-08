@@ -55,6 +55,7 @@ import { toast } from "sonner";
 import BuffetCategoryForm from "./BuffetCategoryForm";
 import BuffetItemForm from "./BuffetItemForm";
 import BuffetOrderForm from "./BuffetOrderForm";
+import { Can } from "@/providers/AbilityProvider";
 
 export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
   const t = useTranslations();
@@ -152,15 +153,17 @@ export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
               </div>
             </div>
 
-            <CardAction>
-              <Button
-                onClick={() => setOpenCreateCategoryForm(true)}
-                className="gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                {t("messages.buffets.add_new_category")}
-              </Button>
-            </CardAction>
+            <Can I="create" a="workspace.buffet_category">
+              <CardAction>
+                <Button
+                  onClick={() => setOpenCreateCategoryForm(true)}
+                  className="gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t("messages.buffets.add_new_category")}
+                </Button>
+              </CardAction>
+            </Can>
           </div>
         </CardHeader>
 
@@ -201,14 +204,16 @@ export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
               {t("messages.buffets.no_categories") ||
                 "لا توجد أقسام في هذا البوفيه حتى الآن"}
             </p>
-            <Button
-              variant="outline"
-              className="mt-4 gap-2"
-              onClick={() => setOpenCreateCategoryForm(true)}
-            >
-              <Plus className="w-4 h-4" />
-              {t("messages.buffets.add_new_category")}
-            </Button>
+            <Can I="create" a="workspace.buffet_category">
+              <Button
+                variant="outline"
+                className="mt-4 gap-2"
+                onClick={() => setOpenCreateCategoryForm(true)}
+              >
+                <Plus className="w-4 h-4" />
+                {t("messages.buffets.add_new_category")}
+              </Button>
+            </Can>
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -230,28 +235,33 @@ export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
                     </div>
 
                     <CardAction className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1.5"
-                        onClick={() =>
-                          setSelectedCategoryIdForNewItem(category.id)
-                        }
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        {t("messages.buffets.add_new_item")}
-                      </Button>
+                      <Can I="create" a="workspace.buffet_item">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={() =>
+                            setSelectedCategoryIdForNewItem(category.id)
+                          }
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          {t("messages.buffets.add_new_item")}
+                        </Button>
+                      </Can>
 
                       {/* Edit Category Button */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        onClick={() => setSelectedCategoryForEdit(category)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      <Can I="update" a="workspace.buffet_category">
+                        <Button
+                          variant="ghost"
+                          size="icon-xs"
+                          onClick={() => setSelectedCategoryForEdit(category)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </Can>
 
                       {/* Delete Category Popover */}
+                      <Can I="delete" a="workspace.buffet_category">
                       <Popover
                         open={popoverCategoryOpenId === category.id}
                         onOpenChange={(open) =>
@@ -315,6 +325,7 @@ export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
                           </div>
                         </PopoverContent>
                       </Popover>
+                      </Can>
                     </CardAction>
                   </CardHeader>
 
@@ -372,28 +383,33 @@ export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
                                 </div>
 
                                 <CardAction className="flex items-center gap-1 shrink-0">
-                                  <Button
-                                    variant="default"
-                                    size="icon-xs"
-                                    onClick={() =>
-                                      setSelectedItemForRequest(item)
-                                    }
-                                    title={
-                                      t("messages.buffets.request_item") ||
-                                      "Request Item"
-                                    }
-                                  >
-                                    <ShoppingCart className="w-3.5 h-3.5" />
-                                  </Button>
+                                  <Can I="create" a="workspace.buffet_order">
+                                    <Button
+                                      variant="default"
+                                      size="icon-xs"
+                                      onClick={() =>
+                                        setSelectedItemForRequest(item)
+                                      }
+                                      title={
+                                        t("messages.buffets.request_item") ||
+                                        "Request Item"
+                                      }
+                                    >
+                                      <ShoppingCart className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </Can>
 
-                                  <Button
-                                    variant="ghost"
-                                    size="icon-xs"
-                                    onClick={() => setSelectedItemForEdit(item)}
-                                  >
-                                    <Edit className="w-3.5 h-3.5" />
-                                  </Button>
+                                  <Can I="update" a="workspace.buffet_item">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon-xs"
+                                      onClick={() => setSelectedItemForEdit(item)}
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </Can>
 
+                                  <Can I="delete" a="workspace.buffet_item">
                                   <Popover
                                     open={popoverItemOpenId === item.id}
                                     onOpenChange={(open) =>
@@ -467,6 +483,7 @@ export default function BuffetDetail({ buffet }: { buffet: BuffetResource }) {
                                       </div>
                                     </PopoverContent>
                                   </Popover>
+                                  </Can>
                                 </CardAction>
                               </div>
                             </CardContent>

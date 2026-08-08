@@ -6,9 +6,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
 import { getPositions, deletePositions, PositionResource } from "@/actions/workspace/positions.actions";
 import { Card, CardContent } from "@/components/ui/card";
+import { PermissionGate } from "@/components/shared/PermissionGate";
+import { useCan } from "@/providers/AbilityProvider";
 
 export default function PositionsPage() {
     const t = useTranslations();
+    const canCreate = useCan("workspace.position.create");
+    const canEdit = useCan("workspace.position.update");
+    const canDelete = useCan("workspace.position.delete");
 
     const columns = useMemo<ColumnDef<PositionResource>[]>(
         () => [
@@ -32,19 +37,23 @@ export default function PositionsPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
+        <PermissionGate permission="workspace.position.view">
+            <Card>
+                <CardContent>
 
-                <DataGrid<PositionResource, any>
-                    title={t("routes.positions")}
-                    description={t("messages.hr.positions_description")}
-                    fetchAction={getPositions}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    createTitle={t("messages.hr.create_new_position")}
-                />
-            </CardContent>
-        </Card>
+                    <DataGrid<PositionResource, any>
+                        title={t("routes.positions")}
+                        description={t("messages.hr.positions_description")}
+                        fetchAction={getPositions}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        createTitle={canCreate ? t("messages.hr.create_new_position") : undefined}
+                        editable={canEdit}
+                        deletable={canDelete}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

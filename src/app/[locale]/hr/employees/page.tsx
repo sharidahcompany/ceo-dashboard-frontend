@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/field";
 import { Loader2, User, UserPlus } from "lucide-react";
 import { saveFileDownload } from "@/lib/download";
+import { Can, useCan } from "@/providers/AbilityProvider";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 import {
   getEmployees,
   inviteUser,
@@ -41,6 +43,7 @@ import {
 
 export default function EmployeesPage() {
   const t = useTranslations();
+  const canEdit = useCan("workspace.user.update");
 
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -133,8 +136,10 @@ export default function EmployeesPage() {
   );
 
   return (
+    <PermissionGate permission="workspace.user.view">
     <Card>
       <CardContent>
+        <Can I="create" a="workspace.user">
         <div className="flex justify-end mb-4">
           <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
             <DialogTrigger
@@ -245,6 +250,7 @@ export default function EmployeesPage() {
             </DialogContent>
           </Dialog>
         </div>
+        </Can>
 
         <DataGrid<UserResource, any>
           key={gridKey}
@@ -252,7 +258,7 @@ export default function EmployeesPage() {
           fetchAction={getEmployees}
           columns={columns}
           idKey="id"
-          editable={true}
+          editable={canEdit}
           deletable={false}
           importable
           exportable
@@ -262,5 +268,6 @@ export default function EmployeesPage() {
         />
       </CardContent>
     </Card>
+    </PermissionGate>
   );
 }

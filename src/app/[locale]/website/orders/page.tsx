@@ -13,6 +13,7 @@ import {
     OrderResource,
     OrderStatusValue,
 } from "@/actions/website/orders.actions";
+import { PermissionGate } from "@/components/shared/PermissionGate";
 
 const STATUS_VARIANTS: Record<OrderStatusValue, "default" | "secondary" | "destructive" | "outline"> = {
     PENDING: "secondary",
@@ -107,18 +108,20 @@ export default function OrdersPage() {
     };
 
     return (
-        <Card>
-            <CardContent>
-                <DataGrid<OrderResource, any>
-                    title={t("routes.orders")}
-                    description={t("messages.website.orders_description")}
-                    fetchAction={getOrders}
-                    deleteAction={handleDelete}
-                    columns={columns}
-                    idKey="id"
-                    editable={false}
-                />
-            </CardContent>
-        </Card>
+        <PermissionGate permission="website.setting.view">
+            <Card>
+                <CardContent>
+                    <DataGrid<OrderResource, any>
+                        title={t("routes.orders")}
+                        description={t("messages.website.orders_description")}
+                        fetchAction={getOrders}
+                        deleteAction={handleDelete}
+                        columns={columns}
+                        idKey="id"
+                        editable={false}
+                    />
+                </CardContent>
+            </Card>
+        </PermissionGate>
     );
 }

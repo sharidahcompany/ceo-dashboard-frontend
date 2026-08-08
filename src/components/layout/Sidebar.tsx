@@ -2,13 +2,14 @@
 import React from "react";
 import { Building2 } from "lucide-react";
 import Logo from "../common/Logo";
-import { routes } from "@/app/routes";
+import { routes, isRouteVisible } from "@/app/routes";
 import DynamicIcon from "../common/DynamicIcon";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { getCurrentOrganization, OrganizationResource } from "@/actions/workspace/organization.actions";
+import { useAbility } from "@/providers/AbilityProvider";
 
 function organizationName(org: OrganizationResource | null): string {
   if (!org) return "";
@@ -20,7 +21,10 @@ function organizationName(org: OrganizationResource | null): string {
 export default function Sidebar() {
   const activePathname = usePathname();
   const t = useTranslations();
+  const ability = useAbility();
   const [organization, setOrganization] = React.useState<OrganizationResource | null>(null);
+
+  const visibleRoutes = routes.filter((route) => isRouteVisible(route, ability));
 
   React.useEffect(() => {
     getCurrentOrganization().then((res) => {
@@ -33,7 +37,7 @@ export default function Sidebar() {
       <Logo />
 
       <div className="flex flex-col gap-7">
-        {routes.map((route) => {
+        {visibleRoutes.map((route) => {
           const isActive =
             route.path === "/"
               ? activePathname === "/"
