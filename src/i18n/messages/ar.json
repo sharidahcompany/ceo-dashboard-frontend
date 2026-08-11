@@ -5,6 +5,7 @@
   },
   "success": "تم الحفظ بنجاح!",
   "attributes": {
+    "not_set": "غير محدد",
     "name": "الاسم",
     "name_ar": "الاسم بالعربية",
     "name_en": "الاسم بالانجليزية",
@@ -262,6 +263,22 @@
     "discount_total": "إجمالي الخصم",
     "tax_total": "إجمالي الضريبة",
     "total": "الإجمالي",
+    "tracking": "جارٍ التتبع",
+    "journey": "الرحلة",
+    "start": "البداية",
+    "maintenance": "تحت الصيانة",
+    "model": "الموديل",
+    "year": "سنة الصنع",
+    "has_gps": "يحتوي على GPS",
+    "traccar_device_id": "معرّف جهاز GPS",
+    "traccar_device_id_placeholder": "مثال: IMEI أو المعرّف الفريد في GPS",
+    "current_assignment": "التكليف الحالي",
+    "taken_at": "تاريخ الاستلام",
+    "returned_at": "تاريخ الإرجاع",
+    "checked_out": "مُسندة حالياً",
+    "available": "متاحة",
+    "assign_to": "إسناد إلى",
+    "assignment_history": "سجل الإسناد",
     "total_adjustment_amount": "إجمالي مبلغ التسوية",
     "total_deductions": "إجمالي الخصومات",
     "total_gross": "إجمالي الراتب الإجمالي",
@@ -292,7 +309,25 @@
     "missions_completion_rate": "معدل إنجاز المهام الخارجية",
     "tasks_completion_rate": "معدل إنجاز المهام",
     "order_number": "رقم الطلب",
-    "created_at": "تاريخ الإنشاء"
+    "created_at": "تاريخ الإنشاء",
+    "category": "التصنيف",
+    "body": "نص المستند",
+    "page_size": "حجم الصفحة",
+    "orientation": "اتجاه الصفحة",
+    "version": "الإصدار",
+    "label": "التسمية",
+    "required": "مطلوب",
+    "template": "القالب",
+    "role": "الدور",
+    "party": "يوقع بصفة",
+    "signer": "الموقّع",
+    "signers": "الموقّعون",
+    "expires_at": "تاريخ الانتهاء",
+    "signed_at": "تاريخ التوقيع",
+    "hash": "البصمة",
+    "verification_code": "رمز التحقق",
+    "decline_reason": "سبب الرفض",
+    "company": "الشركة"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -316,7 +351,12 @@
     "radius_range": "يجب أن تكون القيمة بين 1 و 1000",
     "invalid_subdomain": "اسم النطاق الفرعي غير صالح (يسمح فقط بالأحرف، الأرقام والشرطة '-')",
     "invalid_domain": "اسم النطاق غير صالح (مثال: example.com)",
-    "invalid_slug": "يجب أن يحتوي الرابط البديل على أحرف صغيرة وأرقام وشرطة فقط"
+    "invalid_slug": "يجب أن يحتوي الرابط البديل على أحرف صغيرة وأرقام وشرطة فقط",
+    "invalid_placeholder_key": "استخدم الحروف والأرقام والشرطة السفلية فقط، مثال: client_name.",
+    "invalid_anchor_role": "استخدم الحروف والأرقام والشرطة السفلية فقط، مثال: ceo.",
+    "split_placeholder": "تم تقسيم أحد الحقول بسبب التنسيق. حدده بالكامل وأزل التنسيق ثم أعد المحاولة.",
+    "no_signers": "أضف موقّعًا واحدًا على الأقل.",
+    "signature_required": "التوقيع مطلوب."
   },
   "buttons": {
     "previous": "السابق",
@@ -327,6 +367,8 @@
     "upload_file": "رفع الملف",
     "add_new_vision": "إضافة رؤية جديدة",
     "edit_vision": "تعديل الرؤية",
+    "return_car": "تسجيل الإرجاع",
+    "assign_car": "تسليم السيارة",
     "cancel": "إلغاء",
     "delete": "حذف",
     "save": "حفظ",
@@ -335,7 +377,22 @@
     "update": "تحديث",
     "create": "إنشاء",
     "add_slide": "إضافة شريحة",
-    "add_feature": "إضافة بطاقة ميزة"
+    "add_feature": "إضافة بطاقة ميزة",
+    "insert": "إدراج",
+    "insert_placeholder": "إدراج حقل",
+    "insert_signature": "إدراج توقيع",
+    "insert_stamp": "إدراج ختم",
+    "preview": "معاينة",
+    "send_for_signature": "إرسال للتوقيع",
+    "sign_now": "وقّع الآن",
+    "apply_stamp": "إضافة الختم",
+    "void": "إلغاء المستند",
+    "resend": "إعادة الإرسال",
+    "decline": "رفض",
+    "clear": "مسح",
+    "download_pdf": "تحميل PDF",
+    "copy_verify_link": "نسخ رابط التحقق",
+    "verify": "تحقق"
   },
   "theme": {
     "dark": "الوضع الداكن",
@@ -346,12 +403,41 @@
     "ar": "العربية",
     "en": "الانجليزية"
   },
+  "notifications": {
+    "no_notifications": "لا توجد إشعارات"
+  },
   "messages": {
     "no_permission_title": "غير مصرح بالوصول",
     "no_permission_description": "ليس لديك الصلاحية لعرض هذه الصفحة أو تنفيذ هذا الإجراء.",
+    "document_templates": {
+      "description": "مستندات جاهزة لإعادة الاستخدام، بحقول تُملأ لاحقًا ومواضع محددة للتوقيع والختم.",
+      "create_new": "قالب جديد",
+      "form_description": "اكتب المستند مرة واحدة. حدد الأجزاء التي تتغير في كل مستند، وموضع كل توقيع وختم.",
+      "body_description": "أدرج حقلًا لكل ما يتغير بين مستند وآخر، وعلامة توقيع أو ختم في الموضع المناسب.",
+      "body_placeholder": "اكتب نص المستند هنا…",
+      "placeholder_hint": "سمِّ هذا الحقل، مثال: client_name. سيظهر في المستند بالشكل '{{client_name}}' ويُملأ لاحقًا.",
+      "anchor_hint": "سمِّ الدور الذي يوقّع هنا، مثال: ceo أو client. كل دور يوقّع في موضع واحد.",
+      "fields_detected": "الحقول",
+      "fields_detected_hint": "مستخرجة من نص المستند. عدّل النص لإضافتها أو حذفها.",
+      "anchors_detected": "التواقيع والأختام",
+      "anchors_detected_hint": "حدد من يوقّع كل واحدة. الأطراف الداخلية توقّع من لوحة التحكم قبل إرسال المستند.",
+      "no_fields": "لا توجد حقول بعد. استخدم «إدراج حقل» في المحرر.",
+      "no_anchors": "لا توجد علامات توقيع أو ختم بعد.",
+      "options_hint": "الخيارات، مفصولة بفواصل",
+      "save_to_detect": "احفظ القالب لاستخراج حقوله وعلامات التوقيع فيه.",
+      "preview_title": "معاينة"
+    },
     "file_upload": {
       "drag_files": "اسحب الملفات هنا للرفع",
       "drag_file": "اسحب الملف هنا للرفع"
+    },
+    "cars": {
+      "cars_description": "إدارة سيارات الشركة ومعرفة من لديه كل سيارة حالياً",
+      "create_new_car": "إضافة سيارة",
+      "car_description": "أدخل تفاصيل السيارة أدناه",
+      "has_gps_hint": "هذه السيارة ترسل موقعها الحالي مباشرة",
+      "traccar_device_id_hint": "يربط هذه السيارة بجهاز  GPS لاستقبال تحديثات الموقع المباشر    ",
+      "no_journey_recorded": "لم يتم تسجيل أي بيانات موقع لهذه السيارة حتى الآن."
     },
     "vision": {
       "title": "رؤية المؤسسة",
@@ -407,6 +493,7 @@
       "missions_description": "إدارة وتتبع مأموريات الموظفين ومهامهم الميدانية",
       "create_new_mission": "إضافة مأمورية جديدة",
       "mission_description": "أدخل تفاصيل المأمورية وحدد الموظفين المكلفين بها",
+      "no_journey_recorded": "لم يتم تسجيل أي بيانات موقع لهذه المأمورية حتى الآن.",
       "attendance_permissions_description": "إدارة طلبات أذونات الحضور والغياب والتأخير للموظفين",
       "attendance_permission_description": "أدخل تفاصيل طلب الإذن وحدد المدة الزمنية المطلوبة",
       "available_scholarships_description": "إدارة المنح الدراسية والتدريبية المتاحة وتفاصيلها الماليّة والزمنية",
@@ -493,6 +580,67 @@
     },
     "website": {
       "orders_description": "عرض وإدارة الطلبات الواردة من متجر الموقع الإلكتروني."
+    },
+    "documents": {
+      "description": "المستندات المنشأة من القوالب، وموضع كل منها في مسار التوقيع.",
+      "create_new": "مستند جديد",
+      "form_description": "اختر قالبًا، واملأ حقوله، وحدد من يوقّع. الموقّعون الداخليون يوقّعون هنا قبل إرسال المستند.",
+      "pick_template": "اختر قالبًا",
+      "pick_template_first": "اختر قالبًا أولًا.",
+      "step_fields": "املأ البيانات",
+      "step_fields_hint": "هذه القيم تحل محل الحقول المحددة في القالب.",
+      "step_signers": "الموقّعون",
+      "step_signers_hint": "موقّع واحد لكل علامة توقيع أو ختم. الأرقام الأقل توقّع أولًا.",
+      "step_n": "الخطوة {step}",
+      "step_internal_hint": "يوقّع من لوحة التحكم",
+      "step_external_hint": "يوقّع عبر رابط بالبريد",
+      "current_step": "بانتظار هذه الخطوة",
+      "waiting_on": "بانتظار",
+      "no_signers": "لا يوجد موقّعون بعد.",
+      "no_activity": "لم يحدث شيء بعد.",
+      "no_fields_in_template": "لا توجد حقول قابلة للتعبئة في هذا القالب.",
+      "no_anchors_in_template": "لا توجد في هذا القالب علامات توقيع أو ختم، لذا لا يمكن توقيعه. أضف علامة في القالب أولًا.",
+      "not_editable": "تم إرسال هذا المستند للتوقيع، لذا لم يعد بالإمكان تغيير محتواه.",
+      "activity": "السجل",
+      "event": "الحدث",
+      "ip_address": "عنوان IP",
+      "verify_link_copied": "تم نسخ رابط التحقق.",
+      "public_pdf_label": "السماح لكل من يملك الرمز بتحميل ملف PDF",
+      "public_pdf_hint": "الرمز ينتقل مع النسخ المطبوعة عبر رمز QR. اتركه غير مفعّل لمشاركة حالة المستند والموقّعين فقط.",
+      "sign_dialog_title": "هذا التوقيع خاص بهذا الدور فقط في هذا المستند.",
+      "new_signature": "جديد",
+      "saved_signature": "محفوظ",
+      "save_signature_for_next_time": "احفظ هذا التوقيع للمرة القادمة",
+      "pick_a_saved_signature": "اختر توقيعًا محفوظًا.",
+      "no_saved_assets": "لا يوجد شيء محفوظ بعد.",
+      "void_confirm": "لا يمكن التراجع عن هذا الإجراء. سيتوقف المستند عن جمع التواقيع."
+    },
+    "public_sign": {
+      "tabs": {
+        "draw": "رسم",
+        "type": "كتابة",
+        "upload": "رفع"
+      },
+      "typed_placeholder": "اكتب اسمك الكامل",
+      "typed_preview_placeholder": "معاينة توقيعك",
+      "upload_invalid_type": "يرجى رفع صورة بصيغة PNG أو JPG.",
+      "expired": "هذا الرابط لم يعد صالحًا.",
+      "already_signed": "لقد وقّعت على هذا المستند بالفعل.",
+      "declined": "لقد رفضت توقيع هذا المستند.",
+      "thank_you": "شكرًا لك — تم كل شيء.",
+      "intro": "مرحبًا {name}، يرجى مراجعة المستند أدناه والتوقيع عليه عند الجاهزية.",
+      "decline_confirm": "لا يمكن التراجع عن هذا الإجراء. اذكر السبب إن أردت، وسيتم إخطار المرسل."
+    },
+    "verify": {
+      "title": "التحقق من مستند",
+      "valid": "هذا المستند صحيح ومكتمل.",
+      "invalid": "هذا المستند غير مكتمل بعد.",
+      "voided": "تم إلغاء هذا المستند.",
+      "not_found": "تعذّر التحقق من هذا المستند.",
+      "hash_label": "بصمة المستند",
+      "check_file": "تحقق من ملف لديك",
+      "file_match": "هذا الملف مطابق للمستند المسجل.",
+      "file_mismatch": "هذا الملف لا يطابق المستند المسجل."
     }
   },
   "sections": {
@@ -539,6 +687,10 @@
   },
   "routes": {
     "home": "الصفحة الرئيسية",
+    "document_templates": "قوالب المستندات",
+    "cars": "السيارات",
+    "create_car": "إضافة سيارة",
+    "edit_car": "تعديل السيارة",
     "finance": "المالية",
     "company_spirit": "روح المنشأة",
     "vision": "الرؤية",
@@ -682,7 +834,14 @@
     "create_page": "إنشاء صفحة",
     "edit_page": "تعديل بيانات الصفحة",
     "plans": "الخطط والأسعار والباقات",
-    "reports": "التقارير"
+    "reports": "التقارير",
+    "documents": "المستندات",
+    "create_document_template": "قالب جديد",
+    "edit_document_template": "تعديل القالب",
+    "issued_documents": "المستندات",
+    "create_document": "مستند جديد",
+    "edit_document": "تعديل المستند",
+    "document_details": "تفاصيل المستند"
   },
   "actions": {
     "loading": "جاري التحميل",
@@ -886,6 +1045,8 @@
     "description": "قم بإنشاء المشاريع، وتحديد دورات العمل (Sprints)، وإضافة الأعمدة والمهام ومتابعة سير العمليات.",
     "create_project": "إنشاء مشروع",
     "create_description": "تحديد مساحة عمل لمشروع جديد للتعاون مع فريقك.",
+    "branch_label": "الفرع",
+    "branch_placeholder": "اختر الفرع",
     "name_label": "اسم المشروع",
     "name_placeholder": "مثال: إعادة تصميم الموقع",
     "description_label": "الوصف",
@@ -1025,7 +1186,70 @@
       "paid": "مدفوع",
       "unpaid": "غير مدفوع",
       "partial": "مدفوع جزئياً",
-      "processed": "تمت المعالجة"
+      "processed": "تمت المعالجة",
+      "pending_internal": "بانتظار التواقيع الداخلية",
+      "pending_external": "بانتظار التواقيع الخارجية",
+      "completed": "مكتمل",
+      "declined": "مرفوض",
+      "voided": "ملغى",
+      "expired": "منتهي الصلاحية"
+    },
+    "documentTemplateStatus": {
+      "draft": "مسودة",
+      "active": "نشط",
+      "archived": "مؤرشف"
+    },
+    "documentFieldType": {
+      "text": "نص",
+      "textarea": "نص طويل",
+      "number": "رقم",
+      "date": "تاريخ",
+      "select": "قائمة منسدلة",
+      "boolean": "نعم / لا"
+    },
+    "signerParty": {
+      "internal": "داخلي (يوقّع من لوحة التحكم)",
+      "external": "خارجي (يوقّع عبر رابط بالبريد)"
+    },
+    "documentAnchorType": {
+      "signature": "توقيع",
+      "stamp": "ختم"
+    },
+    "orientation": {
+      "portrait": "طولي",
+      "landscape": "عرضي"
+    },
+    "documentSignerStatus": {
+      "pending": "قيد الانتظار",
+      "notified": "تم إرسال الدعوة",
+      "viewed": "تم الاطلاع",
+      "signed": "تم التوقيع",
+      "declined": "مرفوض",
+      "expired": "منتهي الصلاحية"
+    },
+    "signatureKind": {
+      "drawn": "مرسوم",
+      "typed": "مكتوب",
+      "uploaded": "مرفوع",
+      "stamp": "ختم"
+    },
+    "documentEvent": {
+      "created": "تم الإنشاء",
+      "updated": "تم التعديل",
+      "sent": "أُرسل للتوقيع",
+      "viewed": "تم الاطلاع",
+      "signed": "تم التوقيع",
+      "declined": "تم الرفض",
+      "completed": "اكتمل",
+      "voided": "تم الإلغاء",
+      "downloaded": "تم التحميل",
+      "verified": "تم التحقق",
+      "expired": "انتهت الصلاحية"
+    },
+    "actorType": {
+      "user": "موظف",
+      "signer": "موقّع",
+      "system": "النظام"
     }
   },
   "profile": {
@@ -1161,6 +1385,28 @@
     "period": "الفترة",
     "no_data": "لا توجد بيانات",
     "no_data_desc": "لا يوجد نشاط في هذا النطاق الزمني."
+  },
+  "branches_map": {
+    "title": "تقارير الفروع الشاملة",
+    "no_data": "لم يتم العثور على مواقع للفروع.",
+    "missions_legend": "المأموريات",
+    "cars_legend": "السيارات",
+    "cars_online_legend": "السيارات (متصلة)",
+    "cars_offline_legend": "السيارات (غير متصلة)",
+    "online": "متصلة",
+    "offline": "غير متصلة",
+    "driver": "السائق",
+    "reports": {
+      "no_data": "لا توجد تقارير للفروع.",
+      "attendance": "الحضور",
+      "projects": "المشاريع",
+      "tasks_completion": "إنجاز المهام",
+      "not_enough_data": "لا توجد بيانات كافية بعد",
+      "finance": "المالية (هذا الشهر)",
+      "revenue": "الإيرادات",
+      "expenses": "المصروفات",
+      "net_profit_loss": "صافي الربح/الخسارة"
+    }
   },
   "orders": {
     "status": {

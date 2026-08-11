@@ -3,7 +3,9 @@
     "title": "CEO App",
     "description": "An all-in-one cloud platform providing financial accounting, HR management, organizational structure design, and website building solutions for startups and enterprises. Boost your company's efficiency today with the CEO software."
   },
+  "success": "Saved successfully!",
   "attributes": {
+    "not_set": "Not set",
     "name": "Name",
     "name_ar": "Arabic Name",
     "name_en": "English Name",
@@ -83,6 +85,24 @@
     "discount_total": "Discount",
     "tax_total": "Tax",
     "total": "Total",
+    "journey": "Journey",
+    "tracking": "Tracking",
+    "start": "Start",
+    "active": "Active",
+    "maintenance": "In Maintenance",
+    "model": "Model",
+    "year": "Year",
+    "has_gps": "Has GPS",
+    "traccar_device_id": "Traccar Device ID",
+    "traccar_device_id_placeholder": "e.g. IMEI or Traccar unique ID",
+    "current_assignment": "Current Assignment",
+    "taken_at": "Taken at",
+    "returned_at": "Returned at",
+    "checked_out": "Checked out",
+    "available": "Available",
+    "assign_to": "Assign To",
+    "assignment_history": "Assignment History",
+    "employee": "Employee",
     "current_password": "Current Password",
     "assignments": "Branch, Department & Position Assignments",
     "branches": "Branches",
@@ -108,7 +128,25 @@
     "tasks_completion_rate": "Tasks Completion Rate",
     "order_number": "Order Number",
     "customer": "Customer",
-    "created_at": "Created At"
+    "created_at": "Created At",
+    "category": "Category",
+    "body": "Document Body",
+    "page_size": "Page Size",
+    "orientation": "Orientation",
+    "version": "Version",
+    "label": "Label",
+    "required": "Required",
+    "template": "Template",
+    "role": "Role",
+    "party": "Signs As",
+    "signer": "Signer",
+    "signers": "Signers",
+    "expires_at": "Expires On",
+    "signed_at": "Signed On",
+    "hash": "Hash",
+    "verification_code": "Verification Code",
+    "decline_reason": "Reason for Declining",
+    "company": "Company"
   },
   "validation": {
     "required": "This field is required",
@@ -126,7 +164,12 @@
     "file_size_max": "File size must not exceed {max} MB",
     "invalid_subdomain": "Invalid subdomain (only letters, numbers, and dashes '-' are allowed)",
     "invalid_domain": "Invalid domain format (e.g. example.com)",
-    "invalid_slug": "Slug must contain only lowercase letters, numbers, and dashes '-'"
+    "invalid_slug": "Slug must contain only lowercase letters, numbers, and dashes '-'",
+    "invalid_placeholder_key": "Use only letters, numbers and underscores — for example client_name.",
+    "invalid_anchor_role": "Use only letters, numbers and underscores — for example ceo.",
+    "split_placeholder": "A field was broken apart by formatting. Select it fully, clear the formatting, and try again.",
+    "no_signers": "Add at least one signer.",
+    "signature_required": "A signature is required."
   },
   "buttons": {
     "previous": "Previous",
@@ -137,6 +180,8 @@
     "upload_file": "Upload File",
     "add_new_vision": "Add New Vision",
     "edit_vision": "Edit Vision",
+    "return_car": "Mark Returned",
+    "assign_car": "Check Out",
     "cancel": "Cancel",
     "delete": "Delete",
     "save": "Save",
@@ -145,7 +190,22 @@
     "update": "Update",
     "create": "Create",
     "add_slide": "Add Slide",
-    "add_feature": "Add Feature Card"
+    "add_feature": "Add Feature Card",
+    "insert": "Insert",
+    "insert_placeholder": "Insert Field",
+    "insert_signature": "Insert Signature",
+    "insert_stamp": "Insert Stamp",
+    "preview": "Preview",
+    "send_for_signature": "Send for Signature",
+    "sign_now": "Sign Now",
+    "apply_stamp": "Apply Stamp",
+    "void": "Void",
+    "resend": "Resend",
+    "decline": "Decline",
+    "clear": "Clear",
+    "download_pdf": "Download PDF",
+    "copy_verify_link": "Copy Verification Link",
+    "verify": "Verify"
   },
   "theme": {
     "dark": "Dark Mode",
@@ -156,11 +216,40 @@
     "ar": "العربية",
     "en": "English"
   },
+  "notifications": {
+    "no_notifications": "No notifications"
+  },
   "messages": {
     "no_permission_title": "Access denied",
     "no_permission_description": "You don't have permission to view this page or perform this action.",
+    "document_templates": {
+      "description": "Reusable documents with fill-in fields and marked signature and stamp positions.",
+      "create_new": "New Template",
+      "form_description": "Write the document once. Mark the parts that change per document, and where each signature and stamp belongs.",
+      "body_description": "Insert a field for anything that changes per document, and a signature or stamp marker wherever one belongs.",
+      "body_placeholder": "Write the document text here…",
+      "placeholder_hint": "Name this field, for example client_name. It becomes '{{client_name}}' in the document and is filled in later.",
+      "anchor_hint": "Name the role that signs here, for example ceo or client. Each role signs in one place.",
+      "fields_detected": "Fields",
+      "fields_detected_hint": "Taken from the document body. Edit the body to add or remove them.",
+      "anchors_detected": "Signatures & Stamps",
+      "anchors_detected_hint": "Choose who signs each one. Internal parties sign in the dashboard before the document is sent.",
+      "no_fields": "No fields yet. Use “Insert Field” in the editor.",
+      "no_anchors": "No signature or stamp markers yet.",
+      "options_hint": "Options, separated by commas",
+      "save_to_detect": "Save the template to detect its fields and signature markers.",
+      "preview_title": "Preview"
+    },
     "file_upload": {
       "drag_files": "Drag and drop files here to upload"
+    },
+    "cars": {
+      "cars_description": "Manage company cars and who currently has them",
+      "create_new_car": "Add Car",
+      "car_description": "Fill in the car details below",
+      "has_gps_hint": "This car reports its live location",
+      "traccar_device_id_hint": "Links this car to a device in Traccar so live GPS updates are received via webhook",
+      "no_journey_recorded": "No location data recorded for this car yet."
     },
     "vision": {
       "title": "Organization Vision",
@@ -237,7 +326,8 @@
       "candidates_description": "Manage job applications received for open vacancies.",
       "create_new_candidate": "Add Candidate",
       "invite_employee": "Invite Employee",
-      "invite_employee_description": "Send an invitation email so this person can set up their account and join your workspace."
+      "invite_employee_description": "Send an invitation email so this person can set up their account and join your workspace.",
+      "no_journey_recorded": "No location data recorded for this mission yet."
     },
     "employees": {
       "assignments_description": "Assign this employee to one or more branches, departments, and positions.",
@@ -251,6 +341,67 @@
     },
     "website": {
       "orders_description": "View and manage orders placed through the website store."
+    },
+    "documents": {
+      "description": "Documents created from a template, and where each one is in its signing flow.",
+      "create_new": "New Document",
+      "form_description": "Pick a template, fill in its fields, and say who signs. Internal signers sign here before the document is sent out.",
+      "pick_template": "Choose a template",
+      "pick_template_first": "Choose a template first.",
+      "step_fields": "Fill in the details",
+      "step_fields_hint": "These values replace the fields marked in the template.",
+      "step_signers": "Signers",
+      "step_signers_hint": "One signer per signature or stamp marker. Lower step numbers sign first.",
+      "step_n": "Step {step}",
+      "step_internal_hint": "Signs in the dashboard",
+      "step_external_hint": "Signs by emailed link",
+      "current_step": "Waiting on this step",
+      "waiting_on": "Waiting on",
+      "no_signers": "No signers yet.",
+      "no_activity": "Nothing has happened yet.",
+      "no_fields_in_template": "This template has no fill-in fields.",
+      "no_anchors_in_template": "This template has no signature or stamp markers, so nobody can sign it. Add one in the template first.",
+      "not_editable": "This document has already been sent for signature, so its contents can no longer be changed.",
+      "activity": "Activity",
+      "event": "Event",
+      "ip_address": "IP address",
+      "verify_link_copied": "Verification link copied.",
+      "public_pdf_label": "Let anyone with the code download the PDF",
+      "public_pdf_hint": "The code travels on printed copies via the QR. Leave this off to share only the document's status and signers.",
+      "sign_dialog_title": "This signature applies to this role only, on this document.",
+      "new_signature": "New",
+      "saved_signature": "Saved",
+      "save_signature_for_next_time": "Save this signature for next time",
+      "pick_a_saved_signature": "Choose a saved signature.",
+      "no_saved_assets": "Nothing saved yet.",
+      "void_confirm": "This cannot be undone. The document will stop collecting signatures."
+    },
+    "public_sign": {
+      "tabs": {
+        "draw": "Draw",
+        "type": "Type",
+        "upload": "Upload"
+      },
+      "typed_placeholder": "Type your full name",
+      "typed_preview_placeholder": "Your signature preview",
+      "upload_invalid_type": "Please upload a PNG or JPG image.",
+      "expired": "This link is no longer valid.",
+      "already_signed": "You have already signed this document.",
+      "declined": "You have declined to sign this document.",
+      "thank_you": "Thank you — you're all set.",
+      "intro": "Hello {name}, please review the document below and sign when ready.",
+      "decline_confirm": "This cannot be undone. Explain why, if you'd like, and the sender will be notified."
+    },
+    "verify": {
+      "title": "Verify a document",
+      "valid": "This document is valid and complete.",
+      "invalid": "This document is not yet complete.",
+      "voided": "This document has been voided.",
+      "not_found": "We couldn't verify this document.",
+      "hash_label": "Document hash",
+      "check_file": "Check a file you have",
+      "file_match": "This file matches the document on record.",
+      "file_mismatch": "This file does not match the document on record."
     }
   },
   "sections": {
@@ -293,7 +444,8 @@
   },
   "errors": {
     "something_went_wrong": "Something went wrong, please try again later",
-    "network_error": "Unable to connect to the server. Please check your internet connection"
+    "network_error": "Unable to connect to the server. Please check your internet connection",
+    "unknown_error": "Something went wrong, please try again later"
   },
   "themeStore": {
     "badge": "Next-gen storefront designs",
@@ -312,6 +464,10 @@
   },
   "routes": {
     "home": "Home",
+    "document_templates": "Document Templates",
+    "cars": "Cars",
+    "create_car": "Add Car",
+    "edit_car": "Edit Car",
     "company_spirit": "Company Spirit",
     "vision": "Vision",
     "goals": "Goals",
@@ -363,7 +519,14 @@
     "edit_cost_center": "Edit Cost Center",
     "profile": "Profile",
     "reports": "Reports",
-    "orders": "Orders"
+    "orders": "Orders",
+    "documents": "Documents",
+    "create_document_template": "New Template",
+    "edit_document_template": "Edit Template",
+    "issued_documents": "Documents",
+    "create_document": "New Document",
+    "edit_document": "Edit Document",
+    "document_details": "Document Details"
   },
   "profile": {
     "title": "Profile",
@@ -576,6 +739,8 @@
     "description": "Create projects, define sprints, set columns, build tasks, and track operations.",
     "create_project": "Create Project",
     "create_description": "Define a new workspace project to collaborate with your team.",
+    "branch_label": "Branch",
+    "branch_placeholder": "Select a branch",
     "name_label": "Project Name",
     "name_placeholder": "e.g. Website Redesign",
     "description_label": "Description",
@@ -715,7 +880,70 @@
       "paid": "Paid",
       "unpaid": "Unpaid",
       "partial": "Partial",
-      "processed": "Processed"
+      "processed": "Processed",
+      "pending_internal": "Awaiting internal signatures",
+      "pending_external": "Awaiting external signatures",
+      "completed": "Completed",
+      "declined": "Declined",
+      "voided": "Voided",
+      "expired": "Expired"
+    },
+    "documentTemplateStatus": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "documentFieldType": {
+      "text": "Text",
+      "textarea": "Long text",
+      "number": "Number",
+      "date": "Date",
+      "select": "Dropdown",
+      "boolean": "Yes / No"
+    },
+    "signerParty": {
+      "internal": "Internal (signs in the dashboard)",
+      "external": "External (signs by email link)"
+    },
+    "documentAnchorType": {
+      "signature": "Signature",
+      "stamp": "Stamp"
+    },
+    "orientation": {
+      "portrait": "Portrait",
+      "landscape": "Landscape"
+    },
+    "documentSignerStatus": {
+      "pending": "Pending",
+      "notified": "Invitation sent",
+      "viewed": "Viewed",
+      "signed": "Signed",
+      "declined": "Declined",
+      "expired": "Expired"
+    },
+    "signatureKind": {
+      "drawn": "Drawn",
+      "typed": "Typed",
+      "uploaded": "Uploaded",
+      "stamp": "Stamp"
+    },
+    "documentEvent": {
+      "created": "Created",
+      "updated": "Updated",
+      "sent": "Sent for signature",
+      "viewed": "Viewed",
+      "signed": "Signed",
+      "declined": "Declined",
+      "completed": "Completed",
+      "voided": "Voided",
+      "downloaded": "Downloaded",
+      "verified": "Verified",
+      "expired": "Expired"
+    },
+    "actorType": {
+      "user": "Staff member",
+      "signer": "Signer",
+      "system": "System"
     }
   },
   "reports": {
@@ -819,6 +1047,28 @@
     "period": "Period",
     "no_data": "No Data Found",
     "no_data_desc": "No activity in this date range."
+  },
+  "branches_map": {
+    "title": "Branch Locations",
+    "no_data": "No branch locations found.",
+    "missions_legend": "Missions",
+    "cars_legend": "Cars",
+    "cars_online_legend": "Cars (online)",
+    "cars_offline_legend": "Cars (offline)",
+    "online": "Online",
+    "offline": "Offline",
+    "driver": "Driver",
+    "reports": {
+      "no_data": "No branch reports found.",
+      "attendance": "Attendance",
+      "projects": "Projects",
+      "tasks_completion": "Tasks completion",
+      "not_enough_data": "Not enough data yet",
+      "finance": "Finance (this month)",
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "net_profit_loss": "Net profit/loss"
+    }
   },
   "orders": {
     "status": {

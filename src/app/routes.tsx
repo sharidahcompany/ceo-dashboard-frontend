@@ -690,6 +690,51 @@ export const routes: Route[] = [
     ],
   },
   {
+    path: "/cars",
+    title: "routes.cars",
+    icon: "Car",
+    permission: "workspace.car.view",
+  },
+  {
+    path: "/documents",
+    title: "routes.documents",
+    icon: "FileText",
+    children: [
+      {
+        path: "templates",
+        title: "routes.document_templates",
+        icon: "LayoutTemplate",
+        permission: "workspace.document_template.view",
+        children: [
+          {
+            path: "create",
+            title: "routes.create_document_template",
+          },
+          {
+            path: "edit",
+            title: "routes.edit_document_template",
+          },
+        ],
+      },
+      {
+        path: "issued",
+        title: "routes.issued_documents",
+        icon: "FileSignature",
+        permission: "workspace.document.view",
+        children: [
+          {
+            path: "create",
+            title: "routes.create_document",
+          },
+          {
+            path: "edit",
+            title: "routes.edit_document",
+          },
+        ],
+      },
+    ],
+  },
+  {
     path: "/buffets",
     title: "routes.buffets",
     icon: "Coffee",

@@ -36,6 +36,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { SelectEntity, EntityOption } from "@/components/ui/select-entity";
+import { SelectBranch } from "@/components/ui/select-branch";
 import { LineItemsTotals } from "./LineItemsTotals";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -83,6 +84,7 @@ const invoiceSchema = z.object({
     reference: z.string().optional(),
     project_id: z.union([z.string(), z.number()]).optional().nullable(),
     warehouse_id: z.union([z.string(), z.number()]).optional().nullable(),
+    branch_id: z.union([z.string(), z.number()]).optional().nullable(),
     tax_amount_type: z.enum(["EXCLUSIVE", "INCLUSIVE"]),
     notes: z.string().optional(),
     items: z.array(lineItemSchema).min(1, { message: "validation.required" }),
@@ -139,6 +141,7 @@ export default function InvoiceForm() {
             reference: "",
             project_id: null,
             warehouse_id: null,
+            branch_id: null,
             tax_amount_type: "EXCLUSIVE",
             notes: "",
             items: [emptyLineItem],
@@ -204,6 +207,7 @@ export default function InvoiceForm() {
                 setValue("reference", inv.reference || "");
                 setValue("project_id", inv.project_id ? String(inv.project_id) : null);
                 setValue("warehouse_id", inv.warehouse_id ? String(inv.warehouse_id) : null);
+                setValue("branch_id", inv.branch_id ? String(inv.branch_id) : null);
                 setValue("tax_amount_type", inv.tax_amount_type);
                 setValue("notes", inv.notes || "");
                 if (inv.items?.length) {
@@ -234,6 +238,7 @@ export default function InvoiceForm() {
                 ...values,
                 project_id: values.project_id || null,
                 warehouse_id: values.warehouse_id || null,
+                branch_id: values.branch_id || null,
                 items: values.items.map((item) => ({
                     ...item,
                     item_id: item.item_id || null,
@@ -415,6 +420,13 @@ export default function InvoiceForm() {
                                             loading={optionsLoading}
                                             placeholder={t("actions.select_warehouse") || "Select warehouse"}
                                         />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.branch") || "Branch"}</FieldLabel>
+                                    <FieldContent>
+                                        <SelectBranch control={control} name="branch_id" />
                                     </FieldContent>
                                 </Field>
                             </FieldGroup>

@@ -104,6 +104,7 @@ export interface DataGridProps<TData, TValue> {
 
     // Actions
     createTitle?: string;
+    createIcon?: React.ComponentType<{ className?: string }>;
 
     editable?: boolean;
     idKey?: keyof TData;
@@ -134,6 +135,7 @@ export function DataGrid<TData, TValue>({
     gridCols = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
     customFilters,
     createTitle,
+    createIcon: CreateIcon = Plus,
     editable = true,
     idKey = "id" as keyof TData,
     deletable = true,
@@ -537,7 +539,7 @@ export function DataGrid<TData, TValue>({
                     )}
                     {createTitle && (
                         <Button render={<Link href={`${pathname}/create`} />} nativeButton={false} >
-                            <Plus className="w-4 h-4  " />
+                            <CreateIcon className="w-4 h-4  " />
                             {createTitle}
                         </Button>
                     )}
@@ -611,7 +613,7 @@ export function DataGrid<TData, TValue>({
                             <EmptyDescription>{t("no_data_desc")}</EmptyDescription>
                             {createTitle && (
                                 <Button size="sm" render={<Link href={`${pathname}/create`} />} nativeButton={false} className="mt-4">
-                                    <Plus className="w-4 h-4 mr-2" />
+                                    <CreateIcon className="w-4 h-4 mr-2" />
                                     {createTitle}
                                 </Button>
                             )}

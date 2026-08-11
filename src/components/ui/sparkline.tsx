@@ -11,7 +11,7 @@ interface SparklinePoint {
 interface SparklineProps {
     data: SparklinePoint[];
     color?: string;
-    height?: number;
+    height?: number | string;
     formatValue?: (value: number) => string;
 }
 
@@ -20,13 +20,15 @@ export function Sparkline({ data, color = "var(--chart-1)", height = 40, formatV
         return null;
     }
 
+    const gradientId = `sparkline-fill-${color.replace(/[^a-zA-Z0-9-]/g, "")}`;
+
     return (
         <div style={{ height }}>
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data} margin={{ top: 4, right: 2, left: 2, bottom: 0 }}>
                     <defs>
-                        <linearGradient id={`sparkline-fill-${color}`} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={color} stopOpacity={0.1} />
+                        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={1} />
                             <stop offset="100%" stopColor={color} stopOpacity={0} />
                         </linearGradient>
                     </defs>
@@ -47,7 +49,7 @@ export function Sparkline({ data, color = "var(--chart-1)", height = 40, formatV
                         dataKey="value"
                         stroke={color}
                         strokeWidth={2}
-                        fill={`url(#sparkline-fill-${color})`}
+                        fill={`url(#${gradientId})`}
                         dot={false}
                         activeDot={{ r: 4, fill: color, stroke: "var(--card)", strokeWidth: 2 }}
                         isAnimationActive={false}

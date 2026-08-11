@@ -44,9 +44,12 @@ export interface BranchesApiResponse {
 import { getErrorMessage } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 
-export async function getBranches(query?: string): Promise<ActionResponse<BranchesApiResponse>> {
+export async function getBranches(query?: string, tenantId?: string): Promise<ActionResponse<BranchesApiResponse>> {
     try {
-        const response = await api.get<BranchesApiResponse>(`/workspace/branches${query ? `?${query}` : ""}`);
+        const response = await api.get<BranchesApiResponse>(
+            `/workspace/branches${query ? `?${query}` : ""}`,
+            tenantId ? { headers: { "X-Tenant": tenantId } } : undefined,
+        );
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

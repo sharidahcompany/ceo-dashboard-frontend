@@ -38,9 +38,12 @@ export interface AttendanceData {
     status?: string;
 }
 
-export async function getAttendances(query?: string): Promise<ActionResponse<{ data: AttendanceResource[]; meta?: any }>> {
+export async function getAttendances(query?: string, tenantId?: string): Promise<ActionResponse<{ data: AttendanceResource[]; meta?: any }>> {
     try {
-        const response = await api.get(`/workspace/attendances${query ? `?${query}` : ""}`);
+        const response = await api.get(
+            `/workspace/attendances${query ? `?${query}` : ""}`,
+            tenantId ? { headers: { "X-Tenant": tenantId } } : undefined,
+        );
         const responseData = response.data;
         return {
             success: true,

@@ -30,9 +30,9 @@ export async function getMissionRequests(
   query?: string
 ): Promise<ActionResponse<{ data: MissionResource[]; meta?: any }>> {
   try {
-    const response = await api.get(
-      `/workspace/missions${query ? `?${query}` : ""}`
-    );
+    const params = new URLSearchParams(query);
+    params.set("include", "assignees");
+    const response = await api.get(`/workspace/missions?${params.toString()}`);
     return {
       success: true,
       data: {

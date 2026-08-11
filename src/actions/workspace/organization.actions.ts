@@ -51,28 +51,39 @@ async function getCurrentTenantId(): Promise<string | null> {
 }
 
 /**
+ * Fetch a specific tenant's organization info by id.
+ */
+export async function getOrganizationById(
+  tenantId: string,
+): Promise<ActionResponse<OrganizationResource>> {
+  try {
+    const response = await api.get(`/auth/tenants/${tenantId}`, {
+      headers: { "X-Tenant": tenantId },
+    });
+    return { success: true, data: response.data.data ?? response.data };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+/**
  * Fetch the current authenticated user's organization (tenant) info.
  */
 export async function getCurrentOrganization(): Promise<
   ActionResponse<OrganizationResource>
 > {
-  try {
-    const tenantId = await getCurrentTenantId();
-    if (!tenantId) {
-      return {
-        success: false,
-        error: getErrorMessage(
-          undefined,
-          "No tenant found for the current user.",
-        ),
-      };
-    }
-
-    const response = await api.get(`/auth/tenants/${tenantId}`);
-    return { success: true, data: response.data.data ?? response.data };
-  } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
+  const tenantId = await getCurrentTenantId();
+  if (!tenantId) {
+    return {
+      success: false,
+      error: getErrorMessage(
+        undefined,
+        "No tenant found for the current user.",
+      ),
+    };
   }
+
+  return getOrganizationById(tenantId);
 }
 
 /**

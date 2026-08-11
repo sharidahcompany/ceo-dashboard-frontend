@@ -39,6 +39,7 @@ export interface InvoiceResource {
     reference: string | null;
     project_id: number | null;
     warehouse_id: number | null;
+    branch_id: number | null;
     tax_amount_type: TaxAmountType;
     notes: string | null;
     subtotal: number;
@@ -50,6 +51,7 @@ export interface InvoiceResource {
     customer?: any;
     project?: any;
     warehouse?: any;
+    branch?: any;
     created_at: string;
     updated_at: string;
 }
@@ -76,6 +78,7 @@ export interface InvoiceFormData {
     reference?: string;
     project_id?: number | string | null;
     warehouse_id?: number | string | null;
+    branch_id?: number | string | null;
     tax_amount_type: TaxAmountType;
     notes?: string;
     items: InvoiceLineItemFormData[];

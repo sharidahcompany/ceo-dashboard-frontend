@@ -58,10 +58,14 @@ export interface BalanceSheetResponse {
 }
 
 export async function getProfitAndLossReport(
-    params: { start_month: string; end_month: string }
+    params: { start_month: string; end_month: string; branch_id?: number | string },
+    tenantId?: string,
 ): Promise<ActionResponse<{ data: ProfitAndLossPeriod[] }>> {
     try {
-        const response = await api.get("/finance/financial-reports/profit-and-loss", { params });
+        const response = await api.get("/finance/financial-reports/profit-and-loss", {
+            params,
+            headers: tenantId ? { "X-Tenant": tenantId } : undefined,
+        });
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

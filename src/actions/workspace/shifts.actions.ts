@@ -5,9 +5,12 @@ import { getErrorMessage, normalizePaginationMeta } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 import { revalidatePath } from "next/cache";
 import { UserResource } from "./user.actions";
+import { BranchResource } from "@/actions/company-spirit/branch.actions";
 
 export interface ShiftResource {
     id: number;
+    branch_id?: number | null;
+    branch?: BranchResource | null;
     name: string;
     work_days: Array<{
         value: string;
@@ -28,6 +31,7 @@ export interface ShiftResource {
 }
 
 export interface ShiftData {
+    branch_id?: number | string | null;
     name: string;
     work_days?: string[];
     start_time: string;
@@ -39,9 +43,12 @@ export interface ShiftData {
     user_ids?: string[];
 }
 
-export async function getShifts(query?: string): Promise<ActionResponse<{ data: ShiftResource[]; meta?: any }>> {
+export async function getShifts(query?: string, tenantId?: string): Promise<ActionResponse<{ data: ShiftResource[]; meta?: any }>> {
     try {
-        const response = await api.get(`/workspace/shifts${query ? `?${query}` : ""}`);
+        const response = await api.get(
+            `/workspace/shifts${query ? `?${query}` : ""}`,
+            tenantId ? { headers: { "X-Tenant": tenantId } } : undefined,
+        );
         const responseData = response.data;
         return {
             success: true,

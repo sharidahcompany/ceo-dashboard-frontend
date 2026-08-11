@@ -36,6 +36,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { SelectEntity, EntityOption } from "@/components/ui/select-entity";
+import { SelectBranch } from "@/components/ui/select-branch";
 import { LineItemsTotals } from "./LineItemsTotals";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -82,6 +83,7 @@ const debitNoteSchema = z.object({
     reference: z.string().optional(),
     project_id: z.union([z.string(), z.number()]).optional().nullable(),
     warehouse_id: z.union([z.string(), z.number()]).optional().nullable(),
+    branch_id: z.union([z.string(), z.number()]).optional().nullable(),
     tax_amount_type: z.enum(["EXCLUSIVE", "INCLUSIVE"]),
     notes: z.string().optional(),
     items: z.array(lineItemSchema).min(1, { message: "validation.required" }),
@@ -137,6 +139,7 @@ export default function DebitNoteForm() {
             reference: "",
             project_id: null,
             warehouse_id: null,
+            branch_id: null,
             tax_amount_type: "EXCLUSIVE",
             notes: "",
             items: [emptyLineItem],
@@ -201,6 +204,7 @@ export default function DebitNoteForm() {
                 setValue("reference", cn.reference || "");
                 setValue("project_id", cn.project_id ? String(cn.project_id) : null);
                 setValue("warehouse_id", cn.warehouse_id ? String(cn.warehouse_id) : null);
+                setValue("branch_id", cn.branch_id ? String(cn.branch_id) : null);
                 setValue("tax_amount_type", cn.tax_amount_type);
                 setValue("notes", cn.notes || "");
                 if (cn.items?.length) {
@@ -231,6 +235,7 @@ export default function DebitNoteForm() {
                 ...values,
                 project_id: values.project_id || null,
                 warehouse_id: values.warehouse_id || null,
+                branch_id: values.branch_id || null,
                 items: values.items.map((item) => ({
                     ...item,
                     item_id: item.item_id || null,
@@ -404,6 +409,13 @@ export default function DebitNoteForm() {
                                             loading={optionsLoading}
                                             placeholder={t("actions.select_warehouse") || "Select warehouse"}
                                         />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.branch") || "Branch"}</FieldLabel>
+                                    <FieldContent>
+                                        <SelectBranch control={control} name="branch_id" />
                                     </FieldContent>
                                 </Field>
                             </FieldGroup>

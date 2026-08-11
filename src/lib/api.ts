@@ -27,7 +27,7 @@ api.interceptors.request.use(
         config.headers["Accept-Language"] = language;
       }
 
-      if (tenant) {
+      if (tenant && !config.headers["X-Tenant"]) {
         config.headers["X-Tenant"] = tenant;
       }
 

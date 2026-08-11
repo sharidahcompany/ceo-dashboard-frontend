@@ -19,6 +19,8 @@ import {
 } from "@/actions/workspace/shifts.actions";
 import { MultiSelectUser } from "@/components/ui/multi-select-user";
 import { UserResource } from "@/actions/workspace/user.actions";
+import { SelectBranch } from "@/components/ui/select-branch";
+import { BranchResource } from "@/actions/company-spirit/branch.actions";
 import {
     Select,
     SelectContent,
@@ -37,6 +39,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface ShiftFormValues {
+    branch_id: string | null;
     name: string;
     work_days: string[];
     start_time: string;
@@ -58,6 +61,7 @@ export default function ShiftForm() {
     const [isPending, startTransition] = useTransition();
     const [loadingData, setLoadingData] = useState(!!shiftId);
     const [initialUsers, setInitialUsers] = useState<UserResource[]>([]);
+    const [initialBranch, setInitialBranch] = useState<BranchResource | null>(null);
 
     const daysOptions = [
         { value: "0", label: t("weekdays.sunday") || "Sunday" },
@@ -71,6 +75,7 @@ export default function ShiftForm() {
 
     const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm<ShiftFormValues>({
         defaultValues: {
+            branch_id: null,
             name: "",
             work_days: [],
             start_time: "",
@@ -89,6 +94,10 @@ export default function ShiftForm() {
                 const res = await getShift(shiftId);
                 if (res.success) {
                     const data = res.data;
+                    if (data.branch) {
+                        setInitialBranch(data.branch);
+                    }
+                    setValue("branch_id", data.branch_id ? String(data.branch_id) : null);
                     setValue("name", data.name || "");
                     
                     // Map days back to string values
@@ -126,6 +135,7 @@ export default function ShiftForm() {
     const onSubmit = (values: ShiftFormValues) => {
         startTransition(async () => {
             const payload: ShiftData = {
+                branch_id: values.branch_id || undefined,
                 name: values.name,
                 work_days: values.work_days,
                 start_time: values.start_time,
@@ -173,6 +183,18 @@ export default function ShiftForm() {
                     <CardContent className="pt-6">
                         <FieldSet>
                             <FieldGroup className="md:grid md:grid-cols-2 md:gap-5">
+                                {/* Branch */}
+                                <Field>
+                                    <FieldLabel>{t("attributes.branch") || "Branch"}</FieldLabel>
+                                    <FieldContent>
+                                        <SelectBranch
+                                            control={control}
+                                            name="branch_id"
+                                            initialBranch={initialBranch}
+                                        />
+                                    </FieldContent>
+                                </Field>
+
                                 {/* Name */}
                                 <Field>
                                     <FieldLabel>{t("attributes.name") || "Shift Name"}</FieldLabel>

@@ -4,6 +4,7 @@ import api from "@/lib/api";
 import { getErrorMessage } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 import { revalidatePath } from "next/cache";
+import { BranchResource } from "@/actions/company-spirit/branch.actions";
 
 // ==========================================
 // TYPES
@@ -29,6 +30,8 @@ export interface FileResource {
 
 export interface ProjectResource {
     id: number;
+    branch_id?: number | null;
+    branch?: BranchResource | null;
     name: string;
     description?: string;
     notes?: string;
@@ -123,9 +126,12 @@ export interface TaskResource {
 
 // --- PROJECTS ---
 
-export async function getProjects(): Promise<ActionResponse<ProjectResource[]>> {
+export async function getProjects(tenantId?: string): Promise<ActionResponse<ProjectResource[]>> {
     try {
-        const response = await api.get("/workspace/projects");
+        const response = await api.get(
+            "/workspace/projects",
+            tenantId ? { headers: { "X-Tenant": tenantId } } : undefined,
+        );
         return { success: true, data: response.data.data || response.data };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -142,6 +148,7 @@ export async function getProjectDetails(projectId: number | string): Promise<Act
 }
 
 export async function createProject(data: {
+    branch_id?: number | string;
     name: string;
     description?: string;
     notes?: string;
@@ -159,6 +166,7 @@ export async function createProject(data: {
 }
 
 export async function updateProject(id: number | string, data: {
+    branch_id?: number | string;
     name?: string;
     description?: string;
     notes?: string;

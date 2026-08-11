@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { SelectEntity, EntityOption } from "@/components/ui/select-entity";
 import { SelectUser } from "@/components/ui/select-user";
+import { SelectBranch } from "@/components/ui/select-branch";
 import { UserResource } from "@/actions/workspace/user.actions";
 
 import {
@@ -51,6 +52,7 @@ const payrollSchema = z.object({
     user_id: z.union([z.string(), z.number()]).refine((v) => !!v, {
         message: "validation.required",
     }),
+    branch_id: z.union([z.string(), z.number()]).optional().nullable(),
     gross_salary: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== null, {
         message: "validation.required",
     }),
@@ -90,6 +92,7 @@ export default function PayrollForm() {
         defaultValues: {
             payrun_id: null,
             user_id: "",
+            branch_id: null,
             gross_salary: "",
             total_deductions: "",
             net_salary: "",
@@ -119,6 +122,7 @@ export default function PayrollForm() {
                 const p = res.data;
                 setValue("payrun_id", null);
                 setValue("user_id", p.user_id ? String(p.user_id) : "");
+                setValue("branch_id", p.branch_id ? String(p.branch_id) : null);
                 setValue("gross_salary", p.gross_salary);
                 setValue("total_deductions", p.total_deductions ?? "");
                 setValue("net_salary", p.net_salary);
@@ -147,6 +151,7 @@ export default function PayrollForm() {
             const payload: PayrollFormData = {
                 ...values,
                 payrun_id: values.payrun_id || null,
+                branch_id: values.branch_id || null,
             };
 
             const res = payrollId
@@ -201,6 +206,13 @@ export default function PayrollForm() {
                                             loading={optionsLoading}
                                             placeholder={t("actions.select_payrun") || "Select payrun"}
                                         />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.branch") || "Branch"}</FieldLabel>
+                                    <FieldContent>
+                                        <SelectBranch control={control} name="branch_id" />
                                     </FieldContent>
                                 </Field>
 

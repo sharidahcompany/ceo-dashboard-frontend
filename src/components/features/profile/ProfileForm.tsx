@@ -143,8 +143,9 @@ export default function ProfileForm() {
       const res = await updateProfile(user.id, formData);
       if (res.success) {
         toast.success(res.message || t("success"));
-        setUser(res.data);
-        setUserStore(res.data);
+        const mergedUser = { ...user, ...res.data };
+        setUser(mergedUser);
+        setUserStore(mergedUser);
         setAvatarFile(null);
         if (avatarPreview) URL.revokeObjectURL(avatarPreview);
         setAvatarPreview(null);

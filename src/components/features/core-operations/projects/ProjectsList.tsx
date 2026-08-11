@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useTransition } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { SelectBranch } from "@/components/ui/select-branch";
 import { getProjects, createProject, ProjectResource } from "@/actions/projects/projects.actions";
 import { Calendar, Plus, FolderKanban, Clock } from "lucide-react";
 import { toast } from "sonner";
@@ -28,6 +30,11 @@ export default function ProjectsList() {
     const [notes, setNotes] = useState("");
     const [startDate, setStartDate] = useState("");
     const [dueDate, setDueDate] = useState("");
+
+    const { control: branchControl, watch: watchBranch, reset: resetBranch } = useForm<{ branch_id: string | null }>({
+        defaultValues: { branch_id: null },
+    });
+    const branchId = watchBranch("branch_id");
 
     const fetchProjects = async () => {
         setLoading(true);
@@ -50,6 +57,7 @@ export default function ProjectsList() {
 
         startTransition(async () => {
             const res = await createProject({
+                branch_id: branchId || undefined,
                 name,
                 description,
                 notes,
@@ -61,6 +69,7 @@ export default function ProjectsList() {
                 toast.success(t("success_created"));
                 setIsCreateOpen(false);
                 // Reset form
+                resetBranch({ branch_id: null });
                 setName("");
                 setDescription("");
                 setNotes("");
@@ -103,6 +112,10 @@ export default function ProjectsList() {
                                 <DialogDescription>{t("create_description")}</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <label className="text-sm font-medium">{t("branch_label")}</label>
+                                    <SelectBranch control={branchControl} name="branch_id" />
+                                </div>
                                 <div className="grid gap-2">
                                     <label className="text-sm font-medium">{t("name_label")}</label>
                                     <Input 

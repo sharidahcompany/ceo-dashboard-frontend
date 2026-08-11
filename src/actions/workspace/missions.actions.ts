@@ -47,7 +47,9 @@ export interface MissionData {
 
 export async function getMissions(query?: string): Promise<ActionResponse<{ data: MissionResource[]; meta?: any }>> {
     try {
-        const response = await api.get(`/workspace/missions${query ? `?${query}` : ""}`);
+        const params = new URLSearchParams(query);
+        params.set("include", "assignees");
+        const response = await api.get(`/workspace/missions?${params.toString()}`);
         const responseData = response.data;
         return {
             success: true,
@@ -85,6 +87,70 @@ export async function updateMission(id: number | string, data: MissionData): Pro
         const response = await api.put(`/workspace/missions/${id}`, data);
         revalidatePath("/[locale]/hr/missions", "page");
         return { success: true, data: response.data.data, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export interface MissionLocationPoint {
+    latitude: number;
+    longitude: number;
+    accuracy?: number | null;
+    recorded_at: string;
+}
+
+export interface MissionLocationResource extends MissionLocationPoint {
+    id: number;
+    mission_id: number;
+    user_id: string;
+    user?: UserResource | null;
+}
+
+export async function getMissionLocations(
+    missionId: number | string,
+): Promise<ActionResponse<MissionLocationResource[]>> {
+    try {
+        const response = await api.get(`/workspace/missions/${missionId}/locations`);
+        return { success: true, data: response.data.data ?? [] };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export interface ActiveMissionLocations {
+    id: number;
+    title: string;
+    assignees: UserResource[];
+    locations: MissionLocationResource[];
+}
+
+/**
+ * Every currently in_progress mission with its recorded journey so far, for
+ * the live cross-tenant missions map. Accepts an explicit tenantId (via the
+ * X-Tenant header) the same way getBranches() does, since the map aggregates
+ * across every tenant the user can see, not just the active one.
+ */
+export async function getActiveMissionLocations(
+    tenantId?: string,
+): Promise<ActionResponse<ActiveMissionLocations[]>> {
+    try {
+        const response = await api.get(
+            "/workspace/missions/live-locations",
+            tenantId ? { headers: { "X-Tenant": tenantId } } : undefined,
+        );
+        return { success: true, data: response.data.data ?? [] };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function saveMissionLocations(
+    missionId: number | string,
+    points: MissionLocationPoint[],
+): Promise<ActionResponse<void>> {
+    try {
+        const response = await api.post(`/workspace/missions/${missionId}/locations`, { points });
+        return { success: true, data: undefined as any, message: response.data.message };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
     }

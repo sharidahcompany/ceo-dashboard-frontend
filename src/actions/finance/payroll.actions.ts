@@ -16,6 +16,7 @@ export interface PayrollResource {
     };
     employee_name: string | null;
     user_id: number;
+    branch_id: number | null;
     gross_salary: number | string;
     total_deductions: number | string | null;
     net_salary: number | string;
@@ -28,6 +29,7 @@ export interface PayrollResource {
 export interface PayrollFormData {
     payrun_id?: number | string | null;
     user_id: number | string;
+    branch_id?: number | string | null;
     gross_salary: number | string;
     total_deductions?: number | string;
     net_salary: number | string;
