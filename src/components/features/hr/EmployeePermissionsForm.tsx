@@ -38,7 +38,7 @@ function groupPermissions(catalog: string[]): ServiceGroup[] {
         const segments = permission.split(".");
         const action = segments.pop() ?? permission;
         const subject = segments.join(".");
-        const [service, ...resourceParts] = segments;
+        const [service = "", ...resourceParts] = segments;
         const resource = resourceParts.join(".");
         if (!subjectGroups.has(subject)) subjectGroups.set(subject, { service, resource, permissions: [] });
         subjectGroups.get(subject)!.permissions.push({ full: permission, action });
@@ -63,8 +63,8 @@ function groupPermissions(catalog: string[]): ServiceGroup[] {
         .sort((a, b) => a.service.localeCompare(b.service));
 }
 
-function formatLabel(value: string): string {
-    return value
+function formatLabel(value?: string): string {
+    return (value ?? "")
         .split(/[._]/)
         .filter(Boolean)
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
