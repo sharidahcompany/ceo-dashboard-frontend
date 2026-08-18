@@ -13,6 +13,7 @@ import {
     importPurchaseOrders,
     exportPurchaseOrders,
     downloadPurchaseOrderImportTemplate,
+    downloadPurchaseOrderPdf,
     PurchaseOrderResource,
 } from "@/actions/finance/purchase-order.actions";
 
@@ -69,6 +70,12 @@ export default function PurchaseOrdersPage() {
         saveFileDownload(res.data);
     };
 
+    const handleDownloadPdf = async (item: PurchaseOrderResource) => {
+        const res = await downloadPurchaseOrderPdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     const handleImport = async (file: File) => {
         const res = await importPurchaseOrders(file);
         return res.success
@@ -91,6 +98,8 @@ export default function PurchaseOrdersPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

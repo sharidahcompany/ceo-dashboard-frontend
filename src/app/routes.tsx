@@ -143,6 +143,22 @@ export const routes: Route[] = [
         ],
       },
       {
+        path: "job-offers",
+        title: "routes.job_offer",
+        icon: "FileSignature",
+        permission: "workspace.job_offer.view",
+        children: [
+          {
+            path: "create",
+            title: "routes.create_job_offer",
+          },
+          {
+            path: "edit",
+            title: "routes.edit_job_offer",
+          },
+        ],
+      },
+      {
         path: "interviews",
         title: "routes.interviews",
         icon: "Handshake",
@@ -696,6 +712,12 @@ export const routes: Route[] = [
     permission: "workspace.car.view",
   },
   {
+    path: "/permissions",
+    title: "routes.permissions",
+    icon: "ShieldCheck",
+    permission: "workspace.user.update",
+  },
+  {
     path: "/documents",
     title: "routes.documents",
     icon: "FileText",
@@ -729,6 +751,17 @@ export const routes: Route[] = [
           {
             path: "edit",
             title: "routes.edit_document",
+          },
+        ],
+      },
+      {
+        path: "signatures",
+        title: "routes.signature_assets",
+        icon: "Stamp",
+        children: [
+          {
+            path: "create",
+            title: "routes.create_signature_asset",
           },
         ],
       },
@@ -810,7 +843,7 @@ export const routes: Route[] = [
   {
     path: "/auditor",
     title: "routes.auditor",
-    icon: "ShieldCheck",
+    icon: "Search",
     children: [
       {
         path: "companies",

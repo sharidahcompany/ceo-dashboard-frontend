@@ -11,14 +11,15 @@ import Image from "next/image";
 import VisionForm, { VisionFormData } from "./VisionForm";
 import { FieldSeparator } from "@/components/ui/field";
 import { VisionResource } from "@/actions/company-spirit/vision.actions";
+import GoalTimer from "./GoalTimer";
 
 export default function Vision({ vision }: { vision: VisionResource | null }) {
     const t = useTranslations();
     const [createOpen, setCreateOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
-    const [selectedVision, setSelectedVision] = useState<VisionFormData | null>(null);
+    const [selectedVision, setSelectedVision] = useState<VisionResource | null>(null);
 
-    const handleEditClick = (item: VisionFormData) => {
+    const handleEditClick = (item: VisionResource) => {
         setSelectedVision(item);
         setEditOpen(true);
     };
@@ -58,6 +59,8 @@ export default function Vision({ vision }: { vision: VisionResource | null }) {
                                     {vision.description_localized}
                                 </p>
                             </div>
+
+                            {vision.end_date && <GoalTimer endDate={vision.end_date} className="w-fit" />}
 
                             <Button variant="outline" onClick={() => handleEditClick(vision)} >{t("buttons.edit_vision")}</Button>
                         </div>

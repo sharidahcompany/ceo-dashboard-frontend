@@ -35,6 +35,8 @@ export interface DocumentTemplateAnchorResource {
     party: EnumField;
     required: boolean;
     sort_order: number;
+    auto_sign?: boolean;
+    signature_asset_id?: number | null;
     token: string;
 }
 
@@ -50,6 +52,7 @@ export interface DocumentTemplateResource {
     page_size: string;
     orientation: string;
     version: number;
+    is_default_contract?: boolean;
     created_by?: string | null;
     fields?: DocumentTemplateFieldResource[];
     anchors?: DocumentTemplateAnchorResource[];
@@ -69,6 +72,7 @@ export interface DocumentTemplateData {
     status?: string;
     page_size?: string;
     orientation?: string;
+    is_default_contract?: boolean;
 }
 
 /** Payload for the builder's side panel (labels, types, signer sides). */
@@ -86,6 +90,8 @@ export interface DocumentTemplateFieldsData {
         role: string;
         party: string;
         required?: boolean;
+        auto_sign?: boolean;
+        signature_asset_id?: number | null;
     }[];
 }
 
@@ -108,6 +114,38 @@ export async function getDocumentTemplates(
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
     }
+}
+
+/**
+ * The template marked to auto-generate as the employment contract for new
+ * employees, with its fields, or null if none is set. `is_default_contract`
+ * isn't in the backend's allowed filter list, so this fetches active
+ * templates and checks the flag client-side.
+ */
+export async function getDefaultContractTemplate(): Promise<
+    ActionResponse<DocumentTemplateResource | null>
+> {
+    try {
+        const response = await api.get(
+            "/workspace/document-templates?filter[status]=active&per_page=100",
+        );
+        const responseData = response.data.data;
+        const templates: DocumentTemplateResource[] = Array.isArray(responseData) ? responseData : [];
+        const defaultTemplate = templates.find((template) => template.is_default_contract);
+        if (!defaultTemplate) return { success: true, data: null };
+
+        const detail = await api.get(`/workspace/document-templates/${defaultTemplate.id}`);
+        return { success: true, data: detail.data.data };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+/** Whether a template is marked to auto-generate as the employment contract for new employees. */
+export async function hasDefaultContractTemplate(): Promise<ActionResponse<boolean>> {
+    const res = await getDefaultContractTemplate();
+    if (!res.success) return res;
+    return { success: true, data: res.data !== null };
 }
 
 export async function getDocumentTemplate(

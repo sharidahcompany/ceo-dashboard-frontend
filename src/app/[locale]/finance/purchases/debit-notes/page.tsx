@@ -13,6 +13,7 @@ import {
     importDebitNotes,
     exportDebitNotes,
     downloadDebitNoteImportTemplate,
+    downloadDebitNotePdf,
     DebitNoteResource,
 } from "@/actions/finance/debit-note.actions";
 
@@ -74,6 +75,12 @@ export default function DebitNotesPage() {
         saveFileDownload(res.data);
     };
 
+    const handleDownloadPdf = async (item: DebitNoteResource) => {
+        const res = await downloadDebitNotePdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     const handleImport = async (file: File) => {
         const res = await importDebitNotes(file);
         return res.success
@@ -96,6 +103,8 @@ export default function DebitNotesPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

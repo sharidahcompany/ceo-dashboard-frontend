@@ -5,7 +5,30 @@
   },
   "success": "Saved successfully!",
   "attributes": {
+    "language": "Language",
     "not_set": "Not set",
+    "candidate": "Candidate",
+    "job_application": "Application",
+    "salary": "Salary",
+    "benefits": "Benefits",
+    "department": "Department",
+    "gross_salary": "Gross Salary",
+    "custom_fields": "Custom Fields",
+    "field_name": "Field name",
+    "field_value": "Value",
+    "id_number": "ID Number",
+    "address": "Address",
+    "nationality": "Nationality",
+    "gender": "Gender",
+    "date_of_birth": "Date of Birth",
+    "marital_status": "Marital Status",
+    "employment_type": "Employment Type",
+    "net_salary": "Net Salary",
+    "housing_allowance": "Housing Allowance",
+    "transportation_allowance": "Transportation Allowance",
+    "other_allowances": "Other Allowances",
+    "emergency_contact_name": "Emergency Contact Name",
+    "emergency_contact_phone": "Emergency Contact Phone",
     "name": "Name",
     "name_ar": "Arabic Name",
     "name_en": "English Name",
@@ -28,6 +51,7 @@
     "description_ar": "Description (Arabic)",
     "description_en": "Description (English)",
     "image": "Image",
+    "type": "Type",
     "buffet_employees": "Buffet Employees",
     "notes": "Notes",
     "status": "Status",
@@ -123,6 +147,7 @@
     "completed_tasks": "Completed Tasks",
     "stage": "Stage",
     "performance_overview": "Performance Overview",
+    "contracts": "Contracts",
     "on_time_rate": "On-Time Rate",
     "missions_completion_rate": "Missions Completion Rate",
     "tasks_completion_rate": "Tasks Completion Rate",
@@ -169,11 +194,16 @@
     "invalid_anchor_role": "Use only letters, numbers and underscores — for example ceo.",
     "split_placeholder": "A field was broken apart by formatting. Select it fully, clear the formatting, and try again.",
     "no_signers": "Add at least one signer.",
-    "signature_required": "A signature is required."
+    "signature_required": "A signature is required.",
+    "name_required": "Name is required."
   },
   "buttons": {
     "previous": "Previous",
     "next": "Next",
+    "send": "Send",
+    "view": "View",
+    "generate_document": "Generate document",
+    "add_field": "Add field",
     "profile": "Profile",
     "logout": "Logout",
     "edit": "Edit",
@@ -232,6 +262,9 @@
       "anchor_hint": "Name the role that signs here, for example ceo or client. Each role signs in one place.",
       "fields_detected": "Fields",
       "fields_detected_hint": "Taken from the document body. Edit the body to add or remove them.",
+      "auto_sign_label": "Auto-sign with saved signature/stamp",
+      "is_default_contract_label": "Default contract for new employees",
+      "is_default_contract_hint": "Automatically generates and sends this document whenever a new employee is created. Only one template per company can be the default.",
       "anchors_detected": "Signatures & Stamps",
       "anchors_detected_hint": "Choose who signs each one. Internal parties sign in the dashboard before the document is sent.",
       "no_fields": "No fields yet. Use “Insert Field” in the editor.",
@@ -319,6 +352,14 @@
     "notify_success": "We will notify you once the Theme Store is live!",
     "hr": {
       "positions_description": "Enter job details and required qualifications to post the vacancy and start receiving applications.",
+      "job_offers_description": "Manage job offers sent to candidates",
+      "job_offer_no_document_hint": "No document has been generated for this offer yet. Generate it to review and fill in the template variables before sending.",
+      "job_offer_preview_editable_hint": "Review the offer below. Use Edit to fill in or adjust the template variables before sending.",
+      "job_offer_preview_sent_hint": "This offer has already been sent and can no longer be edited.",
+      "pick_candidate_first": "Pick a candidate first",
+      "pick_application": "Select the application this offer is for",
+      "convert_to_employee_description": "Confirm the details before creating the employee record",
+      "profile_details_description": "Used to auto-fill contracts and other HR documents",
       "create_new_position": "Add New Position",
       "create_new_interview": "Schedule Interview",
       "shifts_description": "Manage organization work shifts and assignments",
@@ -327,7 +368,8 @@
       "create_new_candidate": "Add Candidate",
       "invite_employee": "Invite Employee",
       "invite_employee_description": "Send an invitation email so this person can set up their account and join your workspace.",
-      "no_journey_recorded": "No location data recorded for this mission yet."
+      "no_journey_recorded": "No location data recorded for this mission yet.",
+      "no_job_contract_template": "Please create a document template marked as the Job Contract before creating employees."
     },
     "employees": {
       "assignments_description": "Assign this employee to one or more branches, departments, and positions.",
@@ -337,7 +379,9 @@
       "attendance_report_description": "Recent attendance records for this employee.",
       "missions_report_description": "Missions assigned to this employee and their completion status.",
       "tasks_report_description": "Tasks assigned to this employee across all projects and their completion status.",
-      "performance_overview_description": "A quick statistical summary of this employee's attendance, missions, and task performance."
+      "performance_overview_description": "A quick statistical summary of this employee's attendance, missions, and task performance.",
+      "contracts_description": "Contracts and other signed documents issued to this employee.",
+      "no_contracts": "No contracts have been issued to this employee yet."
     },
     "website": {
       "orders_description": "View and manage orders placed through the website store."
@@ -356,6 +400,7 @@
       "step_internal_hint": "Signs in the dashboard",
       "step_external_hint": "Signs by emailed link",
       "current_step": "Waiting on this step",
+      "auto_signing": "Signs automatically",
       "waiting_on": "Waiting on",
       "no_signers": "No signers yet.",
       "no_activity": "Nothing has happened yet.",
@@ -374,7 +419,10 @@
       "save_signature_for_next_time": "Save this signature for next time",
       "pick_a_saved_signature": "Choose a saved signature.",
       "no_saved_assets": "Nothing saved yet.",
-      "void_confirm": "This cannot be undone. The document will stop collecting signatures."
+      "void_confirm": "This cannot be undone. The document will stop collecting signatures.",
+      "signature_assets_description": "Your saved signatures, plus the shared company stamp.",
+      "create_new_asset": "New Signature / Stamp",
+      "save_as_company_stamp": "Save as the shared company stamp"
     },
     "public_sign": {
       "tabs": {
@@ -384,7 +432,7 @@
       },
       "typed_placeholder": "Type your full name",
       "typed_preview_placeholder": "Your signature preview",
-      "upload_invalid_type": "Please upload a PNG or JPG image.",
+      "upload_invalid_type": "Please upload a PNG, JPG, GIF, or BMP image.",
       "expired": "This link is no longer valid.",
       "already_signed": "You have already signed this document.",
       "declined": "You have declined to sign this document.",
@@ -408,6 +456,7 @@
     "navbar": "Navbar",
     "products": "Products",
     "vision": "Vision",
+    "goals": "Goals",
     "footer": "Footer",
     "header": "Header",
     "about": "About",
@@ -466,6 +515,7 @@
     "home": "Home",
     "document_templates": "Document Templates",
     "cars": "Cars",
+    "permissions": "Permissions",
     "create_car": "Add Car",
     "edit_car": "Edit Car",
     "company_spirit": "Company Spirit",
@@ -490,6 +540,12 @@
     "candidates": "Candidates",
     "create_candidate": "Add Candidate",
     "edit_candidate": "Edit Candidate",
+    "job_offer": "Job Offers",
+    "create_job_offer": "Add Job Offer",
+    "edit_job_offer": "Edit Job Offer",
+    "convert_to_employee": "Convert to Employee",
+    "hire_date": "Hire Date",
+    "profile_details": "Profile Details",
     "interviews": "Interviews",
     "create_interview": "Schedule Interview",
     "edit_interview": "Edit Interview",
@@ -526,7 +582,9 @@
     "issued_documents": "Documents",
     "create_document": "New Document",
     "edit_document": "Edit Document",
-    "document_details": "Document Details"
+    "document_details": "Document Details",
+    "signature_assets": "Signatures & Stamps",
+    "create_signature_asset": "New Signature / Stamp"
   },
   "profile": {
     "title": "Profile",
@@ -899,7 +957,8 @@
       "number": "Number",
       "date": "Date",
       "select": "Dropdown",
-      "boolean": "Yes / No"
+      "boolean": "Yes / No",
+      "employee": "Employee"
     },
     "signerParty": {
       "internal": "Internal (signs in the dashboard)",
@@ -1114,6 +1173,7 @@
       "buffet_category": "Buffet Categories",
       "buffet_item": "Buffet Items",
       "buffet_order": "Buffet Orders",
+      "car": "Cars",
       "comment": "Comments",
       "department": "Departments",
       "experience": "Experience",

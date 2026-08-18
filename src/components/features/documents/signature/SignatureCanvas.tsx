@@ -100,7 +100,7 @@ const SignatureCanvas = forwardRef<SignatureCanvasHandle, SignatureCanvasProps>(
 
             ctx.beginPath();
             ctx.moveTo(lastPoint.current.x, lastPoint.current.y);
-            ctx.quadraticCurveTo(lastPoint.current.x, lastPoint.current.y, mid.x, mid.y);
+            ctx.quadraticCurveTo(mid.x, mid.y, point.x, point.y);
             ctx.stroke();
 
             lastPoint.current = point;

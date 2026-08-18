@@ -23,7 +23,22 @@ import "react-quill-new/dist/quill.snow.css";
  */
 const ReactQuill = dynamic(
     async () => {
-        const { default: RQ } = await import("react-quill-new");
+        const { default: RQ, Quill } = await import("react-quill-new");
+
+        // Quill's toolbar registers the *class*-based direction/align
+        // attributors by default (`ql-direction-rtl`, `ql-align-right`),
+        // styled only by Quill's own snow.css — meaningless once the HTML
+        // leaves the editor, since mPDF and the plain document-preview
+        // renderer have no such rules, so RTL/alignment would silently
+        // collapse back to the default everywhere but inside Quill itself.
+        // The *style* variant writes real inline `direction`/`text-align`
+        // instead, which every renderer understands, which the `document`
+        // Purifier profile already allows through (CSS.AllowedProperties),
+        // and which — being inline — visibly overrides Quill's own
+        // `.ql-editor { text-align: left }` right there in the editor too.
+        Quill.register(Quill.import("attributors/style/direction") as any, true);
+        Quill.register(Quill.import("attributors/style/align") as any, true);
+
         const Wrapped = ({ forwardedRef, ...props }: any) => <RQ ref={forwardedRef} {...props} />;
         Wrapped.displayName = "ReactQuill";
         return Wrapped;

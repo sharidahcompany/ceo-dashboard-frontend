@@ -49,6 +49,7 @@ import {
     DocumentResource,
     DocumentSignerData,
 } from "@/actions/workspace/documents.actions";
+import { getUserContractFields } from "@/actions/workspace/user.actions";
 
 interface DocumentFormValues {
     title: string;
@@ -75,6 +76,7 @@ export default function DocumentForm() {
         handleSubmit,
         setValue,
         control,
+        watch,
         reset,
         formState: { errors },
     } = useForm<DocumentFormValues>({
@@ -175,6 +177,45 @@ export default function DocumentForm() {
             setValue("field_values", defaults);
         });
     };
+
+    // Once an `employee`-type field is filled in, pull that employee's
+    // Profile data and merge it into any other field on the template whose
+    // key matches one of ContractAutoFiller's keys (e.g. employee_full_name)
+    // — without touching fields the user already typed something into, and
+    // without re-fetching every render (guarded by the ref below).
+    const lastAutoFilledEmployeeId = React.useRef<Record<string, string>>({});
+    const employeeFieldKeys = useMemo(
+        () => (template?.fields ?? []).filter((f) => f.type.value === "employee").map((f) => f.key),
+        [template],
+    );
+    const watchedFieldValues = watch("field_values");
+
+    useEffect(() => {
+        if (employeeFieldKeys.length === 0) return;
+
+        employeeFieldKeys.forEach((key) => {
+            const userId = watchedFieldValues?.[key];
+            if (!userId || lastAutoFilledEmployeeId.current[key] === userId) return;
+            lastAutoFilledEmployeeId.current[key] = userId;
+
+            getUserContractFields(userId).then((res) => {
+                if (!res.success) return;
+
+                const templateKeys = new Set((template?.fields ?? []).map((f) => f.key));
+                const current = watchedFieldValues ?? {};
+                const merged = { ...current };
+
+                Object.entries(res.data).forEach(([contractKey, value]) => {
+                    if (templateKeys.has(contractKey) && !current[contractKey]) {
+                        merged[contractKey] = value;
+                    }
+                });
+
+                setValue("field_values", merged);
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [watchedFieldValues, employeeFieldKeys]);
 
     const handleSignerChange = (role: string, patch: Partial<DocumentSignerData>) => {
         setSigners((prev) => ({ ...prev, [role]: { ...prev[role], ...patch } }));

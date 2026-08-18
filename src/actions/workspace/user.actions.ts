@@ -1,5 +1,6 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import api from "@/lib/api";
 import { PaginationMeta } from "@/types/common.types";
 import type { BranchResource } from "@/actions/company-spirit/branch.actions";
@@ -28,6 +29,29 @@ export interface UserResource {
   branches?: BranchResource[];
   departments?: DepartmentResource[];
   positions?: PositionResource[];
+
+  // GET/PUT /workspace/users/{id} additionally return these — the Profile
+  // fields, flattened onto the user, plus the single department/position a
+  // User row is directly assigned to (distinct from the plural
+  // departments/positions pivots above, which EmployeeAssignmentsForm owns).
+  id_number?: string | null;
+  address?: string | null;
+  nationality?: string | null;
+  date_of_birth?: string | null;
+  gender?: string | null;
+  marital_status?: string | null;
+  hire_date?: string | null;
+  employment_type?: string | null;
+  gross_salary?: string | null;
+  net_salary?: string | null;
+  housing_allowance?: string | null;
+  transportation_allowance?: string | null;
+  other_allowances?: string | null;
+  emergency_contact_name?: string | null;
+  emergency_contact_phone?: string | null;
+  custom_fields?: Record<string, string> | null;
+  department?: { id: number; name: Record<string, string> | string } | null;
+  position?: { id: number; name: Record<string, string> | string } | null;
 }
 
 export interface UserApiResponse {
@@ -44,9 +68,13 @@ export interface UsersApiResponse {
 import { getErrorMessage, getRowErrors, extractFileDownload, FileDownload } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
 
+/**
+ * Fetch users belonging to the current tenant, served by workspace-service
+ * (not central-auth) so results are scoped to the workspace database.
+ */
 export async function getUsers(query?: string): Promise<ActionResponse<UsersApiResponse>> {
   try {
-    const response = await api.get<UsersApiResponse>(`/auth/users${query ? `?${query}` : ""}`);
+    const response = await api.get<UsersApiResponse>(`/workspace/users${query ? `?${query}` : ""}`);
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -71,12 +99,26 @@ export async function getEmployees(query?: string): Promise<ActionResponse<Users
  * the same create-or-invite path as inviteUser(), so imported employees get
  * their invitation email too.
  */
+/**
+ * Deletes each id's employee_deleted Kafka event fires for finance-service/
+ * website-service to clean up their own records and for auth-service to
+ * detach the tenant membership; nothing further is needed here.
+ */
+export async function deleteEmployees(ids: (string | number)[]): Promise<ActionResponse<void>> {
+  try {
+    const response = await api.delete("/workspace/users", { data: { ids } });
+    return { success: true, data: undefined as any, message: response.data?.message };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
 export async function importEmployees(file: File): Promise<ActionResponse<void>> {
   try {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await api.post("/auth/users/import", formData);
+    const response = await api.post("/workspace/users/import", formData);
     return { success: true, data: undefined as any, message: response.data.message };
   } catch (error) {
     return { success: false, error: getErrorMessage(error), errors: getRowErrors(error) };
@@ -85,7 +127,7 @@ export async function importEmployees(file: File): Promise<ActionResponse<void>>
 
 export async function exportEmployees(): Promise<ActionResponse<FileDownload>> {
   try {
-    const response = await api.get("/auth/users/export", { responseType: "arraybuffer" });
+    const response = await api.get("/workspace/users/export", { responseType: "arraybuffer" });
     return { success: true, data: extractFileDownload(response, "employees.xlsx") };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -94,7 +136,7 @@ export async function exportEmployees(): Promise<ActionResponse<FileDownload>> {
 
 export async function downloadEmployeeImportTemplate(): Promise<ActionResponse<FileDownload>> {
   try {
-    const response = await api.get("/auth/users/import-template", { responseType: "arraybuffer" });
+    const response = await api.get("/workspace/users/import-template", { responseType: "arraybuffer" });
     return { success: true, data: extractFileDownload(response, "employee-import-template.xlsx") };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -110,14 +152,25 @@ export interface InviteUserData {
 }
 
 /**
- * Invite a new user to join the current tenant (X-Tenant header). The
- * backend creates a central-auth account, attaches it to the tenant with
- * the "employee" role, and emails an invitation/setup link — the user sets
- * their own password via that link, so none is sent here.
+ * Invite a new employee into the current tenant (X-Tenant header). Goes
+ * through workspace-service (POST /workspace/users -> EmployeeService::create),
+ * which stores the User + Profile in one request and publishes a single
+ * `employee_created` Kafka event — auth-service consumes that event
+ * (storeOrInvite) to create/attach the central-auth account and email the
+ * invitation/setup link, so no password is sent here. Accepts the full
+ * profile payload (not just InviteUserData's identity fields) since the
+ * backend persists both in the same call.
  */
-export async function inviteUser(data: InviteUserData): Promise<ActionResponse<UserResource>> {
+export async function inviteUser(
+  data: InviteUserData | UpdateEmployeeData,
+): Promise<ActionResponse<UserResource>> {
   try {
-    const response = await api.post("/auth/users", data);
+    // workspace-service's local tenant row requires a password even though
+    // the invited employee never uses it — they set their real password via
+    // the invitation email auth-service sends off the employee_created
+    // event, same as the bulk-import path (UsersImport::password).
+    const payload = { ...data, password: randomBytes(12).toString("hex") };
+    const response = await api.post("/workspace/users", payload);
     return {
       success: true,
       data: response.data.data ?? response.data,
@@ -137,20 +190,62 @@ export async function getEmployee(id: string): Promise<ActionResponse<UserResour
   }
 }
 
+/** Flat map of employee/profile fields for pre-filling a document — see ContractAutoFiller (backend). */
+export async function getUserContractFields(id: string): Promise<ActionResponse<Record<string, string>>> {
+  try {
+    const response = await api.get(`/workspace/users/${id}/contract-fields`);
+    return { success: true, data: response.data.data };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
 export interface UpdateEmployeeData {
   first_name: string;
   last_name: string;
   username: string;
   email: string;
   phone: string;
+  password?: string;
+  // EmployeeService::update() overwrites department_id/position_id
+  // unconditionally from whatever is present in the payload (missing means
+  // null, wiping the assignment) — callers must carry the user's current
+  // values forward rather than omit them, unless they mean to clear them.
+  department_id?: number | string | null;
+  position_id?: number | string | null;
+  id_number?: string;
+  full_name?: string;
+  address?: string;
+  nationality?: string;
+  date_of_birth?: string;
+  gender?: string;
+  marital_status?: string;
+  hire_date?: string;
+  employment_type?: string;
+  gross_salary?: string;
+  net_salary?: string;
+  housing_allowance?: string;
+  transportation_allowance?: string;
+  other_allowances?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  custom_fields?: Record<string, string>;
 }
 
+/**
+ * Updates the employee's full record (User + Profile) via workspace-service
+ * — the only endpoint that actually persists Profile fields and keeps the
+ * Kafka employee_updated sync with auth-service intact. The equivalent
+ * central-auth route (/auth/users/{id}) only ever touches identity columns
+ * and silently drops every Profile field, which is why this used to point
+ * there.
+ */
 export async function updateEmployee(
   id: string,
   data: UpdateEmployeeData,
 ): Promise<ActionResponse<UserResource>> {
   try {
-    const response = await api.put(`/auth/users/${id}`, data);
+    const response = await api.put(`/workspace/users/${id}`, data);
     return {
       success: true,
       data: response.data.data ?? response.data,

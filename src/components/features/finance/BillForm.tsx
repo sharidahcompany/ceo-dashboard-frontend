@@ -85,6 +85,7 @@ const billSchema = z.object({
     branch_id: z.union([z.string(), z.number()]).optional().nullable(),
     tax_amount_type: z.enum(["EXCLUSIVE", "INCLUSIVE"]),
     notes: z.string().optional(),
+    language: z.enum(["en", "ar"]),
     items: z.array(lineItemSchema).min(1, { message: "validation.required" }),
 });
 
@@ -140,6 +141,7 @@ export default function BillForm() {
             branch_id: null,
             tax_amount_type: "EXCLUSIVE",
             notes: "",
+            language: "en",
             items: [emptyLineItem],
         },
     });
@@ -201,6 +203,7 @@ export default function BillForm() {
                 setValue("branch_id", b.branch_id ? String(b.branch_id) : null);
                 setValue("tax_amount_type", b.tax_amount_type);
                 setValue("notes", b.notes || "");
+                setValue("language", b.language || "en");
                 if (b.items?.length) {
                     setValue(
                         "items",
@@ -404,6 +407,27 @@ export default function BillForm() {
                                     <FieldLabel>{t("attributes.branch") || "Branch"}</FieldLabel>
                                     <FieldContent>
                                         <SelectBranch control={control} name="branch_id" />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.language") || "Language"}</FieldLabel>
+                                    <FieldContent>
+                                        <Controller
+                                            name="language"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="en">{t("locale.en") || "English"}</SelectItem>
+                                                        <SelectItem value="ar">{t("locale.ar") || "العربية"}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
                                     </FieldContent>
                                 </Field>
                             </FieldGroup>

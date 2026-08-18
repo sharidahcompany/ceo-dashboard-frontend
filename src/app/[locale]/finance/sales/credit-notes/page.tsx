@@ -13,6 +13,7 @@ import {
     importCreditNotes,
     exportCreditNotes,
     downloadCreditNoteImportTemplate,
+    downloadCreditNotePdf,
     CreditNoteResource,
 } from "@/actions/finance/credit-note.actions";
 
@@ -74,6 +75,12 @@ export default function CreditNotesPage() {
         saveFileDownload(res.data);
     };
 
+    const handleDownloadPdf = async (item: CreditNoteResource) => {
+        const res = await downloadCreditNotePdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     const handleImport = async (file: File) => {
         const res = await importCreditNotes(file);
         return res.success
@@ -96,6 +103,8 @@ export default function CreditNotesPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

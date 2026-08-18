@@ -96,12 +96,14 @@ export default function InternalSignDialog({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
-                <Button type="button" size="sm" className="gap-2">
-                    <PenLine className="size-4" />
-                    {anchorType === "stamp" ? t("buttons.apply_stamp") : t("buttons.sign_now")}
-                </Button>
-            </DialogTrigger>
+            <DialogTrigger
+                render={
+                    <Button type="button" size="sm" className="gap-2">
+                        <PenLine className="size-4" />
+                        {anchorType === "stamp" ? t("buttons.apply_stamp") : t("buttons.sign_now")}
+                    </Button>
+                }
+            />
 
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>

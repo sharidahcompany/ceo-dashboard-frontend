@@ -7,6 +7,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/
 import { Edit, Plus, Target, Trash, Sparkles } from "lucide-react";
 import React from "react";
 import GoalForm from "./GoalForm";
+import GoalTimer from "./GoalTimer";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -82,6 +83,8 @@ export default function Goals({ goals }: { goals: GoalResource[] }) {
                                         )}
                                         <h3 className="font-semibold">{goal.title_localized}</h3>
                                         <p className="text-sm text-muted-foreground">{goal.description_localized}</p>
+
+                                        {goal.end_date && <GoalTimer endDate={goal.end_date} />}
 
                                         {/* Edit and Delete Buttons */}
                                         <div className="flex justify-end space-x-2 mt-3">

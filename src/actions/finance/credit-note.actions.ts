@@ -41,6 +41,8 @@ export interface CreditNoteResource {
     branch_id: number | null;
     tax_amount_type: TaxAmountType;
     notes: string | null;
+    language: "en" | "ar";
+    pdf_url: string | null;
     subtotal: number;
     discount_exec_vat: number;
     vat: number;
@@ -79,6 +81,7 @@ export interface CreditNoteFormData {
     branch_id?: number | string | null;
     tax_amount_type: TaxAmountType;
     notes?: string;
+    language?: "en" | "ar";
     items: CreditNoteLineItemFormData[];
 }
 
@@ -185,6 +188,18 @@ export async function downloadCreditNoteImportTemplate(): Promise<ActionResponse
     try {
         const response = await api.get("/finance/credit-notes/import-template", { responseType: "arraybuffer" });
         return { success: true, data: extractFileDownload(response, "credit-note-import-template.xlsx") };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function downloadCreditNotePdf(
+    id: number | string
+): Promise<ActionResponse<FileDownload>> {
+    try {
+        const response = await api.get(`/finance/credit-notes/${id}/pdf`);
+        const { filename, content_type, base64 } = response.data.data;
+        return { success: true, data: { filename, contentType: content_type, base64 } };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
     }

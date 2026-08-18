@@ -27,6 +27,7 @@ const SECTION_TYPES = [
     { value: "navbar", label: "Navbar" },
     { value: "header", label: "Header" },
     { value: "vision", label: "Vision" },
+    { value: "goals", label: "Goals" },
     { value: "section", label: "Section" },
     { value: "features", label: "Features" },
     { value: "carousel", label: "Carousel" },
@@ -60,7 +61,7 @@ const sectionSchema = z.object({
     slides_per_view_tablet: z.coerce.number().optional(),
     slides_per_view_desktop: z.coerce.number().optional(),
 }).superRefine((data, ctx) => {
-    const isCustomRawJsonType = !["section", "carousel", "features", "header", "navbar", "products", "vision", "footer", "plans"].includes(data.type);
+    const isCustomRawJsonType = !["section", "carousel", "features", "header", "navbar", "products", "vision", "goals", "footer", "plans"].includes(data.type);
 
     if (isCustomRawJsonType) {
         if (!data.contentRaw) {
@@ -101,6 +102,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
             case "footer":
             case "products":
             case "vision":
+            case "goals":
             case "plans":
                 return {};
             case "carousel":
@@ -182,7 +184,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
 
             // 2. Construct final payload
             let parsedContent: any;
-            const isFixedType = ["navbar", "products", "vision", "footer", "plans"].includes(data.type);
+            const isFixedType = ["navbar", "products", "vision", "goals", "footer", "plans"].includes(data.type);
             if (isFixedType) {
                 parsedContent = [];
             } else if (data.type === "section" || data.type === "header") {
@@ -364,7 +366,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
                                 </>
                             )}
                         </>
-                    ) : ["navbar", "products", "vision", "footer", "plans"].includes(selectedType) ? (
+                    ) : ["navbar", "products", "vision", "goals", "footer", "plans"].includes(selectedType) ? (
                         <div className="p-4 bg-muted/50 rounded-lg text-sm text-muted-foreground text-center border border-dashed">
                             {t("messages.fixed_section_no_config", { defaultValue: "This is a fixed layout section. No configuration is required." })}
                         </div>

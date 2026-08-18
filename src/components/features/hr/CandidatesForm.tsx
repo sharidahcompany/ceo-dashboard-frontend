@@ -7,7 +7,6 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, X, Save } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -15,8 +14,10 @@ import {
     getCandidate,
     createCandidate,
     updateCandidate,
+    JobApplicationData,
 } from "@/actions/workspace/candidates.actions";
 import { getVacancies, VacancyResource } from "@/actions/workspace/vacancies.actions";
+import { SelectUser } from "@/components/ui/select-user";
 import {
     Select,
     SelectContent,
@@ -35,12 +36,9 @@ import {
 
 interface CandidatesFormValues {
     vacancy_id: string;
-    full_name: string;
-    email: string;
-    phone: string;
-    cv: string;
-    cover_letter: string;
+    user_id: string;
     status: string;
+    file: File | undefined;
 }
 
 export default function CandidatesForm() {
@@ -54,15 +52,12 @@ export default function CandidatesForm() {
     const [loadingData, setLoadingData] = useState(!!candidateId);
     const [vacanciesList, setVacanciesList] = useState<VacancyResource[]>([]);
 
-    const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<CandidatesFormValues>({
+    const { handleSubmit, setValue, control, formState: { errors } } = useForm<CandidatesFormValues>({
         defaultValues: {
             vacancy_id: "",
-            full_name: "",
-            email: "",
-            phone: "",
-            cv: "",
-            cover_letter: "",
+            user_id: "",
             status: "pending",
+            file: undefined,
         }
     });
 
@@ -78,11 +73,7 @@ export default function CandidatesForm() {
                 if (res.success) {
                     const data = res.data;
                     setValue("vacancy_id", data.vacancy?.id ? String(data.vacancy.id) : String(data.vacancy_id || ""));
-                    setValue("full_name", data.full_name || "");
-                    setValue("email", data.email || "");
-                    setValue("phone", data.phone || "");
-                    setValue("cv", data.cv || "");
-                    setValue("cover_letter", data.cover_letter || "");
+                    setValue("user_id", data.user_id ? String(data.user_id) : "");
                     setValue("status", data.status || "pending");
                 } else {
                     toast.error(res.error);
@@ -96,9 +87,20 @@ export default function CandidatesForm() {
 
     const onSubmit = (values: CandidatesFormValues) => {
         startTransition(async () => {
+            const payload: JobApplicationData = {
+                vacancy_id: values.vacancy_id,
+                // Only sent on create — this is who the referral is for.
+                // Reassigning the applicant on an existing application isn't
+                // supported (nor meaningful once they may have already
+                // started an interview/offer process under their own id).
+                user_id: candidateId ? undefined : values.user_id,
+                status: values.status,
+                file: values.file,
+            };
+
             const res = candidateId
-                ? await updateCandidate(candidateId, values)
-                : await createCandidate(values);
+                ? await updateCandidate(candidateId, payload)
+                : await createCandidate(payload);
 
             if (res.success) {
                 toast.success(res.message || t("success"));
@@ -166,55 +168,32 @@ export default function CandidatesForm() {
                                     </FieldContent>
                                 </Field>
 
-                                {/* Full Name Field */}
-                                <Field>
-                                    <FieldLabel>{t("attributes.full_name")}</FieldLabel>
-                                    <FieldContent>
-                                        <Input
-                                            {...register("full_name", { required: "validation.required" })}
-                                        />
-                                        {errors.full_name && (
-                                            <FieldError>{t(errors.full_name.message!)}</FieldError>
-                                        )}
-                                    </FieldContent>
-                                </Field>
+                                {/* Applicant — only set on create; the candidate's own account, not editable afterward */}
+                                {!candidateId && (
+                                    <Field>
+                                        <FieldLabel>{t("attributes.candidate") || "Candidate"}</FieldLabel>
+                                        <FieldContent>
+                                            <SelectUser<CandidatesFormValues>
+                                                control={control}
+                                                name="user_id"
+                                                isTenantOnly
+                                            />
+                                            {errors.user_id && (
+                                                <FieldError>{t(errors.user_id.message!)}</FieldError>
+                                            )}
+                                        </FieldContent>
+                                    </Field>
+                                )}
 
-                                {/* Email Field */}
-                                <Field>
-                                    <FieldLabel>{t("attributes.email")}</FieldLabel>
-                                    <FieldContent>
-                                        <Input
-                                            type="email"
-                                            {...register("email", { required: "validation.required" })}
-                                        />
-                                        {errors.email && (
-                                            <FieldError>{t(errors.email.message!)}</FieldError>
-                                        )}
-                                    </FieldContent>
-                                </Field>
-
-                                {/* Phone Field */}
-                                <Field>
-                                    <FieldLabel>{t("attributes.phone")}</FieldLabel>
-                                    <FieldContent>
-                                        <Input {...register("phone")} />
-                                        {errors.phone && (
-                                            <FieldError>{t(errors.phone.message!)}</FieldError>
-                                        )}
-                                    </FieldContent>
-                                </Field>
-
-                                {/* CV Field */}
+                                {/* CV upload */}
                                 <Field>
                                     <FieldLabel>{t("attributes.cv")}</FieldLabel>
                                     <FieldContent>
                                         <Input
-                                            {...register("cv")}
-                                            placeholder="https://example.com/cv.pdf"
+                                            type="file"
+                                            accept="application/pdf"
+                                            onChange={(e) => setValue("file", e.target.files?.[0])}
                                         />
-                                        {errors.cv && (
-                                            <FieldError>{t(errors.cv.message!)}</FieldError>
-                                        )}
                                     </FieldContent>
                                 </Field>
 
@@ -239,17 +218,6 @@ export default function CandidatesForm() {
                                                     </SelectContent>
                                                 </Select>
                                             )}
-                                        />
-                                    </FieldContent>
-                                </Field>
-
-                                {/* Cover Letter Field */}
-                                <Field className="md:col-span-2">
-                                    <FieldLabel>{t("attributes.cover_letter")}</FieldLabel>
-                                    <FieldContent>
-                                        <Textarea
-                                            {...register("cover_letter")}
-                                            rows={4}
                                         />
                                     </FieldContent>
                                 </Field>

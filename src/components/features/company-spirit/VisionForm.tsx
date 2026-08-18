@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, X } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { createVision } from '@/actions/company-spirit/vision.actions';
+import { createVision, updateVision } from '@/actions/company-spirit/vision.actions';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/utils';
 import { FileUpload } from '@/components/ui/file-upload';
 
 interface VisionFormProps {
-    initialData?: VisionFormData & { media_url?: string };
+    initialData?: VisionFormData & { id?: string | number; media_url?: string };
     onSuccess: () => void;
     onCancel: () => void;
 }
@@ -29,6 +29,7 @@ const visionSchema = z.object({
         ar: z.string().min(1, "validation.required"),
         en: z.string().min(1, "validation.required"),
     }),
+    end_date: z.string().optional().nullable(),
     media: z.any().optional().nullable(),
 });
 
@@ -42,6 +43,7 @@ export default function VisionForm({ initialData, onSuccess, onCancel }: VisionF
         defaultValues: {
             title: initialData?.title || { ar: "", en: "" },
             description: initialData?.description || { ar: "", en: "" },
+            end_date: initialData?.end_date ? initialData.end_date.slice(0, 10) : "",
             media: null,
         },
     });
@@ -56,11 +58,15 @@ export default function VisionForm({ initialData, onSuccess, onCancel }: VisionF
             formData.append("description[ar]", data.description.ar);
             formData.append("description[en]", data.description.en);
 
+            if (data.end_date) {
+                formData.append("end_date", data.end_date);
+            }
+
             if (data.media instanceof File) {
                 formData.append("media", data.media);
             }
 
-            const result = await createVision(formData);
+            const result = await (initialData?.id ? updateVision(initialData.id, formData) : createVision(formData));
             if (!result.success) {
                 toast.error(result.error);
                 return;
@@ -124,6 +130,17 @@ export default function VisionForm({ initialData, onSuccess, onCancel }: VisionF
                         {errors.description?.en && <FieldError>{t(errors.description.en.message || "")}</FieldError>}
                     </Field>
                 </FieldGroup>
+
+                <FieldSeparator />
+
+                <Field orientation="horizontal">
+                    <FieldLabel>{t("attributes.end_date")}</FieldLabel>
+                    <Input
+                        type="date"
+                        {...register("end_date")}
+                    />
+                    {errors.end_date && <FieldError>{t(errors.end_date.message || "")}</FieldError>}
+                </Field>
 
                 <FieldSeparator />
 

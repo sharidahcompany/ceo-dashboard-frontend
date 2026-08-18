@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
 import {
     getCandidates,
     deleteCandidates,
@@ -14,6 +16,7 @@ import {
 import { EditableStatusSelect } from "@/components/features/hr/EditableStatusSelect";
 import { PermissionGate } from "@/components/shared/PermissionGate";
 import { useCan } from "@/providers/AbilityProvider";
+import { Link } from "@/i18n/navigation";
 
 export default function CandidatesPage() {
     const t = useTranslations();
@@ -74,6 +77,22 @@ export default function CandidatesPage() {
                         />
                     );
                 },
+            },
+            {
+                id: "convert",
+                header: "",
+                // Real eligibility (an accepted job offer) is enforced server-side
+                // on the convert page itself; "accepted" here is just enough to
+                // avoid showing the action on candidates who obviously aren't ready.
+                cell: ({ row }) =>
+                    row.original.status === "accepted" ? (
+                        <Link href={`/hr/candidates/${row.original.id}/convert`}>
+                            <Button type="button" size="sm" variant="outline" className="gap-2">
+                                <UserPlus className="size-4" />
+                                {t("routes.convert_to_employee") || "Convert to Employee"}
+                            </Button>
+                        </Link>
+                    ) : null,
             },
         ],
         [t]

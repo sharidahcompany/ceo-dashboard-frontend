@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { toast } from "sonner";
-import { Copy, Loader2, Pencil } from "lucide-react";
+import { Copy, Download, Loader2, Pencil, Send } from "lucide-react";
 
 import {
     Card,
@@ -24,13 +24,48 @@ import DocumentActivityLog from "./DocumentActivityLog";
 import DocumentActionsBar from "./DocumentActionsBar";
 import InternalSignDialog from "./InternalSignDialog";
 import {
+    downloadDocumentPdf,
     getDocument,
     getDocumentEvents,
     previewDocument,
+    resendSignerInvite,
     DocumentEventResource,
     DocumentResource,
     DocumentSignerResource,
 } from "@/actions/workspace/documents.actions";
+import { signDocument } from "@/actions/workspace/signature-assets.actions";
+
+function ResendInviteButton({
+    documentId,
+    signer,
+    onSent,
+}: {
+    documentId: number | string;
+    signer: DocumentSignerResource;
+    onSent: () => void;
+}) {
+    const t = useTranslations();
+    const [isPending, startTransition] = useTransition();
+
+    const resend = () => {
+        startTransition(async () => {
+            const res = await resendSignerInvite(documentId, signer.id);
+            if (!res.success) {
+                toast.error(res.error);
+                return;
+            }
+            toast.success(res.message || t("success"));
+            onSent();
+        });
+    };
+
+    return (
+        <Button type="button" size="sm" variant="outline" className="gap-2" disabled={isPending} onClick={resend}>
+            {isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+            {t("buttons.resend")}
+        </Button>
+    );
+}
 
 function statusVariant(value?: string) {
     switch (value) {
@@ -59,6 +94,7 @@ export default function DocumentDetail() {
     const [document, setDocument] = useState<DocumentResource | null>(null);
     const [html, setHtml] = useState("");
     const [events, setEvents] = useState<DocumentEventResource[]>([]);
+    const [downloading, setDownloading] = useState(false);
 
     const load = useCallback(async () => {
         const [docRes, previewRes, eventsRes] = await Promise.all([
@@ -79,6 +115,61 @@ export default function DocumentDetail() {
     useEffect(() => {
         load();
     }, [load]);
+
+    // Anchors marked auto_sign carry a saved signature/stamp asset and
+    // should complete themselves the moment their step becomes current,
+    // instead of waiting on a human to open the sign dialog.
+    const autoSigning = useRef<Set<number>>(new Set());
+
+    useEffect(() => {
+        if (!document || !document.is_pending) return;
+
+        const signer = document.signers?.find(
+            (s) => s.order === document.current_step && s.status.value !== "signed",
+        );
+        if (!signer || signer.party.value !== "internal") return;
+
+        const anchor = document.template?.anchors?.find((a) => a.role === signer.role);
+        if (!anchor?.auto_sign || !anchor.signature_asset_id) return;
+
+        if (autoSigning.current.has(signer.id)) return;
+        autoSigning.current.add(signer.id);
+
+        signDocument(document.id, {
+            role: signer.role,
+            signature_kind: anchor.type.value === "stamp" ? "stamp" : "uploaded",
+            signature_asset_id: anchor.signature_asset_id,
+        }).then((res) => {
+            if (!res.success) {
+                toast.error(res.error);
+                autoSigning.current.delete(signer.id);
+                return;
+            }
+            load();
+        });
+    }, [document, load]);
+
+    const downloadPdf = async () => {
+        if (!document) return;
+        setDownloading(true);
+        const res = await downloadDocumentPdf(document.id);
+        setDownloading(false);
+
+        if (!res.success) {
+            toast.error(res.error);
+            return;
+        }
+
+        const blob = await fetch(`data:${res.data.content_type};base64,${res.data.base64}`).then((r) =>
+            r.blob(),
+        );
+        const url = URL.createObjectURL(blob);
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.download = res.data.filename;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
 
     const copyVerifyLink = () => {
         if (!document) return;
@@ -120,6 +211,23 @@ export default function DocumentDetail() {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
+                            {document.has_pdf && (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="gap-2"
+                                    disabled={downloading}
+                                    onClick={downloadPdf}
+                                >
+                                    {downloading ? (
+                                        <Loader2 className="size-4 animate-spin" />
+                                    ) : (
+                                        <Download className="size-4" />
+                                    )}
+                                    {t("buttons.download_pdf")}
+                                </Button>
+                            )}
+
                             <Button
                                 type="button"
                                 variant="outline"
@@ -171,34 +279,62 @@ export default function DocumentDetail() {
                             <DocumentSignerTimeline
                                 document={document}
                                 renderAction={(signer: DocumentSignerResource) => {
+                                    const isCurrentStep =
+                                        document.is_pending && signer.order === document.current_step;
+
                                     // Only the current, unsigned, internal signer
                                     // gets a "sign now" control here — external
                                     // parties sign exclusively through their
                                     // emailed link.
-                                    const canSignHere =
-                                        document.is_pending &&
-                                        signer.order === document.current_step &&
-                                        signer.party.value === "internal" &&
-                                        signer.status.value !== "signed";
+                                    if (isCurrentStep && signer.party.value === "internal" && signer.status.value !== "signed") {
+                                        // The anchor type (signature vs stamp), and
+                                        // whether this role is set to auto-sign,
+                                        // live on the template, keyed by the same role.
+                                        const anchor = document.template?.anchors?.find(
+                                            (a) => a.role === signer.role,
+                                        );
 
-                                    if (!canSignHere) return null;
+                                        if (anchor?.auto_sign) {
+                                            return (
+                                                <Badge variant="secondary">
+                                                    {t("messages.documents.auto_signing")}
+                                                </Badge>
+                                            );
+                                        }
 
-                                    // The anchor type (signature vs stamp) lives
-                                    // on the template, keyed by the same role.
-                                    const anchor = document.template?.anchors?.find(
-                                        (a) => a.role === signer.role,
-                                    );
+                                        return (
+                                            <InternalSignDialog
+                                                documentId={document.id}
+                                                role={signer.role}
+                                                anchorType={
+                                                    anchor?.type.value === "stamp" ? "stamp" : "signature"
+                                                }
+                                                onSigned={load}
+                                            />
+                                        );
+                                    }
 
-                                    return (
-                                        <InternalSignDialog
-                                            documentId={document.id}
-                                            role={signer.role}
-                                            anchorType={
-                                                anchor?.type.value === "stamp" ? "stamp" : "signature"
-                                            }
-                                            onSigned={load}
-                                        />
-                                    );
+                                    // An external signer who hasn't finished yet
+                                    // (still waiting, or their link expired)
+                                    // can be re-invited in case the original
+                                    // email never arrived.
+                                    if (
+                                        isCurrentStep &&
+                                        signer.party.value === "external" &&
+                                        ["pending", "notified", "viewed", "expired"].includes(
+                                            signer.status.value,
+                                        )
+                                    ) {
+                                        return (
+                                            <ResendInviteButton
+                                                documentId={document.id}
+                                                signer={signer}
+                                                onSent={load}
+                                            />
+                                        );
+                                    }
+
+                                    return null;
                                 }}
                             />
                         </CardContent>

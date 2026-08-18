@@ -169,6 +169,29 @@ export async function previewDocument(
     }
 }
 
+export async function resendSignerInvite(
+    documentId: number | string,
+    signerId: number | string,
+): Promise<ActionResponse<DocumentResource>> {
+    try {
+        const response = await api.post(`/workspace/documents/${documentId}/signers/${signerId}/resend`);
+        return { success: true, data: response.data.data, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
+export async function downloadDocumentPdf(
+    id: number | string,
+): Promise<ActionResponse<{ filename: string; content_type: string; base64: string }>> {
+    try {
+        const response = await api.get(`/workspace/documents/${id}/pdf`);
+        return { success: true, data: response.data.data };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
+}
+
 export async function getDocumentEvents(
     id: number | string,
 ): Promise<ActionResponse<DocumentEventResource[]>> {

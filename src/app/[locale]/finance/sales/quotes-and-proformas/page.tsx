@@ -13,6 +13,7 @@ import {
     importQuotes,
     exportQuotes,
     downloadQuoteImportTemplate,
+    downloadQuotePdf,
     QuoteResource,
 } from "@/actions/finance/quote.actions";
 
@@ -81,6 +82,12 @@ export default function QuotesAndProformasPage() {
             : { success: false, message: res.error, errors: res.errors };
     };
 
+    const handleDownloadPdf = async (item: QuoteResource) => {
+        const res = await downloadQuotePdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     return (
         <Card>
             <CardContent>
@@ -96,6 +103,8 @@ export default function QuotesAndProformasPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     Field,
     FieldContent,
@@ -54,6 +55,7 @@ interface TemplateFormValues {
     status: string;
     page_size: string;
     orientation: string;
+    is_default_contract: boolean;
 }
 
 const STATUSES = ["draft", "active", "archived"] as const;
@@ -86,6 +88,7 @@ export default function DocumentTemplateForm() {
             status: "draft",
             page_size: "A4",
             orientation: "portrait",
+            is_default_contract: false,
         },
     });
 
@@ -96,6 +99,7 @@ export default function DocumentTemplateForm() {
         setValue("status", template.status?.value || "draft");
         setValue("page_size", template.page_size || "A4");
         setValue("orientation", template.orientation || "portrait");
+        setValue("is_default_contract", Boolean(template.is_default_contract));
         setBodyHtml(template.body_html || "");
         setFields(template.fields ?? []);
         setAnchors(template.anchors ?? []);
@@ -148,6 +152,7 @@ export default function DocumentTemplateForm() {
                 status: values.status,
                 page_size: values.page_size,
                 orientation: values.orientation,
+                is_default_contract: values.is_default_contract,
                 body_html: bodyHtml,
             };
 
@@ -181,6 +186,8 @@ export default function DocumentTemplateForm() {
                     role: a.role,
                     party: a.party.value,
                     required: a.required,
+                    auto_sign: a.auto_sign ?? false,
+                    signature_asset_id: a.signature_asset_id ?? null,
                 })),
             });
 
@@ -250,6 +257,29 @@ export default function DocumentTemplateForm() {
                                         {...register("description")}
                                         rows={2}
                                         placeholder={t("attributes.description")}
+                                    />
+                                </FieldContent>
+                            </Field>
+
+                            <Field className="md:col-span-2">
+                                <FieldContent>
+                                    <Controller
+                                        name="is_default_contract"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <label className="flex items-start gap-2 text-sm">
+                                                <Checkbox
+                                                    checked={Boolean(field.value)}
+                                                    onCheckedChange={(c) => field.onChange(Boolean(c))}
+                                                />
+                                                <span>
+                                                    {t("messages.document_templates.is_default_contract_label") || "Default contract for new employees"}
+                                                    <span className="block text-muted-foreground">
+                                                        {t("messages.document_templates.is_default_contract_hint") || "Automatically generates and sends this document whenever a new employee is created. Only one template per company can be the default."}
+                                                    </span>
+                                                </span>
+                                            </label>
+                                        )}
                                     />
                                 </FieldContent>
                             </Field>

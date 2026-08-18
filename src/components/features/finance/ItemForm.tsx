@@ -50,8 +50,8 @@ const itemSchema = z.object({
         ar: z.string().optional(),
         en: z.string().optional(),
     }).optional(),
-    unit_cost: z.union([z.string(), z.number()]).optional(),
-    unit_price: z.union([z.string(), z.number()]).optional(),
+    unit_cost: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== undefined && v !== null, { message: "validation.required" }),
+    unit_price: z.union([z.string(), z.number()]).refine((v) => v !== "" && v !== undefined && v !== null, { message: "validation.required" }),
     expense_account: z.union([z.string(), z.number()]).optional().nullable(),
     revenue_account: z.union([z.string(), z.number()]).optional().nullable(),
     quantity: z.union([z.string(), z.number()]).optional(),
@@ -147,6 +147,7 @@ export default function ItemForm() {
                 setValue("inventory_value", i.inventory_value ?? "");
                 setValue("measurement_unit", i.measurement_unit || "");
                 setValue("warehouse_id", i.warehouse_id ? String(i.warehouse_id) : null);
+                setValue("show_on_site", !!i.show_on_site);
                 if (i.image) {
                     setImagePreview(i.image);
                     setValue("image", i.image);
@@ -247,16 +248,18 @@ export default function ItemForm() {
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel>{t("attributes.unit_cost") || "Unit Cost"}</FieldLabel>
+                                    <FieldLabel>{t("attributes.unit_cost") || "Unit Cost"} *</FieldLabel>
                                     <FieldContent>
                                         <NumericInput {...register("unit_cost")} />
+                                        {errors.unit_cost && <FieldError>{t(errors.unit_cost.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel>{t("attributes.unit_price") || "Unit Price"}</FieldLabel>
+                                    <FieldLabel>{t("attributes.unit_price") || "Unit Price"} *</FieldLabel>
                                     <FieldContent>
                                         <NumericInput {...register("unit_price")} />
+                                        {errors.unit_price && <FieldError>{t(errors.unit_price.message!)}</FieldError>}
                                     </FieldContent>
                                 </Field>
 

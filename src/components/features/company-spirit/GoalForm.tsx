@@ -29,6 +29,7 @@ const goalSchema = z.object({
         ar: z.string().min(1, "validation.required"),
         en: z.string().min(1, "validation.required"),
     }),
+    end_date: z.string().optional().nullable(),
     media: z.any().optional().nullable(),
 });
 
@@ -42,6 +43,7 @@ export default function GoalForm({ initialData, onSuccess, onCancel }: GoalFormP
         defaultValues: {
             title: initialData?.title || { ar: "", en: "" },
             description: initialData?.description || { ar: "", en: "" },
+            end_date: initialData?.end_date ? initialData.end_date.slice(0, 10) : "",
             media: null,
         },
     });
@@ -55,6 +57,10 @@ export default function GoalForm({ initialData, onSuccess, onCancel }: GoalFormP
             formData.append("title[en]", data.title.en);
             formData.append("description[ar]", data.description.ar);
             formData.append("description[en]", data.description.en);
+
+            if (data.end_date) {
+                formData.append("end_date", data.end_date);
+            }
 
             if (data.media instanceof File) {
                 formData.append("media", data.media);
@@ -124,6 +130,17 @@ export default function GoalForm({ initialData, onSuccess, onCancel }: GoalFormP
                         {errors.description?.en && <FieldError>{t(errors.description.en.message || "")}</FieldError>}
                     </Field>
                 </FieldGroup>
+
+                <FieldSeparator />
+
+                <Field orientation="horizontal">
+                    <FieldLabel>{t("attributes.end_date")}</FieldLabel>
+                    <Input
+                        type="date"
+                        {...register("end_date")}
+                    />
+                    {errors.end_date && <FieldError>{t(errors.end_date.message || "")}</FieldError>}
+                </Field>
 
                 <FieldSeparator />
 

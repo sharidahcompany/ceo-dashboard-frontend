@@ -11,6 +11,7 @@ export type VisionResource = {
   title_localized: string;
   description_localized: string;
   media_url?: string;
+  end_date?: string | null;
 };
 
 import { getErrorMessage } from "@/lib/utils";

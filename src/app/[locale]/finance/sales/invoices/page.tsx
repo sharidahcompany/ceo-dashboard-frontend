@@ -13,6 +13,7 @@ import {
     importInvoices,
     exportInvoices,
     downloadInvoiceImportTemplate,
+    downloadInvoicePdf,
     InvoiceResource,
 } from "@/actions/finance/invoice.actions";
 
@@ -79,6 +80,12 @@ export default function InvoicesPage() {
         saveFileDownload(res.data);
     };
 
+    const handleDownloadPdf = async (item: InvoiceResource) => {
+        const res = await downloadInvoicePdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     const handleImport = async (file: File) => {
         const res = await importInvoices(file);
         return res.success
@@ -101,6 +108,8 @@ export default function InvoicesPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

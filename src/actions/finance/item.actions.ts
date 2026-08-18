@@ -28,6 +28,7 @@ export interface ItemResource {
     revenue_account?: AccountResource;
     warehouse_id: number | null;
     warehouse?: WarehouseResource;
+    show_on_site: boolean;
     created_at: string;
 }
 

@@ -12,7 +12,7 @@ export interface SignatureUploadHandle {
     isEmpty: () => boolean;
 }
 
-const MAX_BYTES = 4 * 1024 * 1024;
+const MAX_BYTES = 8 * 1024 * 1024;
 
 /**
  * Standalone (not RHF-bound) image upload that reads straight to a data URI,
@@ -32,12 +32,12 @@ const SignatureUpload = forwardRef<SignatureUploadHandle>(function SignatureUplo
     const handleFile = (file: File | undefined) => {
         if (!file) return;
 
-        if (!["image/png", "image/jpeg"].includes(file.type)) {
+        if (!["image/png", "image/jpeg", "image/gif", "image/bmp"].includes(file.type)) {
             toast.error(t("messages.public_sign.upload_invalid_type"));
             return;
         }
         if (file.size > MAX_BYTES) {
-            toast.error(t("validation.file_size_max", { max: 4 }));
+            toast.error(t("validation.file_size_max", { max: 8 }));
             return;
         }
 
@@ -75,7 +75,7 @@ const SignatureUpload = forwardRef<SignatureUploadHandle>(function SignatureUplo
             <input
                 ref={inputRef}
                 type="file"
-                accept="image/png,image/jpeg"
+                accept="image/png,image/jpeg,image/gif,image/bmp"
                 className="hidden"
                 onChange={(e) => handleFile(e.target.files?.[0])}
             />

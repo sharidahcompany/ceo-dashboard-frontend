@@ -20,33 +20,57 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { DocumentTemplateFieldResource } from "@/actions/workspace/document-templates.actions";
+import { SelectUser } from "@/components/ui/select-user";
 
 export interface DynamicFieldRendererProps<T extends FieldValues> {
     field: DocumentTemplateFieldResource;
     control: Control<T>;
     error?: string;
     disabled?: boolean;
+    /** Overrides the default `field_values.<key>` path, e.g. `custom_fields.<key>`. */
+    name?: Path<T>;
 }
 
 /**
  * Renders one of a template's parsed placeholders as the input type its author
- * configured. The field name is `field_values.<key>`, matching the shape the
- * backend validates against.
+ * configured. Defaults to the `field_values.<key>` path the document-fill
+ * backend validates against; pass `name` to bind elsewhere (e.g. a profile
+ * form's `custom_fields`).
  */
 export default function DynamicFieldRenderer<T extends FieldValues>({
     field,
     control,
     error,
     disabled,
+    name: nameProp,
 }: DynamicFieldRendererProps<T>) {
     const t = useTranslations();
 
     // The set of fields comes from the template at runtime, so this path
     // cannot be known statically — the cast is confined to this one line.
-    const name = `field_values.${field.key}` as Path<T>;
+    const name = nameProp ?? (`field_values.${field.key}` as Path<T>);
     const type = field.type.value;
 
     const rules = field.required ? { required: "validation.required" } : {};
+
+    // SelectUser owns its own Controller bound to `name` — nesting it inside
+    // the generic Controller below (used for every other field type) would
+    // register two Controllers on the same field name, so it renders on its
+    // own instead of going through the shared switch.
+    if (type === "employee") {
+        return (
+            <Field>
+                <FieldLabel>
+                    {field.label}
+                    {field.required && <span className="text-destructive"> *</span>}
+                </FieldLabel>
+                <FieldContent>
+                    <SelectUser control={control} name={name} isTenantOnly />
+                    {error && <FieldError>{t(error)}</FieldError>}
+                </FieldContent>
+            </Field>
+        );
+    }
 
     return (
         <Field className={type === "textarea" ? "md:col-span-2" : undefined}>

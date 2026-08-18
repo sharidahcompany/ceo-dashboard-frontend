@@ -19,7 +19,25 @@ import { toast } from "sonner";
 
 import "react-quill-new/dist/quill.snow.css";
 
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+/**
+ * Quill's toolbar registers the *class*-based direction/align attributors by
+ * default (`ql-direction-rtl`, `ql-align-right`), styled only by Quill's own
+ * snow.css — meaningless once the HTML leaves the editor, since the public
+ * website page has no such rules, so RTL/alignment would silently collapse
+ * back to the default the moment it's rendered outside the editor. The
+ * *style* variant writes real inline `direction`/`text-align` instead, which
+ * survives everywhere and — being inline — also visibly overrides Quill's own
+ * `.ql-editor { text-align: left }` right there in the editor.
+ */
+const ReactQuill = dynamic(
+    async () => {
+        const { default: RQ, Quill } = await import("react-quill-new");
+        Quill.register(Quill.import("attributors/style/direction") as any, true);
+        Quill.register(Quill.import("attributors/style/align") as any, true);
+        return RQ;
+    },
+    { ssr: false },
+);
 
 const quillModules = {
     toolbar: [

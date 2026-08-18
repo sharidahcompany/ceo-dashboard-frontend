@@ -74,12 +74,14 @@ export default function DocumentActionsBar({ document, onChanged }: DocumentActi
 
             {canVoid && !document.is_terminal && (
                 <Dialog open={voidOpen} onOpenChange={setVoidOpen}>
-                    <DialogTrigger>
-                        <Button type="button" variant="outline" className="gap-2 text-destructive">
-                            <Ban className="size-4" />
-                            {t("buttons.void")}
-                        </Button>
-                    </DialogTrigger>
+                    <DialogTrigger
+                        render={
+                            <Button type="button" variant="outline" className="gap-2 text-destructive">
+                                <Ban className="size-4" />
+                                {t("buttons.void")}
+                            </Button>
+                        }
+                    />
                     <DialogContent>
                         <DialogHeader>
                             <DialogTitle>{t("buttons.void")}</DialogTitle>

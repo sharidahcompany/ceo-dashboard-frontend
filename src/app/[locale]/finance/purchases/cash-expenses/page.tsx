@@ -13,6 +13,7 @@ import {
     importCashExpenses,
     exportCashExpenses,
     downloadCashExpenseImportTemplate,
+    downloadCashExpensePdf,
     CashExpenseResource,
 } from "@/actions/finance/cash-expense.actions";
 
@@ -81,6 +82,12 @@ export default function CashExpensesPage() {
             : { success: false, message: res.error, errors: res.errors };
     };
 
+    const handleDownloadPdf = async (item: CashExpenseResource) => {
+        const res = await downloadCashExpensePdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     return (
         <Card>
             <CardContent>
@@ -96,6 +103,8 @@ export default function CashExpensesPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

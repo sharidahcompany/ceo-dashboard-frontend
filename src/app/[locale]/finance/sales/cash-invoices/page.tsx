@@ -13,6 +13,7 @@ import {
     importCashInvoices,
     exportCashInvoices,
     downloadCashInvoiceImportTemplate,
+    downloadCashInvoicePdf,
     CashInvoiceResource,
 } from "@/actions/finance/cash-invoice.actions";
 
@@ -81,6 +82,12 @@ export default function CashInvoicesPage() {
             : { success: false, message: res.error, errors: res.errors };
     };
 
+    const handleDownloadPdf = async (item: CashInvoiceResource) => {
+        const res = await downloadCashInvoicePdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     return (
         <Card>
             <CardContent>
@@ -96,6 +103,8 @@ export default function CashInvoicesPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

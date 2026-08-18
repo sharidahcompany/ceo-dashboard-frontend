@@ -18,8 +18,9 @@ import {
     DocumentTemplateAnchorResource,
     DocumentTemplateFieldResource,
 } from "@/actions/workspace/document-templates.actions";
+import SignatureAssetPicker from "@/components/features/documents/signature/SignatureAssetPicker";
 
-const FIELD_TYPES = ["text", "textarea", "number", "date", "select", "boolean"] as const;
+const FIELD_TYPES = ["text", "textarea", "number", "date", "select", "boolean", "employee"] as const;
 const PARTIES = ["internal", "external"] as const;
 
 export interface TemplateFieldsPanelProps {
@@ -211,6 +212,38 @@ export default function TemplateFieldsPanel({
                                 />
                                 {t("attributes.required")}
                             </label>
+
+                            {/* Only an internal signer can be pre-fulfilled from a
+                                saved asset — external signers always sign live. */}
+                            {anchor.party.value === "internal" && (
+                                <div className="space-y-2 border-t pt-2">
+                                    <label className="flex items-center gap-2 text-sm">
+                                        <Checkbox
+                                            checked={anchor.auto_sign ?? false}
+                                            disabled={disabled}
+                                            onCheckedChange={(checked) =>
+                                                onAnchorChange(anchor.type.value, anchor.role, {
+                                                    auto_sign: Boolean(checked),
+                                                    signature_asset_id: checked ? anchor.signature_asset_id : null,
+                                                })
+                                            }
+                                        />
+                                        {t("messages.document_templates.auto_sign_label") || "Auto-sign with saved signature/stamp"}
+                                    </label>
+
+                                    {anchor.auto_sign && (
+                                        <SignatureAssetPicker
+                                            type={anchor.type.value === "stamp" ? "stamp" : "signature"}
+                                            selectedId={anchor.signature_asset_id ?? null}
+                                            onSelect={(asset) =>
+                                                onAnchorChange(anchor.type.value, anchor.role, {
+                                                    signature_asset_id: asset.id,
+                                                })
+                                            }
+                                        />
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </CardContent>

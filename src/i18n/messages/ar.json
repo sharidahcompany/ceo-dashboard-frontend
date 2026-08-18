@@ -5,7 +5,27 @@
   },
   "success": "تم الحفظ بنجاح!",
   "attributes": {
+    "language": "اللغة",
     "not_set": "غير محدد",
+    "candidate": "المرشح",
+    "job_application": "طلب التوظيف",
+    "salary": "الراتب",
+    "benefits": "المزايا",
+    "department": "القسم",
+    "custom_fields": "حقول مخصصة",
+    "field_name": "اسم الحقل",
+    "field_value": "القيمة",
+    "id_number": "رقم الهوية",
+    "nationality": "الجنسية",
+    "gender": "الجنس",
+    "date_of_birth": "تاريخ الميلاد",
+    "marital_status": "الحالة الاجتماعية",
+    "employment_type": "نوع التوظيف",
+    "housing_allowance": "بدل السكن",
+    "transportation_allowance": "بدل النقل",
+    "other_allowances": "بدلات أخرى",
+    "emergency_contact_name": "اسم جهة الاتصال في حالات الطوارئ",
+    "emergency_contact_phone": "هاتف جهة الاتصال في حالات الطوارئ",
     "name": "الاسم",
     "name_ar": "الاسم بالعربية",
     "name_en": "الاسم بالانجليزية",
@@ -305,6 +325,7 @@
     "completed_tasks": "المهام المكتملة",
     "stage": "المرحلة",
     "performance_overview": "نظرة عامة على الأداء",
+    "contracts": "العقود",
     "on_time_rate": "معدل الالتزام بالحضور",
     "missions_completion_rate": "معدل إنجاز المهام الخارجية",
     "tasks_completion_rate": "معدل إنجاز المهام",
@@ -356,11 +377,16 @@
     "invalid_anchor_role": "استخدم الحروف والأرقام والشرطة السفلية فقط، مثال: ceo.",
     "split_placeholder": "تم تقسيم أحد الحقول بسبب التنسيق. حدده بالكامل وأزل التنسيق ثم أعد المحاولة.",
     "no_signers": "أضف موقّعًا واحدًا على الأقل.",
-    "signature_required": "التوقيع مطلوب."
+    "signature_required": "التوقيع مطلوب.",
+    "name_required": "الاسم مطلوب."
   },
   "buttons": {
     "previous": "السابق",
     "next": "التالي",
+    "send": "إرسال",
+    "view": "عرض",
+    "generate_document": "إنشاء المستند",
+    "add_field": "إضافة حقل",
     "profile": "الملف الشخصي",
     "logout": "تسجيل الخروج",
     "edit": "تعديل",
@@ -419,6 +445,9 @@
       "anchor_hint": "سمِّ الدور الذي يوقّع هنا، مثال: ceo أو client. كل دور يوقّع في موضع واحد.",
       "fields_detected": "الحقول",
       "fields_detected_hint": "مستخرجة من نص المستند. عدّل النص لإضافتها أو حذفها.",
+      "auto_sign_label": "توقيع تلقائي بتوقيع أو ختم محفوظ",
+      "is_default_contract_label": "العقد الافتراضي للموظفين الجدد",
+      "is_default_contract_hint": "يتم إنشاء هذا المستند وإرساله تلقائيًا عند إضافة أي موظف جديد. يمكن أن يكون قالب واحد فقط لكل شركة هو الافتراضي.",
       "anchors_detected": "التواقيع والأختام",
       "anchors_detected_hint": "حدد من يوقّع كل واحدة. الأطراف الداخلية توقّع من لوحة التحكم قبل إرسال المستند.",
       "no_fields": "لا توجد حقول بعد. استخدم «إدراج حقل» في المحرر.",
@@ -482,6 +511,14 @@
     },
     "hr": {
       "positions_description": "أدخل تفاصيل الوظيفة والمؤهلات المطلوبة لنشر الشاغر الوظيفي وبدء استقبال طلبات التوظيف",
+      "job_offers_description": "إدارة عروض العمل المرسلة إلى المرشحين",
+      "job_offer_no_document_hint": "لم يتم إنشاء مستند لهذا العرض بعد. قم بإنشائه لمراجعة متغيرات القالب وتعبئتها قبل الإرسال.",
+      "job_offer_preview_editable_hint": "راجع العرض أدناه. استخدم زر التعديل لتعبئة أو تغيير متغيرات القالب قبل الإرسال.",
+      "job_offer_preview_sent_hint": "تم إرسال هذا العرض بالفعل ولم يعد قابلاً للتعديل.",
+      "pick_candidate_first": "اختر مرشحًا أولاً",
+      "pick_application": "اختر الطلب الذي يخص هذا العرض",
+      "convert_to_employee_description": "تأكيد البيانات قبل إنشاء سجل الموظف",
+      "profile_details_description": "تُستخدم لتعبئة العقود ومستندات الموارد البشرية الأخرى تلقائيًا",
       "create_new_position": "إضافة وظيفة جديدة",
       "create_new_interview": "إضافة مقابلة عمل",
       "shifts_description": "إدارة ورديات العمل وتعيينات الموظفين بالمؤسسة",
@@ -502,7 +539,8 @@
       "candidates_description": "إدارة طلبات التوظيف المقدمة على الوظائف الشاغرة",
       "create_new_candidate": "إضافة متقدم",
       "invite_employee": "رسال دعوة انضمام للفريق",
-      "invite_employee_description": "إرسال دعوة عبر البريد الإلكتروني لتمكين هذا الشخص من إعداد حسابه والانضمام إلى مساحة عملك."
+      "invite_employee_description": "إرسال دعوة عبر البريد الإلكتروني لتمكين هذا الشخص من إعداد حسابه والانضمام إلى مساحة عملك.",
+      "no_job_contract_template": "يرجى إنشاء قالب مستند مُحدد كعقد العمل قبل إنشاء الموظفين."
     },
     "buffets": {
       "no_buffets": "لا يوجد بوفيهات",
@@ -576,7 +614,9 @@
       "attendance_report_description": "سجلات الحضور الأخيرة لهذا الموظف.",
       "missions_report_description": "المهام الخارجية المسندة لهذا الموظف وحالة إنجازها.",
       "tasks_report_description": "المهام المسندة لهذا الموظف عبر جميع المشاريع وحالة إنجازها.",
-      "performance_overview_description": "الملخص الإحصائي لأداء هذا الموظف في الحضور والمهام الخارجية والمهام."
+      "performance_overview_description": "الملخص الإحصائي لأداء هذا الموظف في الحضور والمهام الخارجية والمهام.",
+      "contracts_description": "العقود والمستندات الموقعة الصادرة لهذا الموظف.",
+      "no_contracts": "لم يتم إصدار أي عقود لهذا الموظف بعد."
     },
     "website": {
       "orders_description": "عرض وإدارة الطلبات الواردة من متجر الموقع الإلكتروني."
@@ -595,6 +635,7 @@
       "step_internal_hint": "يوقّع من لوحة التحكم",
       "step_external_hint": "يوقّع عبر رابط بالبريد",
       "current_step": "بانتظار هذه الخطوة",
+      "auto_signing": "يتم التوقيع تلقائيًا",
       "waiting_on": "بانتظار",
       "no_signers": "لا يوجد موقّعون بعد.",
       "no_activity": "لم يحدث شيء بعد.",
@@ -613,7 +654,10 @@
       "save_signature_for_next_time": "احفظ هذا التوقيع للمرة القادمة",
       "pick_a_saved_signature": "اختر توقيعًا محفوظًا.",
       "no_saved_assets": "لا يوجد شيء محفوظ بعد.",
-      "void_confirm": "لا يمكن التراجع عن هذا الإجراء. سيتوقف المستند عن جمع التواقيع."
+      "void_confirm": "لا يمكن التراجع عن هذا الإجراء. سيتوقف المستند عن جمع التواقيع.",
+      "signature_assets_description": "توقيعاتك المحفوظة، بالإضافة إلى ختم الشركة المشترك.",
+      "create_new_asset": "توقيع / ختم جديد",
+      "save_as_company_stamp": "احفظه كختم الشركة المشترك"
     },
     "public_sign": {
       "tabs": {
@@ -623,7 +667,7 @@
       },
       "typed_placeholder": "اكتب اسمك الكامل",
       "typed_preview_placeholder": "معاينة توقيعك",
-      "upload_invalid_type": "يرجى رفع صورة بصيغة PNG أو JPG.",
+      "upload_invalid_type": "يرجى رفع صورة بصيغة PNG أو JPG أو GIF أو BMP.",
       "expired": "هذا الرابط لم يعد صالحًا.",
       "already_signed": "لقد وقّعت على هذا المستند بالفعل.",
       "declined": "لقد رفضت توقيع هذا المستند.",
@@ -647,6 +691,7 @@
     "navbar": "شريط التنقل",
     "products": "المنتجات المعروضة",
     "vision": "الرؤية",
+    "goals": "الأهداف",
     "footer": "التذييل",
     "header": "الترويسة",
     "about": "نبذة عنا",
@@ -689,6 +734,7 @@
     "home": "الصفحة الرئيسية",
     "document_templates": "قوالب المستندات",
     "cars": "السيارات",
+    "permissions": "الصلاحيات",
     "create_car": "إضافة سيارة",
     "edit_car": "تعديل السيارة",
     "finance": "المالية",
@@ -714,6 +760,12 @@
     "candidates": "المتقدمون للوظائف",
     "create_candidate": "إضافة متقدم",
     "edit_candidate": "تعديل بيانات المتقدم",
+    "job_offer": "عروض العمل",
+    "create_job_offer": "إضافة عرض عمل",
+    "edit_job_offer": "تعديل عرض العمل",
+    "convert_to_employee": "تحويل إلى موظف",
+    "hire_date": "تاريخ التعيين",
+    "profile_details": "بيانات الملف الشخصي",
     "interviews": "المقابلات الشخصية",
     "create_interview": "جدولة مقابلة",
     "edit_interview": "تعديل المقابلة",
@@ -841,7 +893,9 @@
     "issued_documents": "المستندات",
     "create_document": "مستند جديد",
     "edit_document": "تعديل المستند",
-    "document_details": "تفاصيل المستند"
+    "document_details": "تفاصيل المستند",
+    "signature_assets": "التوقيعات والأختام",
+    "create_signature_asset": "توقيع / ختم جديد"
   },
   "actions": {
     "loading": "جاري التحميل",
@@ -1205,7 +1259,8 @@
       "number": "رقم",
       "date": "تاريخ",
       "select": "قائمة منسدلة",
-      "boolean": "نعم / لا"
+      "boolean": "نعم / لا",
+      "employee": "موظف"
     },
     "signerParty": {
       "internal": "داخلي (يوقّع من لوحة التحكم)",
@@ -1452,6 +1507,7 @@
       "buffet_category": "فئات البوفيه",
       "buffet_item": "عناصر البوفيه",
       "buffet_order": "طلبات البوفيه",
+      "car": "السيارات",
       "comment": "التعليقات",
       "department": "الأقسام",
       "experience": "الخبرات",

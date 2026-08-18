@@ -166,11 +166,13 @@ export default function PublicSignClient({ token, initialSession }: PublicSignCl
 
                     <div className="flex flex-wrap justify-end gap-2">
                         <Dialog open={declineOpen} onOpenChange={setDeclineOpen}>
-                            <DialogTrigger>
-                                <Button type="button" variant="outline" disabled={isPending}>
-                                    {t("buttons.decline")}
-                                </Button>
-                            </DialogTrigger>
+                            <DialogTrigger
+                                render={
+                                    <Button type="button" variant="outline" disabled={isPending}>
+                                        {t("buttons.decline")}
+                                    </Button>
+                                }
+                            />
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>{t("buttons.decline")}</DialogTitle>

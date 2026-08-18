@@ -13,6 +13,7 @@ import {
     importBills,
     exportBills,
     downloadBillImportTemplate,
+    downloadBillPdf,
     BillResource,
 } from "@/actions/finance/bill.actions";
 
@@ -86,6 +87,12 @@ export default function BillsPage() {
             : { success: false, message: res.error, errors: res.errors };
     };
 
+    const handleDownloadPdf = async (item: BillResource) => {
+        const res = await downloadBillPdf(item.id);
+        if (!res.success) throw new Error(res.error);
+        saveFileDownload(res.data);
+    };
+
     return (
         <Card>
             <CardContent>
@@ -101,6 +108,8 @@ export default function BillsPage() {
                     onExport={handleExport}
                     onDownloadTemplate={handleDownloadTemplate}
                     onImport={handleImport}
+                    hasPdf
+                    onDownloadPdf={handleDownloadPdf}
                 />
             </CardContent>
         </Card>

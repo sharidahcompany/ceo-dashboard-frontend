@@ -85,6 +85,7 @@ const quoteSchema = z.object({
     warehouse_id: z.union([z.string(), z.number()]).optional().nullable(),
     tax_amount_type: z.enum(["EXCLUSIVE", "INCLUSIVE"]),
     notes: z.string().optional(),
+    language: z.enum(["en", "ar"]),
     items: z.array(lineItemSchema).min(1, { message: "validation.required" }),
 });
 
@@ -141,6 +142,7 @@ export default function QuoteForm() {
             warehouse_id: null,
             tax_amount_type: "EXCLUSIVE",
             notes: "",
+            language: "en",
             items: [emptyLineItem],
         },
     });
@@ -206,6 +208,7 @@ export default function QuoteForm() {
                 setValue("warehouse_id", q.warehouse_id ? String(q.warehouse_id) : null);
                 setValue("tax_amount_type", q.tax_amount_type);
                 setValue("notes", q.notes || "");
+                setValue("language", q.language || "en");
                 if (q.items?.length) {
                     setValue(
                         "items",
@@ -414,6 +417,27 @@ export default function QuoteForm() {
                                             options={warehouses}
                                             loading={optionsLoading}
                                             placeholder={t("actions.select_warehouse") || "Select warehouse"}
+                                        />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.language") || "Language"}</FieldLabel>
+                                    <FieldContent>
+                                        <Controller
+                                            name="language"
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="en">{t("locale.en") || "English"}</SelectItem>
+                                                        <SelectItem value="ar">{t("locale.ar") || "العربية"}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
                                         />
                                     </FieldContent>
                                 </Field>

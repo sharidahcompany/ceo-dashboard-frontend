@@ -59,6 +59,7 @@ export default function WebsiteCustomization() {
     { type: "navbar", label: "Navbar" },
     { type: "products", label: "Products" },
     { type: "vision", label: "Vision" },
+    { type: "goals", label: "Goals" },
     { type: "footer", label: "Footer" },
     ...(isSuperAdmin ? [{ type: "plans", label: "Plans" }] : []),
   ];
@@ -488,6 +489,65 @@ export default function WebsiteCustomization() {
                           that simplify complexity, drive performance, and
                           inspire continuous growth.&quot;
                         </p>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (section.type === "goals") {
+                  const mockGoals = [
+                    {
+                      title: "Global Expansion",
+                      description:
+                        "Reach new markets across the region within the next fiscal year.",
+                    },
+                    {
+                      title: "Customer Delight",
+                      description:
+                        "Achieve a 95%+ satisfaction score across all support channels.",
+                    },
+                    {
+                      title: "Sustainable Growth",
+                      description:
+                        "Scale operations while keeping efficiency and quality first.",
+                    },
+                  ];
+
+                  let goalsGridClass = "grid-cols-1 sm:grid-cols-2 md:grid-cols-3";
+                  if (previewMode === "mobile") {
+                    goalsGridClass = "grid-cols-1";
+                  } else if (previewMode === "tablet") {
+                    goalsGridClass = "grid-cols-1 sm:grid-cols-2";
+                  }
+
+                  return (
+                    <div
+                      key={section.id}
+                      className="w-full py-16 px-8 bg-background border-b relative group"
+                    >
+                      <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 pointer-events-none transition-colors z-10" />
+                      <div className="max-w-5xl mx-auto text-center mb-10">
+                        <span className="text-xs font-bold uppercase tracking-wider text-primary mb-2 block">
+                          Our Goals
+                        </span>
+                        <h3 className="text-3xl font-black">
+                          What We&apos;re Working Towards
+                        </h3>
+                      </div>
+                      <div className={`grid ${goalsGridClass} gap-6 max-w-5xl mx-auto`}>
+                        {mockGoals.map((goal, idx) => (
+                          <div
+                            key={idx}
+                            className="p-6 rounded-lg border bg-card text-center"
+                          >
+                            <h4 className="font-semibold text-sm mb-2">
+                              {goal.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {goal.description}
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   );
