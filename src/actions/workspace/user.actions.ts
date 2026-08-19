@@ -52,6 +52,12 @@ export interface UserResource {
   custom_fields?: Record<string, string> | null;
   department?: { id: number; name: Record<string, string> | string } | null;
   position?: { id: number; name: Record<string, string> | string } | null;
+
+  // GET /workspace/users additionally returns this: the employee's most
+  // recently issued contract (whichever document their "employee" signer
+  // anchor belongs to), if any — has_pdf is only true once every signature
+  // is in and DocumentWorkflowService::complete() has rendered the file.
+  contract?: { id: number; status: string; has_pdf: boolean } | null;
 }
 
 export interface UserApiResponse {

@@ -540,7 +540,10 @@
       "create_new_candidate": "إضافة متقدم",
       "invite_employee": "رسال دعوة انضمام للفريق",
       "invite_employee_description": "إرسال دعوة عبر البريد الإلكتروني لتمكين هذا الشخص من إعداد حسابه والانضمام إلى مساحة عملك.",
-      "no_job_contract_template": "يرجى إنشاء قالب مستند مُحدد كعقد العمل قبل إنشاء الموظفين."
+      "no_job_contract_template": "يرجى إنشاء قالب مستند مُحدد كعقد العمل قبل إنشاء الموظفين.",
+      "contract": "العقد",
+      "download_contract": "تنزيل",
+      "contract_download_failed": "فشل تنزيل العقد."
     },
     "buffets": {
       "no_buffets": "لا يوجد بوفيهات",

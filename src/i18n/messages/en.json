@@ -369,7 +369,10 @@
       "invite_employee": "Invite Employee",
       "invite_employee_description": "Send an invitation email so this person can set up their account and join your workspace.",
       "no_journey_recorded": "No location data recorded for this mission yet.",
-      "no_job_contract_template": "Please create a document template marked as the Job Contract before creating employees."
+      "no_job_contract_template": "Please create a document template marked as the Job Contract before creating employees.",
+      "contract": "Contract",
+      "download_contract": "Download",
+      "contract_download_failed": "Failed to download the contract."
     },
     "employees": {
       "assignments_description": "Assign this employee to one or more branches, departments, and positions.",
