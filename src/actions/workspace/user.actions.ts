@@ -149,6 +149,10 @@ export interface InviteUserData {
   username: string;
   email: string;
   phone: string;
+  // Recipient email per external anchor on the default contract template
+  // (e.g. an outside witness/counter-signer), keyed by anchor role — see
+  // ContractGenerationService::seedSigners() on the backend.
+  signers?: { role: string; email: string }[];
 }
 
 /**
@@ -230,6 +234,7 @@ export interface UpdateEmployeeData {
   emergency_contact_name?: string;
   emergency_contact_phone?: string;
   custom_fields?: Record<string, string>;
+  signers?: { role: string; email: string }[];
 }
 
 /**

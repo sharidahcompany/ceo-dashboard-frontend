@@ -22,6 +22,7 @@ import {
     hasDefaultContractTemplate,
     getDefaultContractTemplate,
     DocumentTemplateFieldResource,
+    DocumentTemplateAnchorResource,
 } from "@/actions/workspace/document-templates.actions";
 import {
     Field,
@@ -72,6 +73,9 @@ export default function EmployeeForm() {
     const [employee, setEmployee] = useState<UserResource | null>(null);
     const [tenantUser, setTenantUser] = useState<UserResource | null>(null);
     const [customTemplateFields, setCustomTemplateFields] = useState<DocumentTemplateFieldResource[]>([]);
+    const [externalAnchors, setExternalAnchors] = useState<DocumentTemplateAnchorResource[]>([]);
+    const [signerEmails, setSignerEmails] = useState<Record<string, string>>({});
+    const [signerErrors, setSignerErrors] = useState<Record<string, string>>({});
 
     const { register, handleSubmit, setValue, control, formState: { errors } } = useForm<UpdateEmployeeData>({
         defaultValues: {
@@ -160,6 +164,18 @@ export default function EmployeeForm() {
                 );
                 setCustomTemplateFields(fields);
 
+                // Anchors marked "external" have no tenant account for the
+                // backend to pull an email from — collect one here so it can
+                // be sent along and actually reach seedSigners(). The
+                // "employee" role is always seeded as internal using the
+                // employee's own account email regardless of the anchor's
+                // party (see ContractGenerationService::seedSigners()), so
+                // it's excluded here too.
+                const external = (templateRes.data.anchors ?? []).filter(
+                    (anchor) => anchor.party.value === "external" && anchor.role.toLowerCase() !== "employee"
+                );
+                setExternalAnchors(external);
+
                 const missing: Record<string, string> = {};
                 fields.forEach((field) => {
                     if (field.key in existingCustomFields) return;
@@ -190,10 +206,30 @@ export default function EmployeeForm() {
                     return;
                 }
 
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const newSignerErrors: Record<string, string> = {};
+                externalAnchors.forEach((anchor) => {
+                    const email = signerEmails[anchor.role]?.trim() ?? "";
+                    if (!emailPattern.test(email)) {
+                        newSignerErrors[anchor.role] = "validation.required";
+                    }
+                });
+                if (Object.keys(newSignerErrors).length > 0) {
+                    setSignerErrors(newSignerErrors);
+                    toast.error(t("validation.required"));
+                    return;
+                }
+                setSignerErrors({});
+
+                const signers = externalAnchors.map((anchor) => ({
+                    role: anchor.role,
+                    email: signerEmails[anchor.role].trim(),
+                }));
+
                 // workspace-service stores the User + Profile together and
                 // publishes employee_created, which auth-service consumes
                 // to create the central account and send the invite email.
-                const inviteRes = await inviteUser(values);
+                const inviteRes = await inviteUser({ ...values, ...(signers.length > 0 ? { signers } : {}) });
 
                 if (!inviteRes.success) {
                     toast.error(inviteRes.error);
@@ -480,6 +516,47 @@ export default function EmployeeForm() {
                         </FieldSet>
                     </CardContent>
                 </Card>
+
+                {!employeeId && externalAnchors.length > 0 && (
+                    <Card className="w-full">
+                        <CardHeader className="border-b">
+                            <CardTitle>{t("messages.documents.step_signers")}</CardTitle>
+                            <CardDescription>
+                                {t("messages.documents.step_external_hint")}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            <FieldSet>
+                                <FieldGroup className="md:grid md:grid-cols-2 md:gap-5">
+                                    {externalAnchors.map((anchor) => (
+                                        <Field key={anchor.role}>
+                                            <FieldLabel>
+                                                {anchor.role}
+                                                <span className="text-destructive"> *</span>
+                                            </FieldLabel>
+                                            <FieldContent>
+                                                <Input
+                                                    type="email"
+                                                    dir="ltr"
+                                                    value={signerEmails[anchor.role] ?? ""}
+                                                    onChange={(e) =>
+                                                        setSignerEmails((prev) => ({
+                                                            ...prev,
+                                                            [anchor.role]: e.target.value,
+                                                        }))
+                                                    }
+                                                />
+                                                {signerErrors[anchor.role] && (
+                                                    <FieldError>{t(signerErrors[anchor.role])}</FieldError>
+                                                )}
+                                            </FieldContent>
+                                        </Field>
+                                    ))}
+                                </FieldGroup>
+                            </FieldSet>
+                        </CardContent>
+                    </Card>
+                )}
 
                 <div className="flex justify-end gap-3">
                     <Link href="/hr/employees">
