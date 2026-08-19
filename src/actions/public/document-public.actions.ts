@@ -56,6 +56,13 @@ export async function getSigningSession(
         const response = await publicApi.get(`/public/documents/sign/${token}`);
         return { success: true, data: response.data.data };
     } catch (error) {
+        console.error("[getSigningSession] failed", {
+            token,
+            baseURL: publicApi.defaults.baseURL,
+            message: (error as any)?.message,
+            status: (error as any)?.response?.status,
+            responseData: (error as any)?.response?.data,
+        });
         return { success: false, error: getErrorMessage(error) };
     }
 }
