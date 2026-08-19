@@ -47,7 +47,7 @@ export default function PublicSignClient({ token, initialSession }: PublicSignCl
 
     const padRef = useRef<SignaturePadHandle>(null);
 
-    if (!session.success) {
+    if (!session.success || !session.data) {
         return (
             <Empty>
                 <EmptyHeader>
@@ -55,7 +55,9 @@ export default function PublicSignClient({ token, initialSession }: PublicSignCl
                         <ShieldAlert className="size-5" />
                     </EmptyMedia>
                     <EmptyTitle>{t("messages.public_sign.expired")}</EmptyTitle>
-                    <EmptyDescription>{session.error}</EmptyDescription>
+                    <EmptyDescription>
+                        {session.success ? undefined : session.error}
+                    </EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
