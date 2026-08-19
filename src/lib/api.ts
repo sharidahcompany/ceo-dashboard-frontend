@@ -8,6 +8,9 @@ const api = axios.create({
     Accept: "application/json",
   },
   withCredentials: true,
+  // Without this a hung upstream leaves the caller's promise pending forever —
+  // client grids sit on their loading skeleton until a full page reload.
+  timeout: 60_000,
 });
 
 api.interceptors.request.use(

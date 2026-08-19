@@ -222,8 +222,14 @@ export function DataGrid<TData, TValue>({
         fetchActionRef.current = fetchAction;
     }, [fetchAction]);
 
+    // Ignores responses from superseded fetches (e.g. the post-delete refetch
+    // racing the effect-driven one) so a slow straggler can't overwrite newer
+    // data or leave the loading flag stuck.
+    const fetchIdRef = React.useRef(0);
+
     // Fetch Data
     const fetchData = useCallback(async () => {
+        const fetchId = ++fetchIdRef.current;
         setIsLoading(true);
         try {
             const currentUrl = new URLSearchParams(window.location.search);
@@ -254,6 +260,7 @@ export function DataGrid<TData, TValue>({
             window.history.replaceState(null, "", `?${currentUrl.toString()}`);
 
             const res = await fetchActionRef.current(currentUrl.toString());
+            if (fetchId !== fetchIdRef.current) return;
             if (res.success && res.data) {
                 setData(res.data.data);
                 setMeta(res.data.meta);
@@ -261,9 +268,9 @@ export function DataGrid<TData, TValue>({
                 toast.error(res.error || t("no_data"));
             }
         } catch (error) {
-            toast.error(t("no_data"));
+            if (fetchId === fetchIdRef.current) toast.error(t("no_data"));
         } finally {
-            setIsLoading(false);
+            if (fetchId === fetchIdRef.current) setIsLoading(false);
         }
     }, [pageIndex, pageSize, sorting, activeFilter, debouncedSearch, t]);
 
@@ -371,7 +378,7 @@ export function DataGrid<TData, TValue>({
             if (res.success) {
                 toast.success(res.message || "Deleted successfully");
                 setRowSelection({});
-                fetchData();
+                await fetchData();
             } else {
                 toast.error(res.error || "Failed to delete");
             }
