@@ -301,6 +301,11 @@ export default function EmployeeForm() {
                                         {employee.first_name} {employee.last_name}
                                     </p>
                                     <p className="text-sm text-muted-foreground">{employee.email}</p>
+                                    {employee.employee_id != null && (
+                                        <p className="text-sm text-muted-foreground">
+                                            {t("attributes.employee_id") || "Employee ID"}: {employee.employee_id}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}

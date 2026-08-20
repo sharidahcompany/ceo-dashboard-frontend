@@ -21,6 +21,7 @@ import {
 import { getPositions, PositionResource } from "@/actions/workspace/positions.actions";
 import { getDepartments, DepartmentResource } from "@/actions/company-spirit/department.actions";
 import { hasDefaultContractTemplate } from "@/actions/workspace/document-templates.actions";
+import { SelectPosition } from "@/components/ui/select-position";
 import {
     Select,
     SelectContent,
@@ -51,13 +52,21 @@ export default function ConvertToEmployeeReview() {
     const [departmentsList, setDepartmentsList] = useState<DepartmentResource[]>([]);
     const [loadError, setLoadError] = useState<string | null>(null);
 
-    const { register, handleSubmit, setValue, watch, control, formState: { errors } } = useForm<ConvertToEmployeeData>({
+    const { register, handleSubmit, setValue, watch, control, setError, formState: { errors } } = useForm<ConvertToEmployeeData>({
         defaultValues: {
             department_id: "",
             position_id: "",
             hire_date: "",
             gross_salary: "",
             full_name: "",
+            id_number: "",
+            address: "",
+            nationality: "",
+            date_of_birth: "",
+            gender: "",
+            marital_status: "",
+            emergency_contact_name: "",
+            emergency_contact_phone: "",
             custom_fields: {},
         }
     });
@@ -81,9 +90,21 @@ export default function ConvertToEmployeeReview() {
                 setPreview(data);
                 setValue("department_id", data.department_id ? String(data.department_id) : "");
                 setValue("position_id", data.position_id ? String(data.position_id) : "");
-                setValue("hire_date", data.hire_date || "");
+                // The API may return a bare date or a full ISO datetime — the
+                // <input type="date"> only accepts YYYY-MM-DD, so trim it.
+                setValue("hire_date", data.hire_date ? data.hire_date.slice(0, 10) : "");
                 setValue("gross_salary", data.gross_salary || "");
-                setValue("full_name", `${data.user.first_name} ${data.user.last_name}`.trim());
+                // Prefer what HR already entered on the application itself
+                // over rebuilding it from the account's first/last name.
+                setValue("full_name", data.full_name || `${data.user.first_name} ${data.user.last_name}`.trim());
+                setValue("id_number", data.id_number || "");
+                setValue("address", data.address || "");
+                setValue("nationality", data.nationality || "");
+                setValue("date_of_birth", data.date_of_birth ? data.date_of_birth.slice(0, 10) : "");
+                setValue("gender", data.gender || "");
+                setValue("marital_status", data.marital_status || "");
+                setValue("emergency_contact_name", data.emergency_contact_name || "");
+                setValue("emergency_contact_phone", data.emergency_contact_phone || "");
             } else {
                 setLoadError(previewRes.error);
             }
@@ -95,6 +116,13 @@ export default function ConvertToEmployeeReview() {
     }, [applicationId, setValue]);
 
     const onSubmit = (values: ConvertToEmployeeData) => {
+        // SelectPosition manages its own Controller without RHF `rules`, so
+        // "required" isn't enforced automatically the way department_id's is.
+        if (!values.position_id) {
+            setError("position_id", { message: "validation.required" });
+            return;
+        }
+
         startTransition(async () => {
             const templateRes = await hasDefaultContractTemplate();
             if (!templateRes.success) {
@@ -106,7 +134,17 @@ export default function ConvertToEmployeeReview() {
                 return;
             }
 
-            const res = await convertToEmployee(applicationId, values);
+            // Omit blank optional fields rather than submitting "" —
+            // nullable|numeric and nullable|date backend rules reject an
+            // empty string.
+            const payload: ConvertToEmployeeData = { ...values };
+            (Object.keys(payload) as Array<keyof ConvertToEmployeeData>).forEach((key) => {
+                if (key !== "department_id" && key !== "position_id" && payload[key] === "") {
+                    delete payload[key];
+                }
+            });
+
+            const res = await convertToEmployee(applicationId, payload);
             if (!res.success) {
                 toast.error(res.error);
                 return;
@@ -217,26 +255,10 @@ export default function ConvertToEmployeeReview() {
                                 <Field>
                                     <FieldLabel>{t("routes.positions")}</FieldLabel>
                                     <FieldContent>
-                                        <Controller
-                                            name="position_id"
+                                        <SelectPosition<ConvertToEmployeeData>
                                             control={control}
-                                            rules={{ required: "validation.required" }}
-                                            render={({ field }) => (
-                                                <Select value={field.value} onValueChange={field.onChange}>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder={t("actions.select_department")}>
-                                                            {currentSelectedPosition ? (currentSelectedPosition.name_localized || currentSelectedPosition.name?.en) : undefined}
-                                                        </SelectValue>
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {positionsList.map((pos) => (
-                                                            <SelectItem key={pos.id} value={String(pos.id)}>
-                                                                {pos.name_localized || pos.name?.en}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            )}
+                                            name="position_id"
+                                            initialPosition={currentSelectedPosition}
                                         />
                                         {errors.position_id && (
                                             <FieldError>{t(errors.position_id.message!)}</FieldError>
@@ -262,6 +284,62 @@ export default function ConvertToEmployeeReview() {
                                     <FieldLabel>{t("attributes.gross_salary") || "Gross Salary"}</FieldLabel>
                                     <FieldContent>
                                         <Input type="number" step="0.01" {...register("gross_salary")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.id_number") || "ID Number"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("id_number")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.address") || "Address"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("address")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.nationality") || "Nationality"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("nationality")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.date_of_birth") || "Date of Birth"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input type="date" {...register("date_of_birth")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.gender") || "Gender"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("gender")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.marital_status") || "Marital Status"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("marital_status")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.emergency_contact_name") || "Emergency Contact Name"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("emergency_contact_name")} />
+                                    </FieldContent>
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>{t("attributes.emergency_contact_phone") || "Emergency Contact Phone"}</FieldLabel>
+                                    <FieldContent>
+                                        <Input {...register("emergency_contact_phone")} />
                                     </FieldContent>
                                 </Field>
 

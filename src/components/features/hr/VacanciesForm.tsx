@@ -39,6 +39,7 @@ interface VacanciesFormValues {
     description: string;
     start_date: string;
     end_date: string;
+    status: string;
 }
 
 export default function VacanciesForm() {
@@ -59,6 +60,10 @@ export default function VacanciesForm() {
             description: "",
             start_date: "",
             end_date: "",
+            // The status column defaults to 'draft' in the DB, which the
+            // public apply endpoint rejects — a newly created vacancy must
+            // explicitly be sent as 'open' to accept applications.
+            status: "open",
         }
     });
 
@@ -81,6 +86,7 @@ export default function VacanciesForm() {
                     setValue("description", vac.description || "");
                     setValue("start_date", vac.start_date || "");
                     setValue("end_date", vac.end_date || "");
+                    setValue("status", vac.status || "open");
                 } else {
                     toast.error(vacRes.error);
                 }
@@ -216,6 +222,35 @@ export default function VacanciesForm() {
                                         />
                                         {errors.end_date && (
                                             <FieldError>{t(errors.end_date.message!)}</FieldError>
+                                        )}
+                                    </FieldContent>
+                                </Field>
+
+                                {/* Status Field — must be 'open' for the public apply page to accept applications */}
+                                <Field>
+                                    <FieldLabel>{t("attributes.status") || "Status"}</FieldLabel>
+                                    <FieldContent>
+                                        <Controller
+                                            name="status"
+                                            control={control}
+                                            rules={{ required: "validation.required" }}
+                                            render={({ field }) => (
+                                                <Select value={field.value} onValueChange={field.onChange}>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue>
+                                                            {field.value ? (t(`attributes.${field.value}`) || field.value) : undefined}
+                                                        </SelectValue>
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="draft">{t("attributes.draft") || "Draft"}</SelectItem>
+                                                        <SelectItem value="open">{t("attributes.open") || "Open"}</SelectItem>
+                                                        <SelectItem value="closed">{t("attributes.closed") || "Closed"}</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                        {errors.status && (
+                                            <FieldError>{t(errors.status.message!)}</FieldError>
                                         )}
                                     </FieldContent>
                                 </Field>

@@ -9,19 +9,27 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel, FieldContent, FieldSet } from "@/components/ui/field";
 import { MultiSelectBranch } from "@/components/ui/multi-select-branch";
-import { MultiSelectDepartment } from "@/components/ui/multi-select-department";
-import { MultiSelectPosition } from "@/components/ui/multi-select-position";
-import {
-    UserResource,
-    assignUserBranches,
-    assignUserDepartments,
-    assignUserPositions,
-} from "@/actions/workspace/user.actions";
+import { SelectDepartment } from "@/components/ui/select-department";
+import { SelectPosition } from "@/components/ui/select-position";
+import { UserResource, updateUserAssignments } from "@/actions/workspace/user.actions";
+import type { DepartmentResource } from "@/actions/company-spirit/department.actions";
+import type { PositionResource } from "@/actions/workspace/positions.actions";
+
+/**
+ * The user resource carries the department/position as a bare {id, name}, so
+ * shape it into the option the selects expect — without it the currently
+ * assigned value renders blank until its page happens to load.
+ */
+function toOption<T>(entity?: { id: number; name: Record<string, string> | string } | null): T | null {
+    if (!entity) return null;
+    const name = typeof entity.name === "string" ? entity.name : entity.name?.ar || entity.name?.en || "";
+    return { id: entity.id, name_localized: name, name: { ar: name, en: name } } as T;
+}
 
 interface EmployeeAssignmentsFormValues {
     branch_ids: string[];
-    department_ids: string[];
-    position_ids: string[];
+    department_id: string;
+    position_id: string;
 }
 
 interface EmployeeAssignmentsFormProps {
@@ -36,26 +44,25 @@ export default function EmployeeAssignmentsForm({ employeeId, initialData }: Emp
     const { control, handleSubmit } = useForm<EmployeeAssignmentsFormValues>({
         defaultValues: {
             branch_ids: (initialData?.branches ?? []).map((b) => String(b.id)),
-            department_ids: (initialData?.departments ?? []).map((d) => String(d.id)),
-            position_ids: (initialData?.positions ?? []).map((p) => String(p.id)),
+            department_id: initialData?.department?.id ? String(initialData.department.id) : "",
+            position_id: initialData?.position?.id ? String(initialData.position.id) : "",
         },
     });
 
     const onSubmit = (values: EmployeeAssignmentsFormValues) => {
         startTransition(async () => {
-            const [branchesRes, departmentsRes, positionsRes] = await Promise.all([
-                assignUserBranches(employeeId, { branch_ids: values.branch_ids }),
-                assignUserDepartments(employeeId, { department_ids: values.department_ids }),
-                assignUserPositions(employeeId, { position_ids: values.position_ids }),
-            ]);
+            const res = await updateUserAssignments(employeeId, {
+                branch_ids: values.branch_ids,
+                department_id: values.department_id || null,
+                position_id: values.position_id || null,
+            });
 
-            const failed = [branchesRes, departmentsRes, positionsRes].find((r) => !r.success);
-            if (failed && !failed.success) {
-                toast.error(failed.error);
+            if (!res.success) {
+                toast.error(res.error);
                 return;
             }
 
-            toast.success(t("success"));
+            toast.success(res.message || t("success"));
         });
     };
 
@@ -83,10 +90,10 @@ export default function EmployeeAssignmentsForm({ employeeId, initialData }: Emp
                             <Field>
                                 <FieldLabel>{t("attributes.departments")}</FieldLabel>
                                 <FieldContent>
-                                    <MultiSelectDepartment
+                                    <SelectDepartment
                                         control={control}
-                                        name="department_ids"
-                                        initialDepartments={initialData?.departments ?? []}
+                                        name="department_id"
+                                        initialDepartment={toOption<DepartmentResource>(initialData?.department)}
                                     />
                                 </FieldContent>
                             </Field>
@@ -94,10 +101,10 @@ export default function EmployeeAssignmentsForm({ employeeId, initialData }: Emp
                             <Field className="md:col-span-2">
                                 <FieldLabel>{t("attributes.positions")}</FieldLabel>
                                 <FieldContent>
-                                    <MultiSelectPosition
+                                    <SelectPosition
                                         control={control}
-                                        name="position_ids"
-                                        initialPositions={initialData?.positions ?? []}
+                                        name="position_id"
+                                        initialPosition={toOption<PositionResource>(initialData?.position)}
                                     />
                                 </FieldContent>
                             </Field>

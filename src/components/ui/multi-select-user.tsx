@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/combobox"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { getTenantUsers, UserResource } from "@/actions/workspace/user.actions"
 import { Spinner } from "./spinner"
 import { useTranslations } from "next-intl"
@@ -33,6 +34,7 @@ export function MultiSelectUser<TFieldValues extends FieldValues>({
 }: MultiSelectUserProps<TFieldValues>) {
     const { ref, inView } = useInView()
     const t = useTranslations()
+    const [isSelectingAll, setIsSelectingAll] = React.useState(false)
 
     const {
         data,
@@ -107,6 +109,40 @@ export function MultiSelectUser<TFieldValues extends FieldValues>({
                     field.onChange(currentValues.filter((id) => id !== userIdStr))
                 }
 
+                const allSelected =
+                    allUsers.length > 0 &&
+                    !hasNextPage &&
+                    allUsers.every((u) => currentValues.includes(String(u.id)))
+
+                const toggleSelectAll = async () => {
+                    if (allSelected) {
+                        field.onChange([])
+                        return
+                    }
+
+                    setIsSelectingAll(true)
+                    try {
+                        // Pull the remaining pages so "select all" really means all users.
+                        let pages = data?.pages ?? []
+                        let more = hasNextPage
+                        while (more) {
+                            const result = await fetchNextPage()
+                            pages = result.data?.pages ?? pages
+                            more = !!result.hasNextPage
+                        }
+
+                        const ids = new Set(initialUsers.map((u) => String(u.id)))
+                        pages.forEach((page) => {
+                            if (page && page.success && Array.isArray(page.data.data)) {
+                                page.data.data.forEach((u: UserResource) => ids.add(String(u.id)))
+                            }
+                        })
+                        field.onChange(Array.from(ids))
+                    } finally {
+                        setIsSelectingAll(false)
+                    }
+                }
+
                 return (
                     <div className="space-y-2">
                         {selectedUsers.length > 0 && (
@@ -131,6 +167,18 @@ export function MultiSelectUser<TFieldValues extends FieldValues>({
                                 ))}
                             </div>
                         )}
+
+                        <label className="flex items-center gap-2 text-sm cursor-pointer w-fit">
+                            <Checkbox
+                                checked={allSelected}
+                                disabled={isSelectingAll || isLoading || isError || allUsers.length === 0}
+                                onCheckedChange={() => { void toggleSelectAll() }}
+                            />
+                            <span className="text-muted-foreground">
+                                {allSelected ? t("actions.clear_all") : t("actions.select_all")}
+                            </span>
+                            {isSelectingAll && <Spinner />}
+                        </label>
 
                         <Combobox
                             items={allUsers}

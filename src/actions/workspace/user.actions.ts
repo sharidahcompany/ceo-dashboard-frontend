@@ -4,8 +4,6 @@ import { randomBytes } from "crypto";
 import api from "@/lib/api";
 import { PaginationMeta } from "@/types/common.types";
 import type { BranchResource } from "@/actions/company-spirit/branch.actions";
-import type { DepartmentResource } from "@/actions/company-spirit/department.actions";
-import type { PositionResource } from "./positions.actions";
 
 export interface UserResource {
   id: string;
@@ -24,16 +22,15 @@ export interface UserResource {
   // present when the request is scoped to a tenant (X-Tenant header): this
   // user's role within that specific tenant (employee, owner, super-admin)
   tenant_role?: string | null;
-  // workspace-scoped: a user can belong to more than one branch/department
-  // and hold more than one position at the same time
+  // workspace-scoped: a user can be allowed into more than one branch, but
+  // holds exactly one department and one position (see department/position
+  // below).
   branches?: BranchResource[];
-  departments?: DepartmentResource[];
-  positions?: PositionResource[];
 
   // GET/PUT /workspace/users/{id} additionally return these — the Profile
-  // fields, flattened onto the user, plus the single department/position a
-  // User row is directly assigned to (distinct from the plural
-  // departments/positions pivots above, which EmployeeAssignmentsForm owns).
+  // fields, flattened onto the user, plus the department/position the User
+  // row is assigned to.
+  employee_id?: number | null;
   id_number?: string | null;
   address?: string | null;
   nationality?: string | null;
@@ -294,48 +291,24 @@ export async function getTenantUser(id: string | number): Promise<ActionResponse
   }
 }
 
-export interface AssignUserBranchesData {
-  branch_ids: (number | string)[];
+export interface UserAssignmentsData {
+  branch_ids?: (number | string)[];
+  department_id?: number | string | null;
+  position_id?: number | string | null;
 }
 
-export async function assignUserBranches(
+/**
+ * Saves the workspace assignments only (allowed branches + the single
+ * department/position the user row points at). Uses the dedicated
+ * PUT /workspace/users/{id}/assignments endpoint so the rest of the user
+ * record (username, email, phone, names) doesn't have to be resent.
+ */
+export async function updateUserAssignments(
   id: string | number,
-  data: AssignUserBranchesData,
+  data: UserAssignmentsData,
 ): Promise<ActionResponse<UserResource>> {
   try {
-    const response = await api.put(`/workspace/users/${id}/branches`, data);
-    return { success: true, data: response.data.data ?? response.data, message: response.data.message };
-  } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
-  }
-}
-
-export interface AssignUserDepartmentsData {
-  department_ids: (number | string)[];
-}
-
-export async function assignUserDepartments(
-  id: string | number,
-  data: AssignUserDepartmentsData,
-): Promise<ActionResponse<UserResource>> {
-  try {
-    const response = await api.put(`/workspace/users/${id}/departments`, data);
-    return { success: true, data: response.data.data ?? response.data, message: response.data.message };
-  } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
-  }
-}
-
-export interface AssignUserPositionsData {
-  position_ids: (number | string)[];
-}
-
-export async function assignUserPositions(
-  id: string | number,
-  data: AssignUserPositionsData,
-): Promise<ActionResponse<UserResource>> {
-  try {
-    const response = await api.put(`/workspace/users/${id}/positions`, data);
+    const response = await api.put(`/workspace/users/${id}/assignments`, data);
     return { success: true, data: response.data.data ?? response.data, message: response.data.message };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

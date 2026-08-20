@@ -5,6 +5,7 @@
   },
   "success": "Saved successfully!",
   "attributes": {
+    "invoice": "Invoice",
     "language": "Language",
     "not_set": "Not set",
     "candidate": "Candidate",
@@ -16,6 +17,7 @@
     "custom_fields": "Custom Fields",
     "field_name": "Field name",
     "field_value": "Value",
+    "employee_id": "Employee ID",
     "id_number": "ID Number",
     "address": "Address",
     "nationality": "Nationality",
@@ -71,6 +73,9 @@
     "description": "Description",
     "start_date": "Start Date",
     "end_date": "End Date",
+    "organization": "Organization",
+    "work": "Work",
+    "education": "Education",
     "text_alignment": "Text Alignment",
     "search": "Search",
     "navigate_to": "Navigate to...",
@@ -93,6 +98,9 @@
     "accepted": "Accepted",
     "rejected": "Rejected",
     "pending": "Pending",
+    "draft": "Draft",
+    "open": "Open",
+    "closed": "Closed",
     "full_name": "Full Name",
     "cv": "CV / Resume Link",
     "cover_letter": "Cover Letter",
@@ -171,7 +179,9 @@
     "hash": "Hash",
     "verification_code": "Verification Code",
     "decline_reason": "Reason for Declining",
-    "company": "Company"
+    "company": "Company",
+    "tenant": "Tenant",
+    "owner": "Owner"
   },
   "validation": {
     "required": "This field is required",
@@ -195,7 +205,8 @@
     "split_placeholder": "A field was broken apart by formatting. Select it fully, clear the formatting, and try again.",
     "no_signers": "Add at least one signer.",
     "signature_required": "A signature is required.",
-    "name_required": "Name is required."
+    "name_required": "Name is required.",
+    "duplicate_slug": "This slug is already used by another feature"
   },
   "buttons": {
     "previous": "Previous",
@@ -365,6 +376,8 @@
       "shifts_description": "Manage organization work shifts and assignments",
       "create_new_shift": "Create New Shift",
       "candidates_description": "Manage job applications received for open vacancies.",
+      "experience_description": "Work or education history",
+      "no_experiences": "No experience entries yet.",
       "create_new_candidate": "Add Candidate",
       "invite_employee": "Invite Employee",
       "invite_employee_description": "Send an invitation email so this person can set up their account and join your workspace.",
@@ -387,7 +400,8 @@
       "no_contracts": "No contracts have been issued to this employee yet."
     },
     "website": {
-      "orders_description": "View and manage orders placed through the website store."
+      "orders_description": "View and manage orders placed through the website store.",
+      "subscribers_description": "Tenants with an active subscription, and the owner of each."
     },
     "documents": {
       "description": "Documents created from a template, and where each one is in its signing flow.",
@@ -453,6 +467,11 @@
       "check_file": "Check a file you have",
       "file_match": "This file matches the document on record.",
       "file_mismatch": "This file does not match the document on record."
+    },
+    "saving": "Saving...",
+    "org_structure": {
+      "drag_to_change_parent": "Drag to change parent department",
+      "unnamed_department": "Unnamed department"
     }
   },
   "sections": {
@@ -477,7 +496,11 @@
     "slide_number": "Slide {number}",
     "feature_items": "Feature Cards",
     "feature_number": "Feature {number}",
-    "plans": "Plans"
+    "plans": "Plans",
+    "subscribers": "Subscribers",
+    "branches_map": "Branches Map",
+    "feature_slug_placeholder": "e.g. smart-attendance",
+    "contact_us": "Contact Us"
   },
   "common": {
     "preview": "Preview",
@@ -587,7 +610,11 @@
     "edit_document": "Edit Document",
     "document_details": "Document Details",
     "signature_assets": "Signatures & Stamps",
-    "create_signature_asset": "New Signature / Stamp"
+    "create_signature_asset": "New Signature / Stamp",
+    "tickets": "Tickets",
+    "subscribers": "Subscribers",
+    "verification": "Verification",
+    "verification_requests": "Verification Requests"
   },
   "profile": {
     "title": "Profile",
@@ -619,7 +646,9 @@
       "past_due": "Past Due",
       "canceled": "Canceled",
       "expired": "Expired"
-    }
+    },
+    "switch_tenant": "Switch Organization",
+    "add_tenant": "Add Organization"
   },
   "pages": {
     "description": "Manage website pages, configure custom slugs, and publish changes.",
@@ -663,6 +692,7 @@
       "name": "Plan Name",
       "slug": "Slug",
       "price": "Price",
+      "price_before_discount": "Price Before Discount",
       "currency": "Currency",
       "billing_period": "Billing Period",
       "billing_interval": "Billing Interval",
@@ -790,6 +820,8 @@
     "no_results": "No results found",
     "select": "Select",
     "select_user": "Select User",
+    "select_all": "Select all",
+    "clear_all": "Clear all",
     "select_department": "Select Department",
     "select_branch": "Select Branch",
     "actions": "Actions",
@@ -1155,7 +1187,8 @@
       "import": "Import",
       "export": "Export",
       "pay_run": "Process Pay Run",
-      "approve": "Approve"
+      "approve": "Approve",
+      "reply": "Reply"
     },
     "subjects": {
       "user": "Users",
@@ -1231,7 +1264,68 @@
       "page": "Pages",
       "section": "Sections",
       "setting": "Settings",
-      "social_media_link": "Social Media Links"
+      "social_media_link": "Social Media Links",
+      "ticket": "Ticket"
     }
+  },
+  "verification": {
+    "title": "Verification",
+    "description": "Submit your business documents to get your website verified.",
+    "requests_title": "Verification Requests",
+    "requests_description": "Review and approve tenant verification documents.",
+    "id_image": "ID Image",
+    "commercial_number": "Commercial Number",
+    "tax_number": "Tax Number",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "submitted": "Verification request submitted",
+    "tenant": "Tenant",
+    "view_image": "View",
+    "received": "Received",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Request approved",
+    "rejected": "Request rejected",
+    "rejection_reason": "Reason for rejection",
+    "empty": "No verification requests",
+    "empty_description": "New requests submitted by tenants will show up here.",
+    "badge_text": "Verified by CEO APP",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "tickets": {
+    "title": "Tickets",
+    "description": "Messages sent from your website visitors.",
+    "search_placeholder": "Search by subject, name or email",
+    "all": "All",
+    "open": "Open",
+    "in_progress": "In Progress",
+    "solved": "Solved",
+    "subject": "Subject",
+    "sender": "Sender",
+    "status": "Status",
+    "received": "Received",
+    "replies": "Replies",
+    "empty": "No tickets yet",
+    "empty_description": "Messages from your website contact form will appear here.",
+    "conversation": "Conversation",
+    "visitor_message": "Visitor message",
+    "reply_placeholder": "Write your reply to the visitor...",
+    "send_reply": "Send reply",
+    "reply_sent": "Reply sent and the ticket was marked as solved",
+    "mark_solved": "Mark as solved",
+    "marked_solved": "Ticket marked as solved",
+    "status_updated": "Status updated",
+    "open_task": "Open linked task",
+    "back": "Back to tickets",
+    "contact_details": "Contact details",
+    "phone": "Phone",
+    "email": "Email",
+    "no_replies": "No replies yet",
+    "delete_confirm": "Delete this ticket?",
+    "deleted": "Ticket deleted"
   }
 }

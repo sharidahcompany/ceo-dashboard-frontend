@@ -23,6 +23,17 @@ export interface JobApplicationResource {
     recommended_by?: number | null;
     status: string;
     status_label?: string;
+    // Profile-style data captured on the application itself, ahead of the
+    // candidate having a Profile row (Profile is only created on
+    // conversion). Copied straight through to the employee's Profile then.
+    id_number?: string | null;
+    address?: string | null;
+    nationality?: string | null;
+    date_of_birth?: string | null;
+    gender?: string | null;
+    marital_status?: string | null;
+    emergency_contact_name?: string | null;
+    emergency_contact_phone?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -37,6 +48,24 @@ export interface JobApplicationData {
     recommended_by?: string;
     status?: string;
     file?: File;
+    id_number?: string;
+    address?: string;
+    nationality?: string;
+    date_of_birth?: string;
+    gender?: string;
+    marital_status?: string;
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
+}
+
+export interface ExperienceEntry {
+    id?: number;
+    title: string;
+    organization: string;
+    description?: string;
+    start_date: string;
+    end_date?: string;
+    type: "work" | "education";
 }
 
 export async function getCandidates(query?: string): Promise<ActionResponse<{ data: JobApplicationResource[]; meta?: any }>> {
@@ -71,6 +100,14 @@ function toFormData(data: JobApplicationData): FormData {
     if (data.recommended_by) formData.append("recommended_by", data.recommended_by);
     if (data.status) formData.append("status", data.status);
     if (data.file) formData.append("file", data.file);
+    if (data.id_number) formData.append("id_number", data.id_number);
+    if (data.address) formData.append("address", data.address);
+    if (data.nationality) formData.append("nationality", data.nationality);
+    if (data.date_of_birth) formData.append("date_of_birth", data.date_of_birth);
+    if (data.gender) formData.append("gender", data.gender);
+    if (data.marital_status) formData.append("marital_status", data.marital_status);
+    if (data.emergency_contact_name) formData.append("emergency_contact_name", data.emergency_contact_name);
+    if (data.emergency_contact_phone) formData.append("emergency_contact_phone", data.emergency_contact_phone);
     return formData;
 }
 
@@ -134,4 +171,23 @@ export async function updateCandidateStatus(id: number | string, status: string)
     if (status === "accepted") return acceptCandidate(id);
     if (status === "rejected") return rejectCandidate(id);
     return updateCandidate(id, { status } as JobApplicationData);
+}
+
+// Batch-syncs a candidate's work/education history. Backend replaces the
+// existing rows for the submitted `type`s with this list (upsert-by-id, then
+// deletes anything not resubmitted) — always pass the full current list, not
+// a delta.
+export async function syncExperiences(
+    userId: string,
+    experiences: ExperienceEntry[]
+): Promise<ActionResponse<void>> {
+    try {
+        const response = await api.post("/workspace/experiences", {
+            user_id: userId,
+            experiences,
+        });
+        return { success: true, data: undefined as any, message: response.data.message };
+    } catch (error) {
+        return { success: false, error: getErrorMessage(error) };
+    }
 }

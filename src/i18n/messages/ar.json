@@ -5,6 +5,7 @@
   },
   "success": "تم الحفظ بنجاح!",
   "attributes": {
+    "invoice": "الفاتورة",
     "language": "اللغة",
     "not_set": "غير محدد",
     "candidate": "المرشح",
@@ -15,6 +16,7 @@
     "custom_fields": "حقول مخصصة",
     "field_name": "اسم الحقل",
     "field_value": "القيمة",
+    "employee_id": "رقم الموظف",
     "id_number": "رقم الهوية",
     "nationality": "الجنسية",
     "gender": "الجنس",
@@ -97,6 +99,9 @@
     "description": "الوصف",
     "start_date": "تاريخ البدء",
     "end_date": "تاريخ الانتهاء",
+    "organization": "الجهة",
+    "work": "عمل",
+    "education": "تعليم",
     "text_alignment": "محاذاة النص",
     "navigate_to": "الذهاب إلى...",
     "layout": "التخطيط / ترتيب العناصر",
@@ -137,6 +142,9 @@
     "late_minutes": "دقائق التأخير",
     "overtime_minutes": "دقائق الإضافي",
     "pending": "قيد الانتظار",
+    "draft": "مسودة",
+    "open": "مفتوح",
+    "closed": "مغلق",
     "present": "حاضر",
     "late": "متأخر",
     "absent": "غائب",
@@ -348,7 +356,9 @@
     "hash": "البصمة",
     "verification_code": "رمز التحقق",
     "decline_reason": "سبب الرفض",
-    "company": "الشركة"
+    "company": "الشركة",
+    "tenant": "المنشأة",
+    "owner": "المالك"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -378,7 +388,8 @@
     "split_placeholder": "تم تقسيم أحد الحقول بسبب التنسيق. حدده بالكامل وأزل التنسيق ثم أعد المحاولة.",
     "no_signers": "أضف موقّعًا واحدًا على الأقل.",
     "signature_required": "التوقيع مطلوب.",
-    "name_required": "الاسم مطلوب."
+    "name_required": "الاسم مطلوب.",
+    "duplicate_slug": "هذا الرابط مستخدم بالفعل في ميزة أخرى"
   },
   "buttons": {
     "previous": "السابق",
@@ -507,7 +518,9 @@
       "edit_department_description": "قم بإجراء التعديلات المطلوبة على بيانات هذا القسم ثم احفظ التغييرات.",
       "without_manager_now": "بدون مدير حالياً",
       "delete_success": "تم حذف القسم بنجاح",
-      "delete_multiple_success": "تم حذف الأقسام بنجاح"
+      "delete_multiple_success": "تم حذف الأقسام بنجاح",
+      "drag_to_change_parent": "اسحب لتغيير القسم الأب",
+      "unnamed_department": "قسم بدون اسم"
     },
     "hr": {
       "positions_description": "أدخل تفاصيل الوظيفة والمؤهلات المطلوبة لنشر الشاغر الوظيفي وبدء استقبال طلبات التوظيف",
@@ -537,6 +550,8 @@
       "create_new_scholarship": "إضافة منحة جديدة",
       "scholarship_requests_description": "عرض وإدارة طلبات المنح الدراسية المقدمة من الموظفين ومتابعة حالتها",
       "candidates_description": "إدارة طلبات التوظيف المقدمة على الوظائف الشاغرة",
+      "experience_description": "الخبرات العملية أو التعليمية",
+      "no_experiences": "لا توجد خبرات مضافة بعد.",
       "create_new_candidate": "إضافة متقدم",
       "invite_employee": "رسال دعوة انضمام للفريق",
       "invite_employee_description": "إرسال دعوة عبر البريد الإلكتروني لتمكين هذا الشخص من إعداد حسابه والانضمام إلى مساحة عملك.",
@@ -622,7 +637,8 @@
       "no_contracts": "لم يتم إصدار أي عقود لهذا الموظف بعد."
     },
     "website": {
-      "orders_description": "عرض وإدارة الطلبات الواردة من متجر الموقع الإلكتروني."
+      "orders_description": "عرض وإدارة الطلبات الواردة من متجر الموقع الإلكتروني.",
+      "subscribers_description": "المنشآت ذات الاشتراك الفعّال، ومالك كل منها."
     },
     "documents": {
       "description": "المستندات المنشأة من القوالب، وموضع كل منها في مسار التوقيع.",
@@ -688,7 +704,8 @@
       "check_file": "تحقق من ملف لديك",
       "file_match": "هذا الملف مطابق للمستند المسجل.",
       "file_mismatch": "هذا الملف لا يطابق المستند المسجل."
-    }
+    },
+    "saving": "جاري الحفظ..."
   },
   "sections": {
     "navbar": "شريط التنقل",
@@ -712,7 +729,11 @@
     "slide_number": "شريحة {number}",
     "feature_items": "بطاقات الميزات",
     "feature_number": "ميزة {number}",
-    "plans": "الباقات"
+    "plans": "الباقات",
+    "subscribers": "المشتركون",
+    "branches_map": "خريطة الفروع",
+    "feature_slug_placeholder": "مثال: smart-attendance",
+    "contact_us": "تواصل معنا"
   },
   "common": {
     "preview": "معاينة",
@@ -898,13 +919,19 @@
     "edit_document": "تعديل المستند",
     "document_details": "تفاصيل المستند",
     "signature_assets": "التوقيعات والأختام",
-    "create_signature_asset": "توقيع / ختم جديد"
+    "create_signature_asset": "توقيع / ختم جديد",
+    "tickets": "التذاكر",
+    "subscribers": "المشتركون",
+    "verification": "التحقق",
+    "verification_requests": "طلبات التحقق"
   },
   "actions": {
     "loading": "جاري التحميل",
     "no_results": "لم يتم العثور على نتائج",
     "select": "اختر",
     "select_user": "اختر المستخدم",
+    "select_all": "تحديد الكل",
+    "clear_all": "إلغاء تحديد الكل",
     "select_department": "اختر القسم",
     "select_branch": "اختر الفرع",
     "select_account": "اختر الحساب",
@@ -975,6 +1002,7 @@
       "name": "اسم الباقة / الخطة",
       "slug": "الرابط البديل (Slug)",
       "price": "السعر",
+      "price_before_discount": "السعر قبل الخصم",
       "currency": "العملة",
       "billing_period": "دورة الفوترة",
       "billing_interval": "فترة الفوترة",
@@ -1340,7 +1368,9 @@
       "past_due": "متأخر السداد",
       "canceled": "ملغى",
       "expired": "منتهي"
-    }
+    },
+    "switch_tenant": "تبديل المؤسسة",
+    "add_tenant": "إضافة مؤسسة"
   },
   "reports": {
     "title": "التقارير المالية",
@@ -1489,7 +1519,8 @@
       "import": "استيراد",
       "export": "تصدير",
       "pay_run": "تنفيذ دورة الرواتب",
-      "approve": "اعتماد"
+      "approve": "اعتماد",
+      "reply": "رد"
     },
     "subjects": {
       "user": "المستخدمون",
@@ -1565,7 +1596,68 @@
       "page": "الصفحات",
       "section": "الأقسام (الموقع)",
       "setting": "الإعدادات",
-      "social_media_link": "روابط التواصل الاجتماعي"
+      "social_media_link": "روابط التواصل الاجتماعي",
+      "ticket": "تذكرة"
     }
+  },
+  "verification": {
+    "title": "التحقق",
+    "description": "قم برفع مستندات نشاطك التجاري للحصول على توثيق موقعك.",
+    "requests_title": "طلبات التحقق",
+    "requests_description": "راجع ووافق على مستندات توثيق المستأجرين.",
+    "id_image": "صورة الهوية",
+    "commercial_number": "رقم السجل التجاري",
+    "tax_number": "الرقم الضريبي",
+    "submit": "إرسال",
+    "submitting": "جاري الإرسال...",
+    "submitted": "تم إرسال طلب التوثيق",
+    "tenant": "المستأجر",
+    "view_image": "عرض",
+    "received": "تاريخ الاستلام",
+    "approve": "قبول",
+    "reject": "رفض",
+    "approved": "تم قبول الطلب",
+    "rejected": "تم رفض الطلب",
+    "rejection_reason": "سبب الرفض",
+    "empty": "لا توجد طلبات توثيق",
+    "empty_description": "ستظهر هنا طلبات التوثيق المرسلة من المستأجرين.",
+    "badge_text": "تطبيق الرئيس",
+    "status": {
+      "pending": "قيد المراجعة",
+      "approved": "موثّق",
+      "rejected": "مرفوض"
+    }
+  },
+  "tickets": {
+    "title": "التذاكر",
+    "description": "الرسائل الواردة من زوار موقعك.",
+    "search_placeholder": "ابحث بالموضوع أو الاسم أو البريد",
+    "all": "الكل",
+    "open": "مفتوحة",
+    "in_progress": "قيد المعالجة",
+    "solved": "تم حلها",
+    "subject": "الموضوع",
+    "sender": "المُرسِل",
+    "status": "الحالة",
+    "received": "تاريخ الاستلام",
+    "replies": "الردود",
+    "empty": "لا توجد تذاكر",
+    "empty_description": "ستظهر هنا الرسائل الواردة من نموذج تواصل معنا في موقعك.",
+    "conversation": "المحادثة",
+    "visitor_message": "رسالة الزائر",
+    "reply_placeholder": "اكتب ردك على الزائر...",
+    "send_reply": "إرسال الرد",
+    "reply_sent": "تم إرسال الرد وتحديد التذكرة كمحلولة",
+    "mark_solved": "تحديد كمحلولة",
+    "marked_solved": "تم تحديد التذكرة كمحلولة",
+    "status_updated": "تم تحديث الحالة",
+    "open_task": "فتح المهمة المرتبطة",
+    "back": "العودة إلى التذاكر",
+    "contact_details": "بيانات التواصل",
+    "phone": "الهاتف",
+    "email": "البريد الإلكتروني",
+    "no_replies": "لا توجد ردود بعد",
+    "delete_confirm": "هل تريد حذف هذه التذكرة؟",
+    "deleted": "تم حذف التذكرة"
   }
 }

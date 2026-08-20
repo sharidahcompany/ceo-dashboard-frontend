@@ -48,6 +48,7 @@ const planSchema = z.object({
     is_active: z.boolean(),
     currency: z.string().min(1, "validation.required"),
     price: z.coerce.number().min(0),
+    price_before_discount: z.coerce.number().min(0).nullable().optional(),
     billing_period: z.coerce.number().min(1),
     billing_interval: z.enum(["day", "week", "month", "year"]),
     trial_days: z.coerce.number().min(0),
@@ -105,6 +106,7 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
             is_active: initialData?.is_active ?? true,
             currency: typeof initialData?.currency === "object" && initialData?.currency ? (initialData.currency as any).code : (initialData?.currency || "SAR"),
             price: initialData?.price || 0,
+            price_before_discount: initialData?.price_before_discount ?? null,
             billing_period: initialData?.billing_period || 1,
             billing_interval: initialData?.billing_interval || "month",
             trial_days: initialData?.trial_days || 0,
@@ -141,6 +143,8 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
                 is_active: data.is_active,
                 currency: data.currency,
                 price: data.is_free ? 0 : data.price,
+                price_before_discount:
+                    data.is_free || !data.price_before_discount ? null : data.price_before_discount,
                 billing_period: data.billing_period,
                 billing_interval: data.billing_interval,
                 trial_days: data.trial_days,
@@ -251,6 +255,18 @@ export default function PlanForm({ initialData, featuresList, currencies }: Plan
 
                                             />
                                             {errors.price && <FieldError>{t(errors.price.message as any)}</FieldError>}
+                                        </Field>
+
+                                        <Field>
+                                            <FieldLabel>
+                                                {t("plans.fields.price_before_discount", { defaultValue: "Price Before Discount" })}
+                                            </FieldLabel>
+                                            <NumericInput
+                                                {...register("price_before_discount")}
+                                            />
+                                            {errors.price_before_discount && (
+                                                <FieldError>{t(errors.price_before_discount.message as any)}</FieldError>
+                                            )}
                                         </Field>
 
                                         <Field>

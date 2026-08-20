@@ -12,6 +12,7 @@ export interface VacancyResource {
     description: string;
     start_date: string;
     end_date: string;
+    status: string;
     position?: PositionResource;
     created_at: string;
     updated_at: string;
@@ -23,6 +24,7 @@ export interface VacancyData {
     description: string;
     start_date: string;
     end_date: string;
+    status: string;
 }
 
 export async function getVacancies(query?: string): Promise<ActionResponse<{ data: VacancyResource[]; meta?: any }>> {

@@ -46,3 +46,13 @@ export function useIsOwnerOrSuperAdmin(): boolean {
   const tenantRole = useAppStore((state) => state.user?.tenant_role);
   return isExemptFromPermissionChecks(roles, tenantRole);
 }
+
+/**
+ * True only for the platform's super-admin. Tenant owners are excluded — use
+ * this for platform-level features (billing plans, subscribers) that a tenant
+ * owner must not see, and `useIsOwnerOrSuperAdmin` for tenant-level ones.
+ */
+export function useIsSuperAdmin(): boolean {
+  const roles = useAppStore((state) => state.roles);
+  return (roles ?? []).includes("super-admin");
+}

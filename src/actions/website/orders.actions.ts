@@ -4,7 +4,6 @@ import api from "@/lib/api";
 import { PaginationMeta } from "@/types/common.types";
 import { getErrorMessage } from "@/lib/utils";
 import { ActionResponse } from "@/actions/common/common.actions";
-import { revalidatePath } from "next/cache";
 
 // Matches App\Enums\OrderStatus in the finance-service backend
 export type OrderStatusValue = "PENDING" | "CONFIRMED" | "DELIVERED" | "CANCELLED";
@@ -31,6 +30,10 @@ export interface OrderResource {
     status: OrderStatusValue;
     order_number: string;
     customer_id: number;
+    // Set once the order is delivered: delivery raises the sales invoice and
+    // emails it to the customer.
+    invoice_id?: number | null;
+    invoice_number?: string | null;
     payment_method?: string | null;
     currency?: string | null;
     notes?: string | null;
@@ -85,7 +88,10 @@ export async function updateOrderStatus(
 ): Promise<ActionResponse<OrderResource>> {
     try {
         const response = await api.put<OrderApiResponse>(`/finance/orders/${id}`, { status });
-        revalidatePath("/[locale]/website/orders", "page");
+        // No revalidatePath: the orders page is a client component whose grid
+        // fetches through these actions itself. Revalidating would force a
+        // router refresh that the grid's own refetch then queues behind,
+        // leaving it stuck on its loading skeleton for the whole round trip.
         return { success: true, data: response.data.data, message: response.data.message };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };
@@ -95,7 +101,6 @@ export async function updateOrderStatus(
 export async function deleteOrders(ids: number[]): Promise<ActionResponse<void>> {
     try {
         const response = await api.delete<{ message?: string }>("/finance/orders", { data: { ids } });
-        revalidatePath("/[locale]/website/orders", "page");
         return { success: true, data: undefined, message: response.data.message };
     } catch (error) {
         return { success: false, error: getErrorMessage(error) };

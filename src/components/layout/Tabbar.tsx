@@ -5,12 +5,13 @@ import { usePathname, Link } from "@/i18n/navigation";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { useTranslations } from "next-intl";
 import DynamicIcon from "../common/DynamicIcon";
-import { useAbility } from "@/providers/AbilityProvider";
+import { useAbility, useIsSuperAdmin } from "@/providers/AbilityProvider";
 
 export default function Tabbar() {
   const pathname = usePathname();
   const t = useTranslations();
   const ability = useAbility();
+  const isSuperAdmin = useIsSuperAdmin();
 
   const cleanPath = pathname.replace(/^\/+|\/+$/g, "");
   const pathSegments = cleanPath.split("/").filter(Boolean);
@@ -49,7 +50,7 @@ export default function Tabbar() {
   if (!activeService || !activeService.children) return null;
 
   const activeTabChildren = activeService.children.filter((child) =>
-    isRouteVisible(child, ability),
+    isRouteVisible(child, ability, isSuperAdmin),
   );
   const basePath = activeService.path;
 

@@ -21,20 +21,19 @@ import {
     uploadSectionMedia,
     SectionResource,
 } from "@/actions/website/customiztion.actions";
+import { SECTION_TYPES, isFixedSectionType } from "./section-types";
 
-// Predefined Section Types matching Laravel Backend Enum
-const SECTION_TYPES = [
-    { value: "navbar", label: "Navbar" },
-    { value: "header", label: "Header" },
-    { value: "vision", label: "Vision" },
-    { value: "goals", label: "Goals" },
-    { value: "section", label: "Section" },
-    { value: "features", label: "Features" },
-    { value: "carousel", label: "Carousel" },
-    { value: "products", label: "Products" },
-    { value: "footer", label: "Footer" },
-    { value: "plans", label: "Plans" },
-];
+
+// Convert a free text value into a URL friendly slug
+const slugify = (value: string) =>
+    value
+        .toString()
+        .trim()
+        .toLowerCase()
+        .replace(/[\s_]+/g, "-")
+        .replace(/[^\p{L}\p{N}-]+/gu, "")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
 
 const sectionSchema = z.object({
     order: z.coerce.number().int().min(0, "validation.min_value"),
@@ -53,6 +52,7 @@ const sectionSchema = z.object({
     ]).optional(),
     items: z.array(z.object({
         title: z.string().optional(),
+        slug: z.string().optional(),
         description: z.string().optional(),
         caption: z.string().optional(),
         imageFile: z.any().optional(),
@@ -61,7 +61,24 @@ const sectionSchema = z.object({
     slides_per_view_tablet: z.coerce.number().optional(),
     slides_per_view_desktop: z.coerce.number().optional(),
 }).superRefine((data, ctx) => {
-    const isCustomRawJsonType = !["section", "carousel", "features", "header", "navbar", "products", "vision", "goals", "footer", "plans"].includes(data.type);
+    const isCustomRawJsonType = !["section", "carousel", "features", "header", "navbar", "products", "vision", "goals", "branches_map", "footer", "plans"].includes(data.type);
+
+    if (data.type === "features" && data.items) {
+        const seen = new Map<string, number>();
+        data.items.forEach((item, index) => {
+            const slug = (item.slug || item.title || "").trim().toLowerCase();
+            if (!slug) return;
+            if (seen.has(slug)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["items", index, "slug"],
+                    message: "validation.duplicate_slug",
+                });
+            } else {
+                seen.set(slug, index);
+            }
+        });
+    }
 
     if (isCustomRawJsonType) {
         if (!data.contentRaw) {
@@ -103,6 +120,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
             case "products":
             case "vision":
             case "goals":
+            case "branches_map":
             case "plans":
                 return {};
             case "carousel":
@@ -117,6 +135,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
         handleSubmit,
         control,
         setValue,
+        getValues,
         watch,
         formState: { errors },
     } = useForm<SectionFormValues>({
@@ -135,12 +154,13 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
             items: (initialData?.type === "carousel" || initialData?.type === "features") && Array.isArray(initialData.content?.items)
                 ? initialData.content.items.map((item: any) => ({
                     title: item.title ?? "",
+                    slug: item.slug ?? "",
                     description: item.description ?? "",
                     caption: item.caption ?? "",
                     imageUrl: item.image ?? "",
                     imageFile: undefined,
                 }))
-                : [{ title: "", description: "", caption: "", imageUrl: "", imageFile: undefined }],
+                : [{ title: "", slug: "", description: "", caption: "", imageUrl: "", imageFile: undefined }],
         },
     });
 
@@ -184,7 +204,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
 
             // 2. Construct final payload
             let parsedContent: any;
-            const isFixedType = ["navbar", "products", "vision", "goals", "footer", "plans"].includes(data.type);
+            const isFixedType = isFixedSectionType(data.type);
             if (isFixedType) {
                 parsedContent = [];
             } else if (data.type === "section" || data.type === "header") {
@@ -224,6 +244,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
                         } else {
                             updatedItems.push({
                                 title: item.title || "",
+                                slug: slugify(item.slug || item.title || ""),
                                 description: item.description || "",
                                 image: itemImageUrl,
                             });
@@ -366,7 +387,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
                                 </>
                             )}
                         </>
-                    ) : ["navbar", "products", "vision", "goals", "footer", "plans"].includes(selectedType) ? (
+                    ) : ["navbar", "products", "vision", "goals", "branches_map", "footer", "plans"].includes(selectedType) ? (
                         <div className="p-4 bg-muted/50 rounded-lg text-sm text-muted-foreground text-center border border-dashed">
                             {t("messages.fixed_section_no_config", { defaultValue: "This is a fixed layout section. No configuration is required." })}
                         </div>
@@ -509,7 +530,7 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => append({ title: "", description: "", imageUrl: "", imageFile: undefined })}
+                                        onClick={() => append({ title: "", slug: "", description: "", imageUrl: "", imageFile: undefined })}
                                     >
                                         + {t("buttons.add_feature", { defaultValue: "Add Feature" })}
                                     </Button>
@@ -537,10 +558,35 @@ export default function SectionForm({ initialData, onSuccess }: SectionFormProps
                                             <Label>{t("attributes.title", { defaultValue: "Title" })}</Label>
                                             <Input
                                                 type="text"
-                                                {...register(`items.${index}.title` as any)}
+                                                {...register(`items.${index}.title` as any, {
+                                                    onBlur: (e) => {
+                                                        // Auto fill the slug from the title while the user hasn't set one
+                                                        if (!getValues(`items.${index}.slug` as any)) {
+                                                            setValue(`items.${index}.slug` as any, slugify(e.target.value));
+                                                        }
+                                                    },
+                                                })}
                                                 placeholder={t("attributes.title", { defaultValue: "Title" })}
                                                 className="mt-2"
                                             />
+                                        </Field>
+
+                                        {/* Feature Card Slug (used for its standalone landing page) */}
+                                        <Field>
+                                            <Label>{t("attributes.slug", { defaultValue: "Slug" })}</Label>
+                                            <Input
+                                                dir="ltr"
+                                                type="text"
+                                                {...register(`items.${index}.slug` as any)}
+                                                onBlur={(e) => setValue(`items.${index}.slug` as any, slugify(e.target.value))}
+                                                placeholder={t("sections.feature_slug_placeholder", { defaultValue: "e.g. smart-attendance" })}
+                                                className="mt-2 font-mono text-xs"
+                                            />
+                                            {(errors.items as any)?.[index]?.slug && (
+                                                <FieldError>
+                                                    {t((errors.items as any)[index].slug.message as string, { defaultValue: "Invalid slug" })}
+                                                </FieldError>
+                                            )}
                                         </Field>
 
                                         {/* Feature Card Description */}

@@ -6,6 +6,7 @@ import { ActionResponse } from "@/actions/common/common.actions";
 import { getAuthenticatedUser } from "@/actions/workspace/user.actions";
 import { PlanResource } from "@/actions/website/plans.actions";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 export interface OrganizationResource {
   id: string;
@@ -24,6 +25,7 @@ export interface OrganizationResource {
   country?: string;
   currency?: string;
   is_vat_registered?: boolean;
+  is_verified?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -45,9 +47,85 @@ export interface SubscriptionResource {
  * authenticated user's tenant has to be resolved first via /auth/me.
  */
 async function getCurrentTenantId(): Promise<string | null> {
+  // A user can belong to several tenants; the one they switched to is kept in
+  // the "tenant" cookie (also what api.ts sends as X-Tenant), so it wins over
+  // the first membership returned by /auth/me.
+  const cookieTenant = (await cookies()).get("tenant")?.value;
+  if (cookieTenant) return cookieTenant;
+
   const userRes = await getAuthenticatedUser();
   const tenantId = userRes.success ? userRes.data.tenants?.[0]?.id : undefined;
   return tenantId ? String(tenantId) : null;
+}
+
+export interface TenantSummary {
+  id: string;
+  name: string;
+  logo_url?: string | null;
+}
+
+function tenantName(tenant: Record<string, any>): string {
+  const name = tenant.name_localized ?? tenant.name;
+  if (typeof name === "string") return name;
+  return name?.ar || name?.en || "";
+}
+
+/**
+ * The tenants the authenticated user is a member of, used by the sidebar
+ * tenant switcher. Returns an empty list rather than an error when /auth/me
+ * fails so the sidebar can simply hide the switcher.
+ */
+export async function getUserTenants(): Promise<ActionResponse<TenantSummary[]>> {
+  const userRes = await getAuthenticatedUser();
+  if (!userRes.success) return { success: false, error: userRes.error };
+
+  const tenants = (userRes.data.tenants ?? []).map((tenant) => ({
+    id: String(tenant.id),
+    name: tenantName(tenant),
+    logo_url: tenant.logo_url ?? null,
+  }));
+
+  return { success: true, data: tenants };
+}
+
+/**
+ * The tenant every request is currently scoped to.
+ */
+export async function getActiveTenantId(): Promise<string | null> {
+  return getCurrentTenantId();
+}
+
+/**
+ * Switch the active tenant by rewriting the "tenant" cookie that api.ts turns
+ * into the X-Tenant header. Every cached page/query is tenant-scoped, so the
+ * whole router cache is invalidated afterwards.
+ */
+export async function switchTenant(
+  tenantId: string,
+): Promise<ActionResponse<void>> {
+  try {
+    const userRes = await getAuthenticatedUser();
+    if (!userRes.success) return { success: false, error: userRes.error };
+
+    const isMember = (userRes.data.tenants ?? []).some(
+      (tenant) => String(tenant.id) === String(tenantId),
+    );
+    if (!isMember) {
+      return {
+        success: false,
+        error: getErrorMessage(undefined, "You don't belong to this tenant."),
+      };
+    }
+
+    (await cookies()).set("tenant", String(tenantId), {
+      path: "/",
+      sameSite: "lax",
+    });
+    revalidatePath("/", "layout");
+    return { success: true, data: undefined };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
 }
 
 /**

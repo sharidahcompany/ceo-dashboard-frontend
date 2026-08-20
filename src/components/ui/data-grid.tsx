@@ -84,6 +84,12 @@ export interface DataGridProps<TData, TValue> {
 
     fetchAction: (query: string) => Promise<ActionResponse<{ data: TData[]; meta?: any }>>;
 
+    /**
+     * Change this to re-run fetchAction. Unlike remounting the grid with a
+     * `key`, this keeps page, filters and selection intact.
+     */
+    refreshKey?: number | string;
+
     viewMode?: "table" | "grid";
 
     // Table Mode
@@ -129,6 +135,7 @@ export function DataGrid<TData, TValue>({
     title,
     description,
     fetchAction,
+    refreshKey,
     viewMode = "table",
     columns,
     renderCard,
@@ -272,7 +279,7 @@ export function DataGrid<TData, TValue>({
         } finally {
             if (fetchId === fetchIdRef.current) setIsLoading(false);
         }
-    }, [pageIndex, pageSize, sorting, activeFilter, debouncedSearch, t]);
+    }, [pageIndex, pageSize, sorting, activeFilter, debouncedSearch, refreshKey, t]);
 
     useEffect(() => {
         fetchData();

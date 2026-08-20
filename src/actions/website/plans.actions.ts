@@ -32,6 +32,7 @@ export interface PlanResource {
     is_active: boolean;
     currency: string;
     price: number;
+    price_before_discount?: number | null;
     billing_period: number;
     billing_interval: "day" | "week" | "month" | "year";
     trial_days: number;
@@ -50,6 +51,7 @@ export interface PlanFormData {
     is_active: boolean;
     currency: string;
     price: number;
+    price_before_discount?: number | null;
     billing_period: number;
     billing_interval: "day" | "week" | "month" | "year";
     trial_days: number;

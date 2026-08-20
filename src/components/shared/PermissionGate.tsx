@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { ShieldAlert } from "lucide-react";
-import { useCan } from "@/providers/AbilityProvider";
+import { useCan, useIsSuperAdmin } from "@/providers/AbilityProvider";
 import {
   Empty,
   EmptyDescription,
@@ -14,13 +14,25 @@ import {
 
 export function PermissionGate({
   permission,
+  superAdminOnly = false,
   children,
 }: {
-  permission: string;
+  /** Backend permission string. Omit when gating on `superAdminOnly` alone. */
+  permission?: string;
+  /** Platform-level content: super-admin only, tenant owners excluded. */
+  superAdminOnly?: boolean;
   children: React.ReactNode;
 }) {
   const t = useTranslations();
-  const allowed = useCan(permission);
+  // Hooks can't be called conditionally, so both checks always run and the
+  // unused one is ignored.
+  const can = useCan(permission ?? "");
+  const isSuperAdmin = useIsSuperAdmin();
+  const allowed = superAdminOnly
+    ? isSuperAdmin
+    : permission
+      ? can
+      : true;
 
   if (!allowed) {
     return (

@@ -107,6 +107,11 @@ export default function EmployeesPage() {
   const columns = useMemo<ColumnDef<UserResource>[]>(
     () => [
       {
+        accessorKey: "employee_id",
+        header: t("attributes.employee_id") || "Employee ID",
+        cell: ({ row }) => row.original.employee_id ?? "-",
+      },
+      {
         accessorKey: "full_name",
         header: t("attributes.name") || "Name",
         cell: ({ row }) => {

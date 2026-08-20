@@ -19,6 +19,15 @@ export interface ConversionPreview {
     position_id: number | null;
     hire_date: string | null;
     gross_salary: string | null;
+    full_name?: string | null;
+    id_number?: string | null;
+    address?: string | null;
+    nationality?: string | null;
+    date_of_birth?: string | null;
+    gender?: string | null;
+    marital_status?: string | null;
+    emergency_contact_name?: string | null;
+    emergency_contact_phone?: string | null;
     interviews: Array<{
         id: number;
         scheduled_at: string | null;
@@ -41,6 +50,11 @@ export interface ConvertToEmployeeData {
     full_name?: string;
     address?: string;
     nationality?: string;
+    date_of_birth?: string;
+    gender?: string;
+    marital_status?: string;
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
     custom_fields?: Record<string, string>;
 }
 

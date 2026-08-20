@@ -7,6 +7,7 @@ import { GripVertical, Trash2, Edit } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { SectionResource } from "@/actions/website/customiztion.actions";
 import { Button } from "@/components/ui/button";
+import { isFixedSectionType } from "./section-types";
 
 interface SortableSectionItemProps {
     section: SectionResource;
@@ -35,7 +36,7 @@ export function SortableSectionItem({ section, onEdit, onDelete }: SortableSecti
     const displayName = section.type_localized || t("sections." + section.type, { defaultValue: section.type.charAt(0).toUpperCase() + section.type.slice(1) });
     
     // Fixed sections that have no customization
-    const isFixed = ["products", "navbar", "footer", "vision", "goals"].includes(section.type);
+    const isFixed = isFixedSectionType(section.type);
 
     return (
         <div

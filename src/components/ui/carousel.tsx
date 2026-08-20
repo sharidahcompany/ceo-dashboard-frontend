@@ -6,6 +6,7 @@ import useEmblaCarousel, {
 } from "embla-carousel-react"
 
 import { cn } from "@/lib/utils"
+import { useDirection } from "@/components/ui/direction"
 import { Button } from "@/components/ui/button"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
@@ -51,9 +52,17 @@ function Carousel({
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
+  // Embla does not infer direction from CSS: in an RTL document it still lays
+  // the track out left-to-right, so slides land off-viewport (blank pages that
+  // fill in only after several clicks). The styling here is already logical
+  // (-ms-4 / -start-12), so read the app's direction and tell Embla too.
+  // An explicit opts.direction still wins.
+  const direction = useDirection()
+
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
+      direction: opts?.direction ?? direction,
       axis: orientation === "horizontal" ? "x" : "y",
     },
     plugins

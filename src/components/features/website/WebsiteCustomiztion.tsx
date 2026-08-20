@@ -18,7 +18,16 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useTranslations } from "next-intl";
-import { Monitor, Smartphone, Tablet, Plus, Save, Menu } from "lucide-react";
+import {
+  Monitor,
+  Smartphone,
+  Tablet,
+  Plus,
+  Save,
+  Menu,
+  MapPin,
+  BadgeCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -47,6 +56,8 @@ import {
 } from "@/actions/website/customiztion.actions";
 import SectionForm from "./SectionForm";
 import { SortableSectionItem } from "./SortableSectionItem";
+import { SECTION_TYPES, isFixedSectionType } from "./section-types";
+import { getCurrentOrganization } from "@/actions/workspace/organization.actions";
 
 type PreviewMode = "desktop" | "tablet" | "mobile";
 
@@ -55,16 +66,17 @@ export default function WebsiteCustomization() {
   const roles = useAppStore((state) => state.roles || []);
   const isSuperAdmin = roles.includes("super-admin");
 
-  const fixedSections = [
-    { type: "navbar", label: "Navbar" },
-    { type: "products", label: "Products" },
-    { type: "vision", label: "Vision" },
-    { type: "goals", label: "Goals" },
-    { type: "footer", label: "Footer" },
-    ...(isSuperAdmin ? [{ type: "plans", label: "Plans" }] : []),
-  ];
+  // Plans and Subscribers are platform-level sections (they render the
+  // platform's billing plans and subscribed tenants, not this tenant's own
+  // data), so only super admins may add them.
+  const PLATFORM_SECTIONS = ["plans", "subscribers"];
+  const fixedSections = SECTION_TYPES
+    .filter(({ value }) => isFixedSectionType(value))
+    .filter(({ value }) => !PLATFORM_SECTIONS.includes(value) || isSuperAdmin)
+    .map(({ value, label }) => ({ type: value, label }));
 
   const [sections, setSections] = useState<SectionResource[]>([]);
+  const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("desktop");
   const [isPending, startTransition] = useTransition();
@@ -97,8 +109,46 @@ export default function WebsiteCustomization() {
     setIsLoading(false);
   };
 
+  // Initial fetch. Kept out of `loadSections` so no state is set synchronously
+  // in the effect body (which the React compiler flags as a cascading render);
+  // `isLoading` already starts as true.
   useEffect(() => {
-    loadSections();
+    let cancelled = false;
+
+    (async () => {
+      const result = await getSections();
+      if (cancelled) return;
+
+      if (result.success) {
+        // Sort by order ascending
+        const sorted = result.data.data.sort(
+          (a, b) => (a.order || 0) - (b.order || 0),
+        );
+        setSections(sorted);
+      } else {
+        toast.error(result.error);
+      }
+      setIsLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const result = await getCurrentOrganization();
+      if (!cancelled && result.success) {
+        setIsVerified(!!result.data.is_verified);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -462,9 +512,19 @@ export default function WebsiteCustomization() {
                           </p>
                         </div>
                       </div>
-                      <div className="border-t mt-6 pt-4 text-center text-xs text-muted-foreground">
-                        &copy; {new Date().getFullYear()} CEO App. All rights
-                        reserved.
+                      <div className="border-t mt-6 pt-4 flex flex-col items-center gap-2 text-center text-xs text-muted-foreground">
+                        {isVerified && (
+                          <span className="flex items-center gap-1.5 font-medium text-primary">
+                            <BadgeCheck className="w-4 h-4" />
+                            {t("verification.badge_text", {
+                              defaultValue: "Verified by CEO APP",
+                            })}
+                          </span>
+                        )}
+                        <span>
+                          &copy; {new Date().getFullYear()} CEO App. All rights
+                          reserved.
+                        </span>
                       </div>
                     </div>
                   );
@@ -548,6 +608,171 @@ export default function WebsiteCustomization() {
                             </p>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (section.type === "branches_map") {
+                  const mockBranches = [
+                    { name: "Head Office", city: "Riyadh", top: "38%", left: "46%" },
+                    { name: "Jeddah Branch", city: "Jeddah", top: "62%", left: "22%" },
+                    { name: "Dammam Branch", city: "Dammam", top: "28%", left: "72%" },
+                  ];
+
+                  let branchesGridClass = "grid-cols-1 md:grid-cols-3";
+                  if (previewMode === "mobile") {
+                    branchesGridClass = "grid-cols-1";
+                  } else if (previewMode === "tablet") {
+                    branchesGridClass = "grid-cols-2";
+                  }
+
+                  return (
+                    <div
+                      key={section.id}
+                      className="w-full py-16 px-8 bg-background border-b relative group"
+                    >
+                      <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 pointer-events-none transition-colors z-10" />
+                      <div className="max-w-5xl mx-auto text-center mb-8">
+                        <span className="text-xs font-bold uppercase tracking-wider text-primary mb-2 block">
+                          {t("sections.branches_map", {
+                            defaultValue: "Branches Map",
+                          })}
+                        </span>
+                        <h3 className="text-3xl font-black">Where To Find Us</h3>
+                      </div>
+
+                      <div className="max-w-5xl mx-auto">
+                        <div className="relative w-full aspect-[16/8] rounded-xl border overflow-hidden bg-muted/40">
+                          {/* Mock map grid */}
+                          <div
+                            className="absolute inset-0 opacity-60"
+                            style={{
+                              backgroundImage:
+                                "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+                              backgroundSize: "40px 40px",
+                            }}
+                          />
+                          {mockBranches.map((branch, idx) => (
+                            <div
+                              key={idx}
+                              className="absolute -translate-x-1/2 -translate-y-full flex flex-col items-center"
+                              style={{ top: branch.top, left: branch.left }}
+                            >
+                              <span className="text-[10px] font-semibold bg-card border rounded-full px-2 py-0.5 mb-1 shadow-xs whitespace-nowrap">
+                                {branch.name}
+                              </span>
+                              <MapPin className="w-6 h-6 text-primary fill-primary/20" />
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className={`grid ${branchesGridClass} gap-4 mt-6`}>
+                          {mockBranches.map((branch, idx) => (
+                            <div
+                              key={idx}
+                              className="p-4 rounded-lg border bg-card flex items-start gap-3"
+                            >
+                              <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                              <div>
+                                <h4 className="font-semibold text-sm">
+                                  {branch.name}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">
+                                  {branch.city}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (section.type === "team") {
+                  const mockLeader = {
+                    name: "Khalid Al-Otaibi",
+                    position: "Founder & Chief Executive Officer",
+                    initials: "KA",
+                  };
+                  const mockTeam = [
+                    { name: "Sara Al-Harbi", position: "Head of Operations", initials: "SA" },
+                    { name: "Omar Nasser", position: "Sales Manager", initials: "ON" },
+                    { name: "Layla Ibrahim", position: "Product Designer", initials: "LI" },
+                    { name: "Faisal Al-Qahtani", position: "Software Engineer", initials: "FA" },
+                    { name: "Nora Saeed", position: "HR Specialist", initials: "NS" },
+                    { name: "Yousef Mansour", position: "Accountant", initials: "YM" },
+                  ];
+
+                  // Mirrors Team.tsx on the landing page, whose slides are
+                  // basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 — the
+                  // preview widths land on the full / md / lg tiers.
+                  let memberBasisClass = "basis-full";
+                  if (previewMode === "tablet") {
+                    memberBasisClass = "basis-1/3";
+                  } else if (previewMode === "desktop") {
+                    memberBasisClass = "basis-1/4";
+                  }
+
+                  return (
+                    <div
+                      key={section.id}
+                      className="w-full py-16 px-8 bg-background border-b relative group"
+                    >
+                      <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary/20 pointer-events-none transition-colors z-10" />
+                      <div className="max-w-5xl mx-auto text-center mb-10">
+                        <span className="text-xs font-bold uppercase tracking-wider text-primary mb-2 block">
+                          {t("sections.team", { defaultValue: "Our Team" })}
+                        </span>
+                        <h3 className="text-3xl font-black">
+                          The People Behind The Work
+                        </h3>
+                      </div>
+
+                      {/* Owner / Super Admin highlighted above the team */}
+                      <div className="flex justify-center mb-10">
+                        <div className="flex flex-col items-center text-center p-6 rounded-2xl border bg-card shadow-sm max-w-sm w-full">
+                          <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-black mb-4 ring-4 ring-primary/20">
+                            {mockLeader.initials}
+                          </div>
+                          <h4 className="font-bold text-lg">
+                            {mockLeader.name}
+                          </h4>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {mockLeader.position}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Employees carousel */}
+                      <div className="max-w-5xl mx-auto px-12">
+                        <Carousel className="w-full">
+                          <CarouselContent>
+                            {mockTeam.map((member, idx) => (
+                              <CarouselItem
+                                key={idx}
+                                className={memberBasisClass}
+                              >
+                                <div className="p-1">
+                                  <div className="flex flex-col items-center text-center p-5 rounded-xl border bg-card shadow-xs h-full">
+                                    <div className="w-16 h-16 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-base font-bold mb-3">
+                                      {member.initials}
+                                    </div>
+                                    <h4 className="font-semibold text-sm">
+                                      {member.name}
+                                    </h4>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {member.position}
+                                    </p>
+                                  </div>
+                                </div>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
                       </div>
                     </div>
                   );

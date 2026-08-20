@@ -247,9 +247,16 @@ export default function PlansList({ initialPlans, initialFeatures }: PlansListPr
                                                             {t("plans.free_badge", { defaultValue: "Free" })}
                                                         </Badge>
                                                     ) : (
-                                                        <span className="font-extrabold text-lg text-primary">
-                                                            {plan.price} {typeof plan.currency === "object" && plan.currency ? (plan.currency as any).symbol || (plan.currency as any).code : plan.currency}
-                                                        </span>
+                                                        <div className="flex items-baseline gap-2">
+                                                            {plan.price_before_discount != null && plan.price_before_discount > plan.price && (
+                                                                <span className="text-xs text-muted-foreground line-through">
+                                                                    {plan.price_before_discount} {typeof plan.currency === "object" && plan.currency ? (plan.currency as any).symbol || (plan.currency as any).code : plan.currency}
+                                                                </span>
+                                                            )}
+                                                            <span className="font-extrabold text-lg text-primary">
+                                                                {plan.price} {typeof plan.currency === "object" && plan.currency ? (plan.currency as any).symbol || (plan.currency as any).code : plan.currency}
+                                                            </span>
+                                                        </div>
                                                     )}
                                                     <span className="text-xs text-muted-foreground">
                                                         {plan.billing_period} {t(`plans.interval.${plan.billing_interval}`, { defaultValue: plan.billing_interval })}

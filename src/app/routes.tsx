@@ -10,6 +10,10 @@ export interface Route {
   // tab. Omit for routes with no matching backend resource yet, or that
   // should always be visible (e.g. home). super-admin/owner bypass this.
   permission?: string;
+  // Platform-level tab: visible to the platform's super-admin only. Unlike
+  // `permission`, tenant owners do NOT get this — they bypass permission
+  // checks but are not platform admins.
+  superAdminOnly?: boolean;
 }
 export const routes: Route[] = [
   {
@@ -838,7 +842,31 @@ export const routes: Route[] = [
         icon: "Package",
         permission: "website.setting.view",
       },
+      {
+        path: "subscribers",
+        title: "routes.subscribers",
+        icon: "Users",
+        superAdminOnly: true,
+      },
+      {
+        path: "verification",
+        title: "routes.verification",
+        icon: "BadgeCheck",
+        permission: "website.setting.view",
+      },
+      {
+        path: "verification-requests",
+        title: "routes.verification_requests",
+        icon: "ShieldCheck",
+        superAdminOnly: true,
+      },
     ],
+  },
+  {
+    path: "/tickets",
+    title: "routes.tickets",
+    icon: "MessageSquare",
+    permission: "workspace.ticket.view",
   },
   {
     path: "/auditor",
@@ -879,10 +907,17 @@ export const routes: Route[] = [
  * visible. Routes with neither a permission nor children (e.g. home) stay
  * visible by default.
  */
-export function isRouteVisible(route: Route, ability: AppAbility): boolean {
+export function isRouteVisible(
+  route: Route,
+  ability: AppAbility,
+  isSuperAdmin = false,
+): boolean {
+  if (route.superAdminOnly && !isSuperAdmin) return false;
   if (route.permission) return hasPermission(ability, route.permission);
   if (route.children && route.children.length > 0) {
-    return route.children.some((child) => isRouteVisible(child, ability));
+    return route.children.some((child) =>
+      isRouteVisible(child, ability, isSuperAdmin),
+    );
   }
   return true;
 }

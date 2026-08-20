@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataGrid } from "@/components/ui/data-grid";
@@ -30,6 +30,9 @@ function getCustomerName(customer: OrderResource["customer"]): string {
 export default function OrdersPage() {
     const t = useTranslations();
     const locale = useLocale();
+    // Marking an order delivered creates its invoice server-side, so the grid
+    // has to be re-read to pick the invoice number up.
+    const [reloadKey, setReloadKey] = useState(0);
 
     const statusOptions = useMemo(
         () =>
@@ -77,6 +80,11 @@ export default function OrdersPage() {
                 },
             },
             {
+                accessorKey: "invoice_number",
+                header: t("attributes.invoice"),
+                cell: ({ row }) => row.original.invoice_number || "-",
+            },
+            {
                 accessorKey: "status",
                 header: t("attributes.status"),
                 cell: ({ row }) => {
@@ -93,7 +101,13 @@ export default function OrdersPage() {
                         <EditableStatusSelect
                             value={status ?? ""}
                             options={options}
-                            onChange={(newValue) => updateOrderStatus(row.original.id, newValue as OrderStatusValue)}
+                            onChange={async (newValue) => {
+                                const res = await updateOrderStatus(row.original.id, newValue as OrderStatusValue);
+                                if (res.success && newValue === "DELIVERED") {
+                                    setReloadKey((key) => key + 1);
+                                }
+                                return res;
+                            }}
                         />
                     );
                 },
@@ -112,6 +126,7 @@ export default function OrdersPage() {
             <Card>
                 <CardContent>
                     <DataGrid<OrderResource, any>
+                        refreshKey={reloadKey}
                         title={t("routes.orders")}
                         description={t("messages.website.orders_description")}
                         fetchAction={getOrders}

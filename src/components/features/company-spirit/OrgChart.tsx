@@ -3,10 +3,12 @@
 import React, { memo } from 'react';
 import {
     ReactFlow,
+    ReactFlowProvider,
     Controls,
     Background,
     useNodesState,
     useEdgesState,
+    useReactFlow,
     Handle,
     Position,
     Node,
@@ -16,16 +18,25 @@ import {
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 import { Card, CardContent } from '@/components/ui/card';
-import { DepartmentResource } from '@/actions/company-spirit/department.actions';
+import { DepartmentResource, updateDepartment } from '@/actions/company-spirit/department.actions';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, GripVertical, Trash } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import DepartmentForm from './DepartmentForm';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FieldSeparator } from '@/components/ui/field';
 
-export type DepartmentNodeType = Node<DepartmentResource, 'department'>;
+type DepartmentNodeData = DepartmentResource & {
+    isDropTarget?: boolean;
+    isInvalidDropTarget?: boolean;
+};
+
+export type DepartmentNodeType = Node<DepartmentNodeData, 'department'>;
+
+const DRAG_HANDLE_CLASS = 'org-node-drag-handle';
 
 // -------------------------------------------------------------
 // 1. Custom Node Component
@@ -51,7 +62,25 @@ const DepartmentNode = memo(({ data }: NodeProps<DepartmentNodeType>) => {
 
     return (
         <React.Fragment>
-            <Card className="w-[260px] relative overflow-visible  " dir={dir}>
+            <Card
+                className={`group w-[260px] relative overflow-visible transition-colors ${data.isDropTarget
+                    ? 'ring-2 ring-primary border-primary'
+                    : data.isInvalidDropTarget
+                        ? 'ring-2 ring-destructive border-destructive'
+                        : ''
+                    }`}
+                dir={dir}
+            >
+                {/* Drag handle (shown on hover) */}
+                <div
+                    className={`${DRAG_HANDLE_CLASS} absolute -top-2 ${dir === 'rtl' ? '-right-2' : '-left-2'} z-10 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing rounded-md border border-border bg-background shadow-sm p-1`}
+                    title={t('messages.org_structure.drag_to_change_parent', {
+                        defaultValue: 'اسحب لتغيير القسم الأب',
+                    })}
+                >
+                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
+                </div>
+
                 {/* Point Top */}
                 <Handle
                     type="target"
@@ -196,6 +225,7 @@ const transformDepartmentsToFlow = (departments: DepartmentResource[] = []) => {
                 type: 'department',
                 data: dept,
                 position: { x: 0, y: 0 },
+                dragHandle: `.${DRAG_HANDLE_CLASS}`,
             });
         }
 
@@ -225,34 +255,155 @@ const transformDepartmentsToFlow = (departments: DepartmentResource[] = []) => {
 // -------------------------------------------------------------
 // 3. Main OrgChart Component
 // -------------------------------------------------------------
-export default function OrgChart({ departments = [] }: { departments?: DepartmentResource[] }) {
+function OrgChartFlow({ departments = [] }: { departments?: DepartmentResource[] }) {
+    const t = useTranslations();
+    const router = useRouter();
+    const { getIntersectingNodes } = useReactFlow();
+
     const { nodes: initialNodes, edges: initialEdges } = React.useMemo(() => {
         return transformDepartmentsToFlow(departments);
     }, [departments]);
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [isSaving, setIsSaving] = React.useState(false);
 
     React.useEffect(() => {
         setNodes(initialNodes);
         setEdges(initialEdges);
     }, [initialNodes, initialEdges, setNodes, setEdges]);
 
+    // كل الأبناء (المباشرين وغير المباشرين) لقسم معين — لمنع إسقاط القسم داخل أحد أبنائه
+    const getDescendantIds = React.useCallback(
+        (nodeId: string) => {
+            const descendants = new Set<string>();
+            const walk = (id: string) => {
+                edges.forEach((edge) => {
+                    if (edge.source === id && !descendants.has(edge.target)) {
+                        descendants.add(edge.target);
+                        walk(edge.target);
+                    }
+                });
+            };
+            walk(nodeId);
+            return descendants;
+        },
+        [edges]
+    );
+
+    // أقرب عقدة متقاطعة صالحة كأب جديد
+    const findDropTarget = React.useCallback(
+        (draggedNode: Node) => {
+            const forbidden = getDescendantIds(draggedNode.id);
+            const intersections = getIntersectingNodes(draggedNode);
+
+            const valid = intersections.find(
+                (node) => node.id !== draggedNode.id && !forbidden.has(node.id)
+            );
+            if (valid) return { target: valid, valid: true as const };
+
+            const invalid = intersections.find((node) => node.id !== draggedNode.id);
+            return invalid ? { target: invalid, valid: false as const } : null;
+        },
+        [getIntersectingNodes, getDescendantIds]
+    );
+
+    const highlight = React.useCallback(
+        (targetId: string | null, valid: boolean) => {
+            setNodes((current) =>
+                current.map((node) => {
+                    const isDropTarget = valid && node.id === targetId;
+                    const isInvalidDropTarget = !valid && node.id === targetId;
+
+                    if (
+                        !!node.data.isDropTarget === isDropTarget &&
+                        !!node.data.isInvalidDropTarget === isInvalidDropTarget
+                    ) {
+                        return node;
+                    }
+
+                    return { ...node, data: { ...node.data, isDropTarget, isInvalidDropTarget } };
+                })
+            );
+        },
+        [setNodes]
+    );
+
+    const onNodeDrag = React.useCallback(
+        (_: MouseEvent | TouchEvent, node: Node) => {
+            const hit = findDropTarget(node);
+            highlight(hit?.target.id ?? null, hit?.valid ?? false);
+        },
+        [findDropTarget, highlight]
+    );
+
+    const onNodeDragStop = React.useCallback(
+        async (_: MouseEvent | TouchEvent, node: Node) => {
+            const hit = findDropTarget(node);
+            highlight(null, false);
+
+            // بدون هدف صالح أو نفس الأب الحالي → رجّع التخطيط كما هو
+            if (!hit?.valid || String((node.data as DepartmentNodeData).parent_id ?? '') === hit.target.id) {
+                setNodes(initialNodes);
+                return;
+            }
+
+            const newParentId = Number(hit.target.id);
+
+            setIsSaving(true);
+            const result = await updateDepartment(node.id, {
+                name: {
+                    en: (node.data as DepartmentNodeData).name?.en ?? '',
+                    ar: (node.data as DepartmentNodeData).name?.ar ?? '',
+                },
+                parent_id: newParentId,
+                branch_id: (node.data as DepartmentNodeData).branch_id ?? (node.data as DepartmentNodeData).branch?.id ?? null,
+                manager_id: (node.data as DepartmentNodeData).manager_id ?? (node.data as DepartmentNodeData).manager?.id ?? null,
+            });
+            setIsSaving(false);
+
+            if (!result.success) {
+                toast.error(result.error);
+                setNodes(initialNodes);
+                return;
+            }
+
+            toast.success(result.data.message);
+            router.refresh();
+        },
+        [findDropTarget, highlight, initialNodes, setNodes, router]
+    );
+
     return (
-        <Card className="w-full h-screen bg-background rounded-lg overflow-hidden">
+        <Card className="w-full h-screen bg-background rounded-lg overflow-hidden relative">
+            {isSaving && (
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 rounded-md bg-background border border-border shadow-sm px-3 py-1.5 text-xs text-muted-foreground">
+                    {t('messages.saving', { defaultValue: 'جاري الحفظ...' })}
+                </div>
+            )}
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                onNodeDrag={onNodeDrag}
+                onNodeDragStop={onNodeDragStop}
                 nodeTypes={nodeTypes}
                 fitView
-                nodesDraggable={false}
+                nodesDraggable
                 nodesConnectable={false}
             >
                 <Controls />
                 <Background color="var(--border)" gap={25} size={1} />
             </ReactFlow>
         </Card>
+    );
+}
+
+export default function OrgChart({ departments = [] }: { departments?: DepartmentResource[] }) {
+    return (
+        <ReactFlowProvider>
+            <OrgChartFlow departments={departments} />
+        </ReactFlowProvider>
     );
 }
