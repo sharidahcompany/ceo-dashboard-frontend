@@ -96,6 +96,32 @@ export async function getActiveTenantId(): Promise<string | null> {
 }
 
 /**
+ * Make sure the "tenant" cookie exists so api.ts can send X-Tenant on every
+ * request. A user arriving straight from the external subscriptions app after
+ * creating a tenant lands here without the `?tenant=` param, and without the
+ * cookie every tenant-scoped call would go out unscoped. /auth/me already
+ * filters `tenants` to memberships the dashboard is for, so the first entry is
+ * a safe default.
+ *
+ * Returns the tenant id it settled on, and whether it had to write the cookie.
+ */
+export async function ensureActiveTenant(): Promise<{
+  tenantId: string | null;
+  changed: boolean;
+}> {
+  const cookieStore = await cookies();
+  const existing = cookieStore.get("tenant")?.value;
+  if (existing) return { tenantId: existing, changed: false };
+
+  const userRes = await getAuthenticatedUser();
+  const tenantId = userRes.success ? userRes.data.tenants?.[0]?.id : undefined;
+  if (!tenantId) return { tenantId: null, changed: false };
+
+  cookieStore.set("tenant", String(tenantId), { path: "/", sameSite: "lax" });
+  return { tenantId: String(tenantId), changed: true };
+}
+
+/**
  * Switch the active tenant by rewriting the "tenant" cookie that api.ts turns
  * into the X-Tenant header. Every cached page/query is tenant-scoped, so the
  * whole router cache is invalidated afterwards.

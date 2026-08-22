@@ -15,6 +15,7 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { routes } from "@/app/routes";
 import DynamicIcon from "../common/DynamicIcon";
 import { getAuthenticatedUser, logout } from "@/actions/workspace/user.actions";
+import { ensureActiveTenant } from "@/actions/workspace/organization.actions";
 import { useAppStore } from "@/providers/StoreProvider";
 import React from "react";
 import { isAxiosError } from "axios";
@@ -39,6 +40,14 @@ export default function Navbar() {
 
   React.useEffect(() => {
     const fetchUser = async () => {
+      // Settle the active tenant first: /auth/me scopes tenant_role by the
+      // X-Tenant header, which api.ts only sends once the cookie exists.
+      const { changed } = await ensureActiveTenant();
+      if (changed) {
+        window.location.reload();
+        return;
+      }
+
       const result = await getAuthenticatedUser();
       if (result.success) {
         setUserStore(result.data);
