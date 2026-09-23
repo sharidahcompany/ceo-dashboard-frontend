@@ -7,6 +7,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useTranslations } from "next-intl";
 import TenantSwitcher from "./TenantSwitcher";
+import PaymentsNavigationLinks from "./PaymentsNavigationLinks";
 import { useAbility, useIsSuperAdmin } from "@/providers/AbilityProvider";
 
 export default function Sidebar() {
@@ -53,6 +54,7 @@ export default function Sidebar() {
         })}
       </div>
 
+      <PaymentsNavigationLinks />
       <TenantSwitcher />
     </div>
   );

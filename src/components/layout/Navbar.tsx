@@ -84,7 +84,17 @@ export default function Navbar() {
         {currentService?.icon && (
           <DynamicIcon name={currentService.icon} size={20} />
         )}
-        {currentService?.title && t(currentService.title)}
+        {pathname === "/payments"
+              ? locale === "ar"
+                ? "مدفوعات منشآتي"
+                : "My Business Payments"
+              : pathname === "/platform/payments"
+                ? locale === "ar"
+                  ? "إدارة مدفوعات المنصة"
+                  : "Platform Payments Administration"
+                : currentService?.title
+                  ? t(currentService.title)
+                  : null}
       </div>
 
       <div dir={isRtl ? "rtl" : "ltr"}>
