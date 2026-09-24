@@ -58,7 +58,9 @@ export default function TenantSwitcher() {
   }, []);
 
   const activeTenant =
-    tenants.find((tenant) => tenant.id === activeId) ?? tenants[0] ?? null;
+    tenants.find(
+      (tenant) => tenant.id === activeId
+    ) ?? null;
 
   async function handleSelect(tenantId: string) {
     if (tenantId === activeTenant?.id) return;

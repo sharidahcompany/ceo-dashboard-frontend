@@ -1,4 +1,5 @@
 "use server";
+import { cookies } from "next/headers";
 
 import { randomBytes } from "crypto";
 import api from "@/lib/api";
@@ -22,6 +23,24 @@ export interface UserResource {
   // present when the request is scoped to a tenant (X-Tenant header): this
   // user's role within that specific tenant (employee, owner, super-admin)
   tenant_role?: string | null;
+
+  active_tenant?: {
+    membership_id?: string;
+    membership_public_id?: string;
+    membership_type?: string;
+    status?: string;
+    roles?: string[];
+    permissions?: string[];
+    scopes?: Record<string, any>[];
+    tenant?: {
+      id: string;
+      public_id?: string;
+      name?: Record<string, string> | string;
+    };
+  } | null;
+
+  requires_tenant_selection?: boolean;
+  selection_source?: string | null;
   // workspace-scoped: a user can be allowed into more than one branch, but
   // holds exactly one department and one position (see department/position
   // below).
@@ -327,6 +346,11 @@ export async function getAuthenticatedUser(): Promise<ActionResponse<UserResourc
 export async function logout(): Promise<ActionResponse<void>> {
   try {
     await api.get("/auth/logout");
+
+    const cookieStore = await cookies();
+    cookieStore.delete("auth_token");
+    cookieStore.delete("tenant");
+
     return { success: true, data: undefined };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

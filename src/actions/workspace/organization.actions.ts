@@ -47,15 +47,26 @@ export interface SubscriptionResource {
  * authenticated user's tenant has to be resolved first via /auth/me.
  */
 async function getCurrentTenantId(): Promise<string | null> {
-  // A user can belong to several tenants; the one they switched to is kept in
-  // the "tenant" cookie (also what api.ts sends as X-Tenant), so it wins over
-  // the first membership returned by /auth/me.
-  const cookieTenant = (await cookies()).get("tenant")?.value;
-  if (cookieTenant) return cookieTenant;
+  const cookieTenant =
+    (await cookies()).get("tenant")?.value;
 
-  const userRes = await getAuthenticatedUser();
-  const tenantId = userRes.success ? userRes.data.tenants?.[0]?.id : undefined;
-  return tenantId ? String(tenantId) : null;
+  if (cookieTenant) {
+    return cookieTenant;
+  }
+
+  const userRes =
+    await getAuthenticatedUser();
+
+  if (!userRes.success) {
+    return null;
+  }
+
+  const tenantId =
+    userRes.data.active_tenant?.tenant?.id;
+
+  return tenantId
+    ? String(tenantId)
+    : null;
 }
 
 export interface TenantSummary {
@@ -96,29 +107,68 @@ export async function getActiveTenantId(): Promise<string | null> {
 }
 
 /**
- * Make sure the "tenant" cookie exists so api.ts can send X-Tenant on every
- * request. A user arriving straight from the external subscriptions app after
- * creating a tenant lands here without the `?tenant=` param, and without the
- * cookie every tenant-scoped call would go out unscoped. /auth/me already
- * filters `tenants` to memberships the dashboard is for, so the first entry is
- * a safe default.
+ * Keep the legacy "tenant" cookie synchronized with the canonical active tenant
+ * returned by the authentication session.
  *
- * Returns the tenant id it settled on, and whether it had to write the cookie.
+ * No tenant is inferred from list order. When the backend has no active tenant,
+ * the legacy cookie is removed and tenant-scoped requests remain unselected.
+ *
+ * Returns the active tenant id, and whether it had to write the cookie.
  */
 export async function ensureActiveTenant(): Promise<{
   tenantId: string | null;
   changed: boolean;
 }> {
   const cookieStore = await cookies();
-  const existing = cookieStore.get("tenant")?.value;
-  if (existing) return { tenantId: existing, changed: false };
 
-  const userRes = await getAuthenticatedUser();
-  const tenantId = userRes.success ? userRes.data.tenants?.[0]?.id : undefined;
-  if (!tenantId) return { tenantId: null, changed: false };
+  const userRes =
+    await getAuthenticatedUser();
 
-  cookieStore.set("tenant", String(tenantId), { path: "/", sameSite: "lax" });
-  return { tenantId: String(tenantId), changed: true };
+  if (!userRes.success) {
+    return {
+      tenantId: null,
+      changed: false,
+    };
+  }
+
+  const activeTenantId =
+    userRes.data.active_tenant?.tenant?.id;
+
+  if (!activeTenantId) {
+    cookieStore.delete("tenant");
+
+    return {
+      tenantId: null,
+      changed: false,
+    };
+  }
+
+  const resolvedTenantId =
+    String(activeTenantId);
+
+  const existing =
+    cookieStore.get("tenant")?.value;
+
+  if (existing === resolvedTenantId) {
+    return {
+      tenantId: resolvedTenantId,
+      changed: false,
+    };
+  }
+
+  cookieStore.set(
+    "tenant",
+    resolvedTenantId,
+    {
+      path: "/",
+      sameSite: "lax",
+    }
+  );
+
+  return {
+    tenantId: resolvedTenantId,
+    changed: true,
+  };
 }
 
 /**
@@ -130,27 +180,83 @@ export async function switchTenant(
   tenantId: string,
 ): Promise<ActionResponse<void>> {
   try {
-    const userRes = await getAuthenticatedUser();
-    if (!userRes.success) return { success: false, error: userRes.error };
+    const userRes =
+      await getAuthenticatedUser();
 
-    const isMember = (userRes.data.tenants ?? []).some(
-      (tenant) => String(tenant.id) === String(tenantId),
-    );
-    if (!isMember) {
+    if (!userRes.success) {
       return {
         success: false,
-        error: getErrorMessage(undefined, "You don't belong to this tenant."),
+        error: userRes.error,
       };
     }
 
-    (await cookies()).set("tenant", String(tenantId), {
-      path: "/",
-      sameSite: "lax",
-    });
+    const selectedTenant =
+      (userRes.data.tenants ?? []).find(
+        (tenant) =>
+          String(tenant.id) === String(tenantId)
+      );
+
+    const tenantPublicId =
+      selectedTenant?.public_id;
+
+    if (!tenantPublicId) {
+      return {
+        success: false,
+        error: getErrorMessage(
+          undefined,
+          "The tenant public identifier is unavailable."
+        ),
+      };
+    }
+
+    /*
+     * The public API contract uses only the immutable TEN-* identifier.
+     * The backend resolves the internal UUID and validates the V2 membership.
+     */
+    const response =
+      await api.post(
+        "/auth/session/tenant",
+        {
+          tenant_public_id: tenantPublicId,
+        }
+      );
+
+    const activeTenantId =
+      response.data?.data
+        ?.active_tenant
+        ?.tenant
+        ?.id;
+
+    if (!activeTenantId) {
+      return {
+        success: false,
+        error: getErrorMessage(
+          undefined,
+          "The tenant selection was not accepted."
+        ),
+      };
+    }
+
+    (await cookies()).set(
+      "tenant",
+      String(activeTenantId),
+      {
+        path: "/",
+        sameSite: "lax",
+      }
+    );
+
     revalidatePath("/", "layout");
-    return { success: true, data: undefined };
+
+    return {
+      success: true,
+      data: undefined,
+    };
   } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
+    return {
+      success: false,
+      error: getErrorMessage(error),
+    };
   }
 }
 
