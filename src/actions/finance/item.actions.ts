@@ -8,9 +8,13 @@ import { revalidatePath } from "next/cache";
 import { WarehouseResource } from "./warehouse.actions";
 import { AccountResource } from "./account.actions";
 
+// CEO_CATALOG_CATEGORY_RESPONSE_20261009
 export interface ItemResource {
+    catalog_category_ids?: number[];
     id: number;
     image: string | null;
+    legal_entity_id: number;
+    catalog_type: "physical" | "service" | "digital" | "supply" | "asset" | "bundle";
     sku: string | null;
     name: Record<string, string>;
     name_localized: string | null;

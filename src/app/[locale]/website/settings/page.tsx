@@ -7,9 +7,10 @@ import { getAuthenticatedUser } from "@/actions/workspace/user.actions";
 export default async function WebsiteSettingPage() {
     const t = await getTranslations();
     const userResult = await getAuthenticatedUser();
-    const tenantId = userResult.success && userResult.data?.tenants?.[0]?.id 
-        ? userResult.data.tenants[0].id 
-        : 1; // Default or fallback tenant ID
+    const tenantId =
+    userResult.success
+        ? userResult.data?.active_tenant?.tenant?.id
+        : undefined;
 
     return (
         <div className="space-y-6">
@@ -23,7 +24,9 @@ export default async function WebsiteSettingPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <DomainSettingForm tenantId={tenantId} />
+                    {tenantId ? (
+                        <DomainSettingForm tenantId={tenantId} />
+                    ) : null}
                 </CardContent>
             </Card>
 

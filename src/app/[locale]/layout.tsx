@@ -10,6 +10,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import Navbar from "@/components/layout/Navbar";
 import Tabbar from "@/components/layout/Tabbar";
 import GlobalBreadcrumb from "@/components/layout/GlobalBreadcrumb";
+import SubscriptionBanner from "@/components/layout/SubscriptionBanner";
 import Providers from "@/providers/Providers";
 import { TextDirection } from "@base-ui/react";
 import { getMessages } from "next-intl/server";
@@ -64,6 +65,7 @@ export default async function Layout({ children, params }: Props) {
 
             <div className="flex-1 ms-16 flex flex-col min-h-screen min-w-0">
               <Navbar />
+              <SubscriptionBanner locale={locale} />
               <Tabbar />
               <GlobalBreadcrumb />
               <main className="flex-1 p-5">{children}</main>

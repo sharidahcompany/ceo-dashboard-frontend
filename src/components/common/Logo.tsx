@@ -18,7 +18,7 @@ export default function Logo() {
 
       <div className="hidden dark:block">
         <Image
-          src="/images/logo.webp"
+          src="/images/logo-dark.png"
           alt="logo"
           width={100}
           height={100}

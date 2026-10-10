@@ -709,6 +709,50 @@ export const routes: Route[] = [
       },
     ],
   },
+
+  {
+    path: "/governance",
+    title: "routes.governance",
+    icon: "Landmark",
+    children: [
+      {
+        path: "bodies",
+        title: "routes.governance_bodies",
+        icon: "Building2",
+        permission: "workspace.governance_body.view",
+      },
+      {
+        path: "meetings",
+        title: "routes.governance_meetings",
+        icon: "CalendarCheck2",
+        permission: "workspace.governance_meeting.view",
+      },
+      {
+        path: "elections",
+        title: "routes.governance_elections",
+        icon: "Vote",
+        permission: "workspace.governance_election.view",
+      },
+      {
+        path: "approvals",
+        title: "routes.enterprise_approvals",
+        icon: "BadgeCheck",
+        permission: "workspace.enterprise_approval.view",
+      },
+      {
+        path: "transitions",
+        title: "routes.governance_transitions",
+        icon: "ArrowLeftRight",
+        permission: "workspace.governance_transition.view",
+      },
+      {
+        path: "championship",
+        title: "routes.ceo_championship",
+        icon: "Trophy",
+        permission: "workspace.ceo_championship.view",
+      },
+    ],
+  },
   {
     path: "/cars",
     title: "routes.cars",

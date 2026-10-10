@@ -30,6 +30,22 @@ export interface OrganizationResource {
   updated_at?: string;
 }
 
+export interface SubscriptionInteractionResource {
+  tenant_id: string;
+  state: "UNMANAGED" | "ACTIVE" | "GRACE" | "READ_ONLY" | string;
+  read_allowed: boolean;
+  write_allowed: boolean;
+  warning: boolean;
+  subscription_ends_at?: string | null;
+  grace_ends_at?: string | null;
+  presentation?: {
+    severity: "warning" | "blocking" | string;
+    message_ar: string;
+    message_en: string;
+    action: "renew_subscription" | string;
+  } | null;
+}
+
 export interface SubscriptionResource {
   id: string | number;
   status: "active" | "trialing" | "past_due" | "canceled" | "expired" | string;
@@ -294,6 +310,26 @@ export async function getCurrentOrganization(): Promise<
   }
 
   return getOrganizationById(tenantId);
+}
+
+export async function getCurrentSubscriptionInteraction(): Promise<
+  ActionResponse<SubscriptionInteractionResource>
+> {
+  try {
+    const response = await api.get(
+      "/auth/subscription-interaction",
+    );
+
+    return {
+      success: true,
+      data: response.data.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: getErrorMessage(error),
+    };
+  }
 }
 
 /**
