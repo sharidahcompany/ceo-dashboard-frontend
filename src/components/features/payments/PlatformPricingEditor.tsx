@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  savePlatformPricingDraft,
+  type SavePricingDraftResult,
+} from "@/actions/payments/platform-pricing.actions";
 import { Link } from "@/i18n/navigation";
 import {
   ArrowRight,
@@ -68,6 +72,12 @@ export default function PlatformPricingEditor() {
   const [issuedShares, setIssuedShares] = useState(1000000);
   const [listed, setListed] = useState(false);
   const [annual, setAnnual] = useState(true);
+  const [version, setVersion] = useState("");
+  const [effectiveFrom, setEffectiveFrom] = useState("");
+  const [effectiveUntil, setEffectiveUntil] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveResult, setSaveResult] =
+    useState<SavePricingDraftResult | null>(null);
 
   const fields: {
     key: keyof Rates;
@@ -169,6 +179,57 @@ export default function PlatformPricingEditor() {
     setRates((previous) => ({ ...previous, [key]: value }));
   };
 
+  const saveDraft = async () => {
+    if (saving || !valid) return;
+
+    const name = version.trim();
+    const from = `${effectiveFrom}T00:00:00Z`;
+    const until = `${effectiveUntil}T00:00:00Z`;
+    const basisPoints = rates.annual_discount_percent * 100;
+
+    if (
+      !/^[A-Za-z0-9_-]{1,64}$/.test(name) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(effectiveFrom) ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(effectiveUntil) ||
+      !Number.isFinite(Date.parse(from)) ||
+      !Number.isFinite(Date.parse(until)) ||
+      Date.parse(from) >= Date.parse(until) ||
+      !Number.isSafeInteger(basisPoints)
+    ) {
+      setSaveResult({ success: false, error: "invalid" });
+      return;
+    }
+
+    setSaving(true);
+    setSaveResult(null);
+
+    try {
+      const result = await savePlatformPricingDraft({
+        version: name,
+        effective_from: from,
+        effective_until: until,
+        currency: "USD",
+        base_monthly_minor: rates.base_monthly_minor,
+        rightsholder_monthly_minor: rates.rightsholder_monthly_minor,
+        listed_million_shares_monthly_minor:
+          rates.listed_million_shares_monthly_minor,
+        investment_unit_monthly_minor: rates.investment_unit_monthly_minor,
+        operational_seat_tiers: tiers.map((tier) => ({
+          min: tier.min,
+          max: tier.max,
+          unit_monthly_minor: tier.unit_monthly_minor,
+        })),
+        annual_discount_basis_points: basisPoints,
+      });
+
+      setSaveResult(result);
+    } catch {
+      setSaveResult({ success: false, error: "upstream" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const reset = () => {
     setRates({ ...defaultRates });
     setTiers(defaultTiers.map((tier) => ({ ...tier })));
@@ -177,6 +238,10 @@ export default function PlatformPricingEditor() {
     setIssuedShares(1000000);
     setListed(false);
     setAnnual(true);
+    setVersion("");
+    setEffectiveFrom("");
+    setEffectiveUntil("");
+    setSaveResult(null);
   };
 
   return (
@@ -211,11 +276,10 @@ export default function PlatformPricingEditor() {
           <div className="space-y-1">
             <p className="font-semibold">وضع المعاينة الآمنة</p>
             <p className="text-sm leading-7 text-muted-foreground">
-              القيم أدناه للمعاينة والتحرير داخل المتصفح فقط. لا
-              تُحفظ في الكتالوج، ولا تُصدر فواتير أو عروض أسعار، ولا
-              تؤثر في المشتركين الحاليين. الخصم السنوي القابل للتعديل
-              ينتظر عقد كتالوج جديدًا قبل الحفظ والاعتماد.
-            </p>
+                يمكن تعديل الأسعار ومعاينتها، ثم حفظ نسخة V2
+                كمسودة عند تفعيل الربط المصرح به. الحفظ لا يعتمد
+                الأسعار أو ينشرها ولا يؤثر في الاشتراكات القائمة.
+              </p>
           </div>
         </div>
       </section>
@@ -417,10 +481,94 @@ export default function PlatformPricingEditor() {
               حالة الحوكمة
             </div>
             <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              حفظ المسودة، إرسالها للمراجعة، اعتمادها، ونشرها
-              غير متاحة من هذه النسخة حتى يكتمل ربط API
-              وعقد الخصم السنوي القابل للإصدار.
-            </p>
+                حفظ المسودة عملية منفصلة عن المراجعة والاعتماد
+                والنشر. هذه النسخة لا تتيح اعتماد الأسعار أو
+                تطبيقها على فواتير المشتركين.
+              </p>
+            <div className="mt-5 space-y-3">
+              <p className="text-sm font-medium">
+                إعداد مسودة V2 — الحفظ لا يعني الاعتماد أو النشر
+              </p>
+
+              <label className="block space-y-1 text-sm">
+                <span>رقم إصدار الأسعار</span>
+                <input
+                  type="text"
+                  dir="ltr"
+                  maxLength={64}
+                  autoComplete="off"
+                  value={version}
+                  onChange={(e) => {
+                    setVersion(e.target.value);
+                    setSaveResult(null);
+                  }}
+                  placeholder="PRICING_2026_V2_001"
+                  className="w-full rounded-lg border bg-background px-3 py-2.5"
+                />
+              </label>
+
+              <label className="block space-y-1 text-sm">
+                <span>بداية السريان UTC</span>
+                <input
+                  type="date"
+                  value={effectiveFrom}
+                  onChange={(e) => {
+                    setEffectiveFrom(e.target.value);
+                    setSaveResult(null);
+                  }}
+                  className="w-full rounded-lg border bg-background px-3 py-2.5"
+                />
+              </label>
+
+              <label className="block space-y-1 text-sm">
+                <span>نهاية السريان UTC — غير شاملة</span>
+                <input
+                  type="date"
+                  value={effectiveUntil}
+                  onChange={(e) => {
+                    setEffectiveUntil(e.target.value);
+                    setSaveResult(null);
+                  }}
+                  className="w-full rounded-lg border bg-background px-3 py-2.5"
+                />
+              </label>
+
+              <button
+                type="button"
+                onClick={saveDraft}
+                disabled={
+                  saving || !valid || !version.trim() ||
+                  !effectiveFrom || !effectiveUntil ||
+                  effectiveFrom >= effectiveUntil
+                }
+                className="w-full rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground disabled:opacity-50"
+              >
+                {saving ? "جارٍ حفظ المسودة..." : "حفظ مسودة أسعار V2"}
+              </button>
+
+              {saveResult?.success === true && (
+                <div role="status" className="rounded-lg border p-3 text-sm">
+                  <p>تم حفظ المسودة — دون اعتماد أو نشر.</p>
+                  <p dir="ltr" className="break-all">
+                    {saveResult.publicId}
+                  </p>
+                  <p>الإصدار: {saveResult.version}</p>
+                </div>
+              )}
+
+              {saveResult?.success === false && (
+                <p role="alert" className="rounded-lg border p-3 text-sm">
+                  {({
+                    unavailable: "خدمة الحفظ غير مفعلة.",
+                    unauthenticated: "يجب تسجيل الدخول.",
+                    forbidden: "ليس لديك صلاحية إدارة الأسعار.",
+                    invalid: "تحقق من الإصدار والتواريخ والأسعار.",
+                    conflict: "رقم الإصدار موجود مسبقًا.",
+                    upstream: "تعذر الاتصال بخدمة الحفظ.",
+                  } as const)[saveResult.error]}
+                </p>
+              )}
+            </div>
             <button
               type="button"
               onClick={reset}
