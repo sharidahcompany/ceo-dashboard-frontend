@@ -1,0 +1,66 @@
+"use server";
+
+// A57-G04.12-F8-R1
+// Fail-closed server action. No network or database writes.
+
+export interface CreateMarketingCampaignInput {
+  legal_entity_id: number;
+  catalog_id: number;
+  selection_mode: "specific" | "all";
+  item_ids?: number[];
+  campaign_code: string;
+  name: string;
+  objective: string;
+}
+
+export type CreateMarketingCampaignResult =
+  | { success: true; campaignId: string }
+  | { success: false; error: string };
+
+export async function createMarketingCampaign(
+  input: CreateMarketingCampaignInput,
+): Promise<CreateMarketingCampaignResult> {
+  if (
+    !Number.isSafeInteger(input.legal_entity_id) ||
+    input.legal_entity_id < 1 ||
+    !Number.isSafeInteger(input.catalog_id) ||
+    input.catalog_id < 1
+  ) {
+    return { success: false, error: "نطاق الكتالوج غير صالح." };
+  }
+
+  if (input.selection_mode !== "specific" &&
+      input.selection_mode !== "all") {
+    return { success: false, error: "طريقة اختيار غير صالحة." };
+  }
+
+  if (input.selection_mode === "specific" &&
+      (!Array.isArray(input.item_ids) ||
+       input.item_ids.length === 0 ||
+       !input.item_ids.every(
+         (id) => Number.isSafeInteger(id) && id > 0
+       ))) {
+    return { success: false, error: "حدد منتجات صحيحة." };
+  }
+
+  if (input.selection_mode === "all" &&
+      input.item_ids !== undefined) {
+    return { success: false, error: "قائمة المنتجات غير مسموحة." };
+  }
+
+  if (
+    typeof input.campaign_code !== "string" ||
+    typeof input.name !== "string" ||
+    typeof input.objective !== "string" ||
+    !input.campaign_code.trim() ||
+    !input.name.trim() ||
+    !input.objective.trim()
+  ) {
+    return { success: false, error: "بيانات الحملة غير مكتملة." };
+  }
+
+  return {
+    success: false,
+    error: "إنشاء الحملات غير مفعل حتى اعتماد الربط الآمن.",
+  };
+}
